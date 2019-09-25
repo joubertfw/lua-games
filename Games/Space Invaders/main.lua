@@ -1,4 +1,5 @@
 Shoot = {x = 0, y = 0}
+Enemy = {x = 0, y = 0}
 
 function Shoot:new (o)
     o = o or {}
@@ -15,8 +16,6 @@ function Shoot:update ()
     self.y = self.y - 12
 end
 
-Enemy = {x = 0, y = 0}
-
 function Enemy:new (o)
     o = o or {}
     setmetatable(o, self)
@@ -31,10 +30,10 @@ end
 function Enemy:update (move)
     if move == true then
         self.x = self.x + 0.5
-        self.y = self.y + 0.05
+        self.y = self.y + 0.08
     else
         self.x = self.x - 0.5
-        self.y = self.y + 0.05
+        self.y = self.y + 0.08
     end
 end
 
@@ -42,10 +41,21 @@ function generateEnemies(line, row)
     enemies = {}
     for i = 1, row do
       for j = 1, line do
-        table.insert(enemies, Enemy:new{enemySprite = love.graphics.newImage("/Assets/enemy.png"), x = (love.graphics.getWidth()/2 - 350) + i * 40, y = j * 40})
+        table.insert(enemies, Enemy:new{enemySprite = love.graphics.newImage("/Assets/enemy.png"), x = (love.graphics.getWidth()/2 - 350) + i * 40, y = j * 40, width = 32, height = 14})
       end
     end
     return enemies
+end
+
+function isInside(point, retangle)
+    return point >= retangle.x0 and point <= retangle.x1 and point >= retangle.y0 and point <= retangle.y1
+end
+
+-- ponto = (x,y)
+function isColiding(objA, objB)
+    coordA = {objA.x, objA.y, objA.x + objA.width, objA.y + objA.height}
+    coordB = {objB.x, objB.y, objB.x + objB.width, objB.y + objB.height}
+    return isInside(coordA[1], coordB) or isInside(coordA[2], coordB) or isInside(coordA[3], coordB) or isInside(coordA[4], coordB)
 end
 
 function love.load()
@@ -86,7 +96,7 @@ function love.update(dt)
 
 
     if love.keyboard.isDown("space") and tShoot > 0.3 then
-        table.insert(shoots, Shoot:new{shootSprite = love.graphics.newImage("/Assets/shoot.png"), x = ship.x, y = ship.y - 26})
+        table.insert(shoots, Shoot:new{shootSprite = love.graphics.newImage("/Assets/shoot.png"), x = ship.x + ship.width/2 - 2, y = ship.y - 16, width = 4, height = 28})
         tShoot = 0
     end
 
@@ -130,7 +140,8 @@ function love.draw()
     love.graphics.draw(ship.sprite, ship.x, ship.y)
     love.graphics.print("Aceleracao: "..ship.acelX, 100, 100)
     love.graphics.print("Velocidade: "..ship.velX, 100, 115)
+    love.graphics.print("teste", 100, 150)
     --love.graphics.print("Taxa: " .. 1/delta_t .. "fps", 100, 100)
-
+    --isInside(point = 0)
     
 end
