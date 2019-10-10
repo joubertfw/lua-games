@@ -13,7 +13,7 @@ function Shoot:draw ()
 end
 
 function Shoot:update ()
-    self.y = self.y - 12
+    self.y = self.y - 3
 end
 
 function Enemy:new (o)
@@ -41,22 +41,43 @@ function generateEnemies(line, row)
     enemies = {}
     for i = 1, row do
       for j = 1, line do
-        table.insert(enemies, Enemy:new{enemySprite = love.graphics.newImage("/Assets/enemy.png"), x = (love.graphics.getWidth()/2 - 350) + i * 40, y = j * 40, width = 32, height = 14})
+        table.insert(enemies, Enemy:new{enemySprite = love.graphics.newImage("/Assets/enemy.png"), x = (love.graphics.getWidth()/2 - 350) + i * 40, y = j * 40, width = 32, height = 14, delete = false})
       end
     end
     return enemies
 end
 
-function isInside(point, retangle)
-    return point >= retangle.x0 and point <= retangle.x1 and point >= retangle.y0 and point <= retangle.y1
+function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
+    return x1 < x2 + w2 and x2 < x1 + 1 and y1 < y2 + h2 and y2 < y1 + h1
+  end
+
+function isColiding(objA, objB)
+    v = CheckCollision(objA.x, objA.y, objA.width, objA.height, objB.x, objB.y, objB.width, objB.height)
+    if (v == true )then
+        return "TRUE"
+    else
+        return "FALSE"
+    end
 end
 
--- ponto = (x,y)
-function isColiding(objA, objB)
-    coordA = {objA.x, objA.y, objA.x + objA.width, objA.y + objA.height}
-    coordB = {objB.x, objB.y, objB.x + objB.width, objB.y + objB.height}
-    return isInside(coordA[1], coordB) or isInside(coordA[2], coordB) or isInside(coordA[3], coordB) or isInside(coordA[4], coordB)
+function ArrayRemove(t)
+    local j, n = 1, #t;
+
+    for i = 1,n do
+        if (t[i].delete == false) then
+            if (i ~= j) then
+                t[j] = t[i];
+                t[i] = nil;
+            end
+            j = j + 1;
+        else
+            t[i] = nil;
+        end
+    end
+
+    return t;
 end
+
 
 function love.load()
     ship = {
@@ -75,6 +96,8 @@ function love.load()
     enemies = generateEnemies(5, 15)
     tShoot = 0.3
     tEnemy = 0
+    printShot = {}
+    printEnemy = {}
     moveDirection = true
 end
 
@@ -94,20 +117,29 @@ function love.update(dt)
         moveDirection = not moveDirection
     end
 
-
     if love.keyboard.isDown("space") and tShoot > 0.3 then
-        table.insert(shoots, Shoot:new{shootSprite = love.graphics.newImage("/Assets/shoot.png"), x = ship.x + ship.width/2 - 2, y = ship.y - 16, width = 4, height = 28})
+        table.insert(shoots, Shoot:new{shootSprite = love.graphics.newImage("/Assets/shoot.png"), x = ship.x + ship.width/2 - 2, y = ship.y - 16, width = 4, height = 28, delete = false})
         tShoot = 0
     end
 
     -- atualizar lista de tiros
-    for i, shoot in ipairs(shoots) do
-        shoot:update()
+    for i = 1,#shoots do
+    -- for i, shoot in ipairs(shoots) do
+        shoots[i]:update()
+        printShot = shoots[i].x
+        for i = 1,#enemies do
+            printEnemy = enemies[i].x
+            printShoots[i] = isColiding(enemies[i], shoots)[i]
+        end
     end
+
+    -- shoots = ArrayRemove(shoots)
+    -- enemies = ArrayRemove(enemies)
 
     -- atualizar lista de inimigos
     for i, enemy in ipairs(enemies) do
         enemy:update(moveDirection)
+        -- printEnemy = enemy.x
     end
 
     if love.keyboard.isDown("down") and not love.keyboard.isDown("up") then
@@ -127,6 +159,7 @@ function love.update(dt)
 end
 
 function love.draw()
+
     -- desenhar lista de tiros
     for i, shoot in ipairs(shoots) do
         shoot:draw()
@@ -140,7 +173,13 @@ function love.draw()
     love.graphics.draw(ship.sprite, ship.x, ship.y)
     love.graphics.print("Aceleracao: "..ship.acelX, 100, 100)
     love.graphics.print("Velocidade: "..ship.velX, 100, 115)
-    love.graphics.print("teste", 100, 150)
+    love.graphics.print(printShot, 100, 150)
+    love.graphics.print(printEnemy, 100, 170)
+    --[[if isInside({x = 4, y = 4}, {x0 = 0, y0 = 0, x1 = 4, y1 = 4}) then
+        love.graphics.print("TRUE", 100, 150)
+    else
+        love.graphics.print("FALSE", 100, 150)
+    end]]--
     --love.graphics.print("Taxa: " .. 1/delta_t .. "fps", 100, 100)
     --isInside(point = 0)
     
