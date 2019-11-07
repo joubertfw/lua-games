@@ -1,10 +1,11 @@
 HitBox = Object:extend()
 
-function HitBox:new(x, y, width, height)
+function HitBox:new(x, y, width, height, type)
     self.x = x
     self.y = y
     self.width = width
     self.height = height
+    self.type = 0       -- 0 = hitbox, 1 = hurtbox
 end
 
 function HitBox:update(x, y, width, height)

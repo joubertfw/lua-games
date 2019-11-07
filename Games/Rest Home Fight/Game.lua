@@ -8,17 +8,18 @@ function Game:new()
     util = Util()
 
     background = love.graphics.newImage("assets/image/background.png")
-    font = love.graphics.newFont(pathToFontFile, 30)
+    font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
     love.graphics.setFont(font)
     menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
     ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
+    roundTimer = 80
     
     menu = MenuScreen(
-        xOptions, yOptions, 
+        0, 0, 
         {'Start Game 1P','Start Game 2P', 'Exit'}, 
-        love.graphics.newFont(pathToFontFile),
-        love.graphics.newImage(pathToMenuImg),
-        xImg, yImg
+        'assets/fonts/vcr.ttf',
+        'assets/image/background.png',
+        0, 0
     )
     state = 'menu'
     --[[
@@ -28,6 +29,9 @@ function Game:new()
     player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue', "a", "d", "w", "s", "space")
     score = 0
     ]]
+    players = {
+        player = Player(screenWidth/2, screenHeight/2, 'assets/image/playerBlue/player.png'),
+    }
     dtEnemies = 2
     enemies = {}
 end
@@ -40,17 +44,20 @@ function Game:update(dt)
             love.event.quit()
         elseif menu:getSelected() == 1 then
             --begin game
+            state = 'ingame'
             menuTrack:stop()
-            ingameTrack:play()
+            --ingameTrack:play()
         end
     elseif state == 'ingame' then
+        for i, player in pairs(players) do 
+            player:update(dt)
+        end
 
     elseif state == 'gameWon' then
 
     elseif state == 'gameLost' then
 
     end
-    
 end
 
 function Game:draw()
@@ -61,9 +68,9 @@ function Game:draw()
         for i, player in pairs(players) do 
             player:draw()
         end
-        for i, enemie in pairs(enemies) do
-            enemie:draw(dt)
-        end
+        -- for i, enemie in pairs(enemies) do
+        --     enemie:draw(dt)
+        -- end
     elseif state == 'gameWon' then
 
     elseif state == 'gameLost' then
@@ -72,7 +79,7 @@ function Game:draw()
 end
 
 function createEnemie()
-    local x, y, = 0, 0
+    local x, y = 0, 0
     local enemie = Enemie(x, y, 'assets/image/enemie')
     return enemie
 end
