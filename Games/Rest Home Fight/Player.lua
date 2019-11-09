@@ -3,12 +3,14 @@ Player = Object:extend()
 function Player:new(x, y, imgPath, left, right, up, down)
     self.x, self.y = x, y
     self.direction = 1
-    self.acelY = 0
-    self.acelX = 0
-    self.acelHoriz = 150
-    self.acelVert = 150
+    self.velY = 0
+    self.velX = 0
+    self.velHoriz = 250
+    self.velVert = 250
+    self.velX = 0
+    self.velY = 0
     self.animVel = 10
-    self.quadQtd = 8
+    self.quadQtd = 12
 
     self.left = left or 'left'
     self.right = right or 'right'
@@ -16,10 +18,11 @@ function Player:new(x, y, imgPath, left, right, up, down)
     self.down = down or 'down'
     self.jump = 'v'
     self.dtJump = 1
+    self.isJumping = false
 
     self.image = love.graphics.newImage(imgPath)
     self.width = 150
-    self.height = 150
+    self.height = 300
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
     
@@ -27,12 +30,12 @@ function Player:new(x, y, imgPath, left, right, up, down)
 end
 
 function Player:update(dt)
-    if love.keyboard.isDown(self.left) and not love.keyboard.isDown(self.right) then
+    if love.keyboard.isDown(self.left) and not love.keyboard.isDown(self.right) and self.isJumping == false then
         self:animate(dt)
         self:rotateLeft()
         self:moveLeft(dt)
     end
-    if love.keyboard.isDown(self.right) and not love.keyboard.isDown(self.left) then
+    if love.keyboard.isDown(self.right) and not love.keyboard.isDown(self.left) and self.isJumping == false then
         self:animate(dt)
         self:rotateRight()
         self:moveRight(dt)
@@ -75,47 +78,49 @@ function Player:animate(dt)
 end
 
 function Player:moveUp(dt)
-    self.acelY = -self.acelVert
-    self.y = self.y + self.acelY*dt
+    self.velY = -self.velVert
+    self.y = self.y + self.velY*dt
 end
 
 function Player:moveDown(dt)
-    self.acelY = self.acelVert
-    self.y = self.y + self.acelY*dt
+    self.velY = self.velVert
+    self.y = self.y + self.velY*dt
 end
 
 function Player:moveLeft(dt)
-    self.acelX = -self.acelHoriz
-    self.x = self.x + self.acelX*dt
+    self.velX = -self.velHoriz
+    self.x = self.x + self.velX*dt
 end
 
 function Player:moveRight(dt)
-    self.acelX = self.acelHoriz
-    self.x = self.x + self.acelX*dt
+    self.velX = self.velHoriz
+    self.x = self.x + self.velX*dt
+end
+
+function Player:jumpCheck(dt)
+    if self.isJumping == true then
+        self.velY = self.velVert * self.dtJump * 2 
+        self.dtJump = self.dtJump - dt
+        self.y = self.y - self.velY*dt
+        self.velX = self.velHoriz * self.direction
+        self.x = self.x + self.velX*dt
+    end
+    if self.dtJump <= -1 and self.isJumping == true then
+        self.isJumping = false
+        self.dtJump = 1
+        self.velY = 0
+    end
 end
 
 function Player:rotateLeft()
-    if self.direction == 1 then
+    if self.direction == 1 and self.isJumping == false then
         self.direction = -1
         self.x = self.x + self.width
     end
 end
 
-function Player:jumpCheck(dt)
-    if self.isJumping == true then
-        self.acelY = self.acelVert * self.dtJump * 2 
-        self.dtJump = self.dtJump - dt
-        self.y = self.y - self.acelY*dt
-    end
-    if self.dtJump <= -1 and self.isJumping == true then
-        self.isJumping = false
-        self.dtJump = 1
-        self.acelY = 0
-    end
-end
-
 function Player:rotateRight()
-    if self.direction == -1 then
+    if self.direction == -1 and self.isJumping == false then
         self.direction = 1
         self.x = self.x - self.width
     end

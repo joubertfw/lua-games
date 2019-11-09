@@ -30,7 +30,7 @@ function Game:new()
     score = 0
     ]]
     players = {
-        player = Player(screenWidth/2, screenHeight/2, 'assets/image/playerBlue/player.png'),
+        player = Player(screenWidth/2, screenHeight/2, 'assets/image/template.png'),
     }
     dtEnemies = 2
     enemies = {}
