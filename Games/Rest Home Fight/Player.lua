@@ -1,6 +1,6 @@
 Player = Object:extend()
 
-function Player:new(x, y, imgPath, left, right, up, down, jump)
+function Player:new(x, y, imgPath, buttons)
     self.x, self.y = x, y
     self.direction = 1
     self.velY = 0
@@ -12,11 +12,8 @@ function Player:new(x, y, imgPath, left, right, up, down, jump)
     self.animVel = 10
     self.quadQtd = 7
 
-    self.left = left or 'left'
-    self.right = right or 'right'
-    self.up = up or 'up'
-    self.down = down or 'down'
-    self.btJump = jump or 'space'
+    self.input = Input(buttons)
+
     self.dtJump = 1
     self.isJumping = false
     self.screenPosition = 1
@@ -32,13 +29,13 @@ function Player:new(x, y, imgPath, left, right, up, down, jump)
 end
 
 function Player:update(dt)
-    if love.keyboard.isDown(self.left) and not love.keyboard.isDown(self.right) and self.isJumping == false then
+    if love.keyboard.isDown(self.btLeft) and not love.keyboard.isDown(self.btRight) and self.isJumping == false then
         self:animate(dt)
         self.inputDirection = -1
         --self:rotateLeft()
         self:moveLeft(dt)
     end
-    if love.keyboard.isDown(self.right) and not love.keyboard.isDown(self.left) and self.isJumping == false then
+    if love.keyboard.isDown(self.btRight) and not love.keyboard.isDown(self.btLeft) and self.isJumping == false then
         self:animate(dt)
         self.inputDirection = 1
         --self:rotateRight()
@@ -47,15 +44,15 @@ function Player:update(dt)
     if love.keyboard.isDown(self.btJump) then
         self.isJumping = true
     end
-    if love.keyboard.isDown(self.up) and not love.keyboard.isDown(self.down) then
+    if love.keyboard.isDown(self.btUp) and not love.keyboard.isDown(self.btDown) then
         --self:animate(dt)
         --self:moveUp(dt)
     end
-    if love.keyboard.isDown(self.down) and not love.keyboard.isDown(self.up) then
+    if love.keyboard.isDown(self.btDown) and not love.keyboard.isDown(self.btUp) then
         --self:animate(dt)
         --self:moveDown(dt)
     end
-    if not love.keyboard.isDown(self.left) and not love.keyboard.isDown(self.right) and not love.keyboard.isDown(self.down)and not love.keyboard.isDown(self.up) then
+    if not love.keyboard.isDown(self.btLeft) and not love.keyboard.isDown(self.btRight) and not love.keyboard.isDown(self.btDown)and not love.keyboard.isDown(self.btUp) then
         self:stop()
     end
     self:jumpCheck(dt)
