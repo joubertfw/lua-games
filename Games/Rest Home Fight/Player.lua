@@ -1,6 +1,6 @@
 Player = Object:extend()
 
-function Player:new(x, y, imgPath, left, right, up, down)
+function Player:new(x, y, imgPath, left, right, up, down, jump)
     self.x, self.y = x, y
     self.direction = 1
     self.velY = 0
@@ -10,15 +10,17 @@ function Player:new(x, y, imgPath, left, right, up, down)
     self.velX = 0
     self.velY = 0
     self.animVel = 10
-    self.quadQtd = 12
+    self.quadQtd = 7
 
     self.left = left or 'left'
     self.right = right or 'right'
     self.up = up or 'up'
     self.down = down or 'down'
-    self.jump = 'v'
+    self.btJump = jump or 'space'
     self.dtJump = 1
     self.isJumping = false
+    self.screenPosition = 1
+    self.inputDirection = 0
 
     self.image = love.graphics.newImage(imgPath)
     self.width = 150
@@ -32,15 +34,17 @@ end
 function Player:update(dt)
     if love.keyboard.isDown(self.left) and not love.keyboard.isDown(self.right) and self.isJumping == false then
         self:animate(dt)
-        self:rotateLeft()
+        self.inputDirection = -1
+        --self:rotateLeft()
         self:moveLeft(dt)
     end
     if love.keyboard.isDown(self.right) and not love.keyboard.isDown(self.left) and self.isJumping == false then
         self:animate(dt)
-        self:rotateRight()
+        self.inputDirection = 1
+        --self:rotateRight()
         self:moveRight(dt)
     end
-    if love.keyboard.isDown(self.jump) then
+    if love.keyboard.isDown(self.btJump) then
         self.isJumping = true
     end
     if love.keyboard.isDown(self.up) and not love.keyboard.isDown(self.down) then
@@ -61,6 +65,7 @@ end
 function Player:draw()
     self.hitbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0, self.direction, 1)
+    love.graphics.print(self.direction, self.x, self.y)
 end
 
 function Player:stop()
@@ -68,11 +73,25 @@ function Player:stop()
     self.quad:setViewport(w*7, y, w, h)
 end
 
+function Player:jump()
+    local x, y, w, h = self.quad:getViewport()
+    self.quad:setViewport(w*7, y, w, h)
+end
+
 function Player:animate(dt)
     local x, y, w, h = self.quad:getViewport()
-    self.currentImg = self.currentImg + dt*self.animVel
-    if self.currentImg >= self.quadQtd then
+    -- TODO: verificar se player 1 está se afastando de player 2
+    if self.direction > 0 then
+        self.currentImg = self.currentImg + dt*self.animVel
+    else
+        self.currentImg = self.currentImg - dt*self.animVel
+    end
+
+    if self.currentImg >= self.quadQtd and self.direction > 0 then
         self.currentImg = 0
+    end
+    if self.currentImg <= 0  and self.direction < 0 then
+        self.currentImg = self.quadQtd
     end
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
 end
@@ -99,10 +118,11 @@ end
 
 function Player:jumpCheck(dt)
     if self.isJumping == true then
+        self:jump()
         self.velY = self.velVert * self.dtJump * 2 
         self.dtJump = self.dtJump - dt
         self.y = self.y - self.velY*dt
-        self.velX = self.velHoriz * self.direction
+        self.velX = self.velHoriz * self.inputDirection
         self.x = self.x + self.velX*dt
     end
     if self.dtJump <= -1 and self.isJumping == true then

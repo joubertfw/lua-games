@@ -30,7 +30,8 @@ function Game:new()
     score = 0
     ]]
     players = {
-        player = Player(screenWidth/2, screenHeight/2, 'assets/image/template.png'),
+        player1 = Player(screenWidth/2, screenHeight/2, 'assets/image/playerRed/player.png'),
+        player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue/player.png', "a", "d", "w", "s", "v")
     }
     dtEnemies = 2
     enemies = {}
@@ -52,6 +53,7 @@ function Game:update(dt)
         for i, player in pairs(players) do 
             player:update(dt)
         end
+    util:playersDirection(players.player1, players.player2)
 
     elseif state == 'gameWon' then
 
