@@ -1,4 +1,6 @@
 Util = Object:extend()
+local binser = require "binser"
+local TSerial = require "TSerial"
 
 function Util:new()
 
@@ -24,4 +26,19 @@ function Util:playersDirection(player1, player2)
         player1.screenPosition = -1
         player2.screenPosition = 1
     end
+end
+
+function Util:saveTable(filename, table)
+    --print(love.filesystem.getSaveDirectory())
+    local function drop(data)
+        return "Data couldn't be serialized" 
+    end
+    local string = TSerial.pack(table, drop, true)
+    -- love.filesystem reads/writes to application data's folder
+    love.filesystem.write(filename, string)
+end
+
+function Util:loadTable(filepath)
+    -- binser reads/writes to game folder
+    return binser.readFile(filepath)
 end

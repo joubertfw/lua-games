@@ -2,11 +2,12 @@ function love.load ()
     Object = require('classic')
 
     require('Game')
+    require('HitBox')
+    require('Util')
+    require('Input')
+    require('MenuScreen')
     require('Player')
     require('Enemie')
-    require('HitBox')
-    require('MenuScreen')
-    require('Util')
 
     game = Game()
 end

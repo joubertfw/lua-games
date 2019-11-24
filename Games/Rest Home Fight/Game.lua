@@ -1,13 +1,13 @@
 Game = Object:extend()
 
 function Game:new()
-    love.window.setMode(1200, 720)
+    love.window.setMode(1920, 1080)
     love.window.setTitle('Game title')
     screenHeight = love.graphics.getHeight()
     screenWidth = love.graphics.getWidth()
     util = Util()
 
-    background = love.graphics.newImage("assets/image/background.png")
+    background = love.graphics.newImage("assets/image/sky.png")
     font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
     love.graphics.setFont(font)
     menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
@@ -18,10 +18,10 @@ function Game:new()
         0, 0, 
         {'Start Game 1P','Start Game 2P', 'Exit'}, 
         'assets/fonts/vcr.ttf',
-        'assets/image/background.png',
+        'assets/image/sky.png',
         0, 0
     )
-    state = 'menu'
+    state = 'ingame'
     --[[
     players = {
         player = Player(screenWidth/2, screenHeight/2, 'assets/image/playerRed'),
@@ -30,9 +30,10 @@ function Game:new()
     score = 0
     ]]
     players = {
-        player1 = Player(screenWidth/2, screenHeight/2, 'assets/image/playerRed/player.png'),
-        player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue/player.png', "a", "d", "w", "s", "v")
+        player1 = Player(screenWidth/2, screenHeight/2, 'assets/image/oldman.png'),
+        --player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue/player.png', "a", "d", "w", "s", "v")
     }
+
     dtEnemies = 2
     enemies = {}
 end
@@ -53,7 +54,7 @@ function Game:update(dt)
         for i, player in pairs(players) do 
             player:update(dt)
         end
-    util:playersDirection(players.player1, players.player2)
+    --util:playersDirection(players.player1, players.player2)
 
     elseif state == 'gameWon' then
 
@@ -66,7 +67,7 @@ function Game:draw()
     if state == 'menu' then
         menu:draw()
     elseif state == 'ingame' then
-        love.graphics.draw(background)
+        love.graphics.draw(background, 0, -300)
         for i, player in pairs(players) do 
             player:draw()
         end
