@@ -11,8 +11,8 @@ function Player:new(x, y, imgPath, buttons)
     self.velY = 0
     self.acelX = 700
     self.acelY = 1000
-    self.dtJump = 1
-    self.state = 'middleAir'
+    self:resetDtJump()
+    self.state = 'falling'
 
     -- Input
     self.input = Input(buttons)
@@ -43,9 +43,13 @@ function Player:update(dt)
         self:animate(dt)
         self:moveRight(dt)
     end
-    if love.keyboard.isDown(self.input.btJump) then
-        self:setMiddleAir()
+    if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
+        self:setJumping()
+        self:jump(dt)
+    elseif not self:isOnFloor() then
+        self:fall(dt)
     end
+    
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
         --self:animate(dt)
         --self:moveUp(dt)
@@ -57,9 +61,6 @@ function Player:update(dt)
     if not love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btDown)and not love.keyboard.isDown(self.input.btUp) then
         self:stop()
     end
-    if not self:isOnFloor() then
-        self:fall(dt)
-    end 
     --self:jumpCheck(dt)
     self.hitbox:update(self.x, self.y, self.width, self.height)
 end
@@ -68,6 +69,7 @@ function Player:draw()
     self.hitbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
     love.graphics.print(self.direction, self.x, self.y)
+    love.graphics.print(self.state, self.x, self.y + self.height + 5)
 end
 
 function Player:stop()
@@ -80,7 +82,28 @@ function Player:stop()
     self.quad:setViewport(w*self.stopQuad, y, w, h)
 end
 
-function Player:jump()
+function Player:fall(dt)
+    self.velY = self.velY + self.acelY * dt
+    self.y = self.y + self.velY * dt
+end
+
+function Player:jump(dt)
+    if self.dtJump > 0 then
+        --self:animateJump()
+        self.velY = (self.velY * 0.95) + self.acelY * dt
+        self.y = self.y - self.velY * dt
+        self.dtJump = self.dtJump - dt
+    else
+        self.velY = 0
+        self:setFalling()
+    end
+end
+
+function Player:resetDtJump()
+    self.dtJump = 0.5
+end
+--[[
+function Player:animateJump()
     local x, y, w, h = self.quad:getViewport()
     if self.direction == 1 then 
         self.stopQuad = 5
@@ -89,6 +112,7 @@ function Player:jump()
     end
     self.quad:setViewport(w*self.stopQuad, y, w, h)
 end
+]]
 
 function Player:animate(dt)
     local x, y, w, h = self.quad:getViewport()
@@ -111,11 +135,6 @@ function Player:animate(dt)
         self.currentImg = self.quadQtd
     end
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
-end
-
-function Player:fall(dt)
-    self.velY = (self.velY * 0.95) + self.acelY * dt
-    self.y = self.y + self.velY * dt
 end
 
 function Player:moveUp(dt)
@@ -158,10 +177,23 @@ function Player:isOnFloor()
     return self.state == 'onFloor'
 end
 
+function Player:isFalling()
+    return self.state == 'falling'
+end
+
+function Player:isJumping()
+    return self.state == 'jumping'
+end
+
 function Player:setOnFloor()
+    self:resetDtJump()
     self.state = 'onFloor'
 end
 
-function Player:setMiddleAir()
-    self.state = 'middleAir'
+function Player:setFalling()
+    self.state = 'falling'
+end
+
+function Player:setJumping()
+    self.state = 'jumping'
 end

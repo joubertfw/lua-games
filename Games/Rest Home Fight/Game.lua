@@ -53,8 +53,9 @@ function Game:update(dt)
             for i, crate in pairs(crates) do 
                 if crate:checkCollision(player) then
                     player:setOnFloor()
-                else
-                    player:setMiddleAir()
+                    --player:resetDtJump()
+                elseif not player:isJumping() then
+                    player:setFalling()
                 end
             end
         end
