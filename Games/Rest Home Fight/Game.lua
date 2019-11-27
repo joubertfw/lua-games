@@ -1,10 +1,12 @@
 Game = Object:extend()
 
 function Game:new()
+    -- Window configuration
     love.window.setMode(1920, 1080)
-    love.window.setTitle('Game title')
+    love.window.setTitle('Rest Home Fight')
     screenHeight = love.graphics.getHeight()
     screenWidth = love.graphics.getWidth()
+    
     util = Util()
 
     background = love.graphics.newImage("assets/image/sky.png")
@@ -12,7 +14,6 @@ function Game:new()
     love.graphics.setFont(font)
     menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
     ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
-    roundTimer = 80
     
     menu = MenuScreen(
         0, 0, 
@@ -22,18 +23,14 @@ function Game:new()
         0, 0
     )
     state = 'ingame'
-    --[[
-    players = {
-        player = Player(screenWidth/2, screenHeight/2, 'assets/image/playerRed'),
-    }
-    player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue', "a", "d", "w", "s", "space")
     score = 0
-    ]]
     players = {
-        player1 = Player(screenWidth/2, screenHeight/2, 'assets/image/oldman.png'),
+        player1 = Player(screenWidth/2, screenHeight/3, 'assets/image/oldman.png'),
         --player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue/player.png', "a", "d", "w", "s", "v")
     }
-
+    crates = { 
+        Tile(screenWidth/2, screenHeight*0.75, 'assets/image/wooden_crate.png') 
+    }
     dtEnemies = 2
     enemies = {}
 end
@@ -53,8 +50,14 @@ function Game:update(dt)
     elseif state == 'ingame' then
         for i, player in pairs(players) do 
             player:update(dt)
+            for i, crate in pairs(crates) do 
+                if crate:checkCollision(player) then
+                    player:setOnFloor()
+                else
+                    player:setMiddleAir()
+                end
+            end
         end
-    --util:playersDirection(players.player1, players.player2)
 
     elseif state == 'gameWon' then
 
@@ -68,12 +71,17 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         love.graphics.draw(background, 0, -300)
+        for i, crate in pairs(crates) do 
+            crate:draw()
+        end
         for i, player in pairs(players) do 
             player:draw()
         end
-        -- for i, enemie in pairs(enemies) do
-        --     enemie:draw(dt)
-        -- end
+        --[[ 
+        for i, enemie in pairs(enemies) do
+            enemie:draw(dt)
+        end
+        ]]
     elseif state == 'gameWon' then
 
     elseif state == 'gameLost' then

@@ -7,6 +7,7 @@ function love.load ()
     require('Input')
     require('MenuScreen')
     require('Player')
+    require('Tile')
     require('Enemie')
 
     game = Game()
