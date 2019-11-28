@@ -25,14 +25,19 @@ function Game:new()
     state = 'ingame'
     score = 0
     players = {
-        player1 = Player(screenWidth/2, screenHeight/3, 'assets/image/oldman.png'),
-        --player2 = Player(screenWidth/2 - 100, screenHeight/2, 'assets/image/playerBlue/player.png', "a", "d", "w", "s", "v")
+        Player(0, 0, 'assets/image/oldman.png', {jump = 'up'}),
+        --Player(0, 0, 'assets/image/playerBlue/player.png')
     }
+    for i, player in pairs(players) do
+        respawnPlayer(player, i)
+    end
+
+    dtRespawn = {2, 2}
+
     crates = { 
-        Tile(screenWidth/2, screenHeight*0.75, 'assets/image/wooden_crate.png') 
+        Tile(screenWidth/2, screenHeight*0.75, 'assets/image/wooden_crate.png'),
+        Tile(screenWidth/3, screenHeight*0.75, 'assets/image/wooden_crate.png')
     }
-    dtEnemies = 2
-    enemies = {}
 end
 
 function Game:update(dt)
@@ -50,13 +55,23 @@ function Game:update(dt)
     elseif state == 'ingame' then
         for i, player in pairs(players) do 
             player:update(dt)
+            if isBelowScreenView(player) then
+                dtRespawn[i] = dtRespawn[i] - dt
+                if dtRespawn[i] < 0 then
+                    resetDtRespawn(i)
+                    respawnPlayer(player, i)
+                end
+            end
+            local mustFall = true
             for i, crate in pairs(crates) do 
                 if crate:checkCollision(player) then
                     player:setOnFloor()
+                    mustFall = false
                     --player:resetDtJump()
-                elseif not player:isJumping() then
-                    player:setFalling()
                 end
+            end
+            if mustFall and not player:isJumping() then 
+                player:setFalling()
             end
         end
 
@@ -78,11 +93,6 @@ function Game:draw()
         for i, player in pairs(players) do 
             player:draw()
         end
-        --[[ 
-        for i, enemie in pairs(enemies) do
-            enemie:draw(dt)
-        end
-        ]]
     elseif state == 'gameWon' then
 
     elseif state == 'gameLost' then
@@ -90,18 +100,18 @@ function Game:draw()
     end
 end
 
-function createEnemie()
-    local x, y = 0, 0
-    local enemie = Enemie(x, y, 'assets/image/enemie')
-    return enemie
+function respawnPlayer(player, i)
+    player.velY = 0
+    player.x = screenWidth/2
+    player.y = screenHeight/3
 end
 
-function enemieSpawn(dt)
-    dtEnemies = dtEnemies - dt
-    if dtEnemies <= 0 and #enemies <=3 then
-        table.insert(enemies, createEnemie())
-        dtEnemies = 1
-    end
+function resetDtRespawn(i)
+    dtRespawn[i] = 2
+end
+
+function isBelowScreenView(player)
+    return player.y > screenHeight
 end
 
 --Basic definition for future usage

@@ -5,7 +5,7 @@ function Player:new(x, y, imgPath, buttons)
     -- Position and movement
     self.x, self.y = x, y
     self.direction = 1
-    self.velHoriz = 250
+    self.velHoriz = 400
     self.velVert = 250
     self.velX = 0
     self.velY = 0
@@ -28,6 +28,8 @@ function Player:new(x, y, imgPath, buttons)
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
     
+    self.life = 100
+
     -- Hitboxes
     self.hitbox = HitBox(self.x, self.y, self.width*self.direction, self.height)
 end
