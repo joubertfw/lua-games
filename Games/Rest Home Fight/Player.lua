@@ -34,6 +34,14 @@ function Player:new(x, y, imgPath, buttons)
     self.hitbox = HitBox(self.x, self.y, self.width*self.direction, self.height)
 end
 
+local counter = 0
+
+function love.keypressed(key, isrepeat)
+    if key == "escape" then
+        counter = counter + 1
+    end
+ end
+
 function Player:update(dt)
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         self.direction = -1
@@ -72,6 +80,7 @@ function Player:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
     love.graphics.print(self.direction, self.x, self.y)
     love.graphics.print(self.state, self.x, self.y + self.height + 5)
+    love.graphics.print("KeypressTest (esc):" .. counter, 50, 50)
 end
 
 function Player:stop()
