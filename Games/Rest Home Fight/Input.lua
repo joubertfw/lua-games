@@ -7,7 +7,6 @@ function Input:new(buttons)
         self.btUp = buttons.up or 'up'
         self.btDown = buttons.down or 'down'
         self.btJump = buttons.jump or 'space'
-        self.btJump = buttons.jump or 'space'
         self.btPunch = buttons.punch or 'b'
         self.btKick = buttons.kick or 'v'
     else
@@ -15,7 +14,6 @@ function Input:new(buttons)
         self.btRight = 'right'
         self.btUp = 'up'
         self.btDown = 'down'
-        self.btJump = 'space'
         self.btJump = 'space'
         self.btPunch = 'b'
         self.btKick = 'v'

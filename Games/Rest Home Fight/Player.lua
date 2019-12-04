@@ -13,6 +13,7 @@ function Player:new(x, y, imgPath, buttons)
     self.acelY = 1000
     self:resetDtJump()
     self.state = 'falling'
+    self.stateHitted = 'none'
     self.stateHit = false
     self.dtHit = 0
 
@@ -33,7 +34,6 @@ function Player:new(x, y, imgPath, buttons)
     self.life = 100
 
     -- Hitboxes
-    self.hurtboxX = 0
     self.hurtboxY = 0
     self.hurtboxWidth = 0
     self.hurtboxHeight = 40
@@ -46,28 +46,20 @@ local counter2 = 0
 
 function Player:update(dt)
 
-    -- keyPressed code
-
-    function love.keypressed(key, isrepeat)
-        if key == self.input.btPunch then
-            if (self.dtHit == 0) then
-                self.hurtboxWidth = self.width
-                self.stateHit = true
-            end
-            self.hurtboxY = self.y + (40)
-            counter = self.x + 1
+    if love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
+        if (self.dtHit == 0) then
+            self.hurtboxWidth = self.width
+            self.stateHit = true
         end
-        if key == self.input.btKick then
-            if (self.dtHit == 0) then
-                self.hurtboxWidth = self.width
-                self.stateHit = true
-            end
-            self.hurtboxY = self.y + (150)
-            counter2 = self.y + 1
+        self.hurtboxY = 40
+    end
+    if love.keyboard.isDown(self.input.btKick) and not love.keyboard.isDown(self.input.btPunch) then
+        if (self.dtHit == 0) then
+            self.hurtboxWidth = self.width
+            self.stateHit = true
         end
-     end
-
-     -- keyDown code
+        self.hurtboxY = 150
+    end
 
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         self.direction = -1
@@ -102,7 +94,9 @@ function Player:update(dt)
     if (self.dtHit >= 0.3) then
         self.dtHit = 0
         self.hurtboxWidth = 0
-        self.stateHit = false
+        if not love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
+            self.stateHit = false
+        end
     end
 
     if (self.stateHit == true) then
@@ -113,7 +107,7 @@ function Player:update(dt)
 
     -- hitboxes updates
     self.hitbox:update(self.x, self.y, self.width, self.height)
-    self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY, self.hurtboxWidth, self.hurtboxHeight)
+    self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
 end
 
 function Player:draw()
@@ -126,6 +120,9 @@ function Player:draw()
     love.graphics.print("dtHit:" .. self.dtHit, 50, 200)
     love.graphics.print("KeypressTest (esc) x:" .. counter, 50, 50)
     love.graphics.print("KeypressTest (esc) y:" .. counter2, 50, 90)
+
+    
+    love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
 end
 
 function Player:stop()
@@ -211,14 +208,6 @@ function Player:moveRight(dt)
     self.x = self.x + self.velHoriz*dt
 end
 
-function Player:punch(dt)
-    self.x = self.x + self.velHoriz*dt
-end
-
-function Player:kick(dt)
-    self.x = self.x + self.velHoriz*dt
-end
-
 --[[
 function Player:jumpCheck(dt)
     if self.isJumping == true then
@@ -260,4 +249,12 @@ end
 
 function Player:setJumping()
     self.state = 'jumping'
+end
+
+function Player:setHittedLeft()
+    self.state = 'left'
+end
+
+function Player:setHittedRight()
+    self.state = 'right'
 end
