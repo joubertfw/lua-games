@@ -5,7 +5,7 @@ function HitBox:new(x, y, width, height, type)
     self.y = y
     self.width = width
     self.height = height
-    self.type = 0       -- 0 = hitbox, 1 = hurtbox
+    self.type = type       -- 0 = hitbox, 1 = hurtbox
 end
 
 function HitBox:update(x, y, width, height)
@@ -21,7 +21,13 @@ function HitBox:update(x, y, width, height)
 end
 
 function HitBox:draw()
+    if self.type == 1 then
+        love.graphics.setColor(1, 0, 0)
+    else
+        love.graphics.setColor(1, 1, 1)
+    end
     love.graphics.rectangle( "line", self.x, self.y, self.width, self.height)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function HitBox:checkColision(other)
