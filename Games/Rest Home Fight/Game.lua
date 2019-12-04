@@ -26,7 +26,7 @@ function Game:new()
     score = 0
     players = {
         Player(0, 0, 'assets/image/oldman.png', {jump = 'up'}),
-        --Player(0, 0, 'assets/image/playerBlue/player.png')
+        --Player(50, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', jump = 'i', punch = 'o', kick = 'p'})
     }
     for i, player in pairs(players) do
         respawnPlayer(player, i)
@@ -102,7 +102,7 @@ end
 
 function respawnPlayer(player, i)
     player.velY = 0
-    player.x = screenWidth/2
+    player.x = (screenWidth/2)  -200*i
     player.y = screenHeight/3
 end
 
