@@ -26,11 +26,11 @@ function Player:new(x, y, imgPath, buttons)
     
     -- Quads and animation
     self.direction = 1
-    self.animVel = 10
+    self:resetAnimVel()
     self.image = love.graphics.newImage(imgPath)
-    self.quadQtd = 10
+    self:resetQuadQTD()
     self.stopQuad = 4
-    self.width = 120
+    self.width = 160
     self.height = 240
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
@@ -44,9 +44,6 @@ function Player:new(x, y, imgPath, buttons)
     self.hitbox = HitBox(self.x, self.y, self.width*self.direction, self.height, 0)
     self.hurtbox = HitBox(self.x, self.y, 0, 0, 1)
 end
-
-local counter = 0
-local counter2 = 0
 
 function Player:update(dt)
 
@@ -90,7 +87,12 @@ function Player:update(dt)
         --self:animate(dt)
         --self:moveDown(dt)
     end
-    if not love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btDown)and not love.keyboard.isDown(self.input.btUp) then
+    if not love.keyboard.isDown(self.input.btLeft) 
+        and not love.keyboard.isDown(self.input.btRight) 
+        and not love.keyboard.isDown(self.input.btDown)
+        and not love.keyboard.isDown(self.input.btUp) 
+        and not love.keyboard.isDown(self.input.btKick)
+        and not love.keyboard.isDown(self.input.btPunch) then
         self:stop()
         self.acelX = 0
         self.acelY = 750
@@ -197,20 +199,17 @@ function Player:jump(dt)
     end
 end
 
+function Player:resetQuadQTD()
+    self.quadQtd = 10
+end
+
 function Player:resetDtJump()
     self.dtJump = 0.5
 end
---[[
-function Player:animateJump()
-    local x, y, w, h = self.quad:getViewport()
-    if self.direction == 1 then 
-        self.stopQuad = 5
-    else
-        self.stopQuad = 4
-    end
-    self.quad:setViewport(w*self.stopQuad, y, w, h)
+
+function Player:resetAnimVel()
+    self.animVel = 10
 end
-]]
 
 function Player:animate(dt)
     local x, y, w, h = self.quad:getViewport()
@@ -219,17 +218,21 @@ function Player:animate(dt)
     else
         y = h
     end
-    -- TODO: verificar se player 1 está se afastando de player 2
-    if self.direction > 0 then
-        self.currentImg = self.currentImg + dt*self.animVel
+    if self.stateHit then
+        self.animVel = 20
+        y = y + h*2
+        self.quadQtd = 9
     else
-        self.currentImg = self.currentImg - dt*self.animVel
+        self:resetQuadQTD()
+        self:resetAnimVel()
     end
 
-    if self.currentImg >= self.quadQtd and self.direction > 0 then
+    self.currentImg = self.currentImg + self.direction*dt*self.animVel
+
+    if self.currentImg > self.quadQtd then
         self.currentImg = 0
     end
-    if self.currentImg <= 0  and self.direction < 0 then
+    if self.currentImg < 0 then
         self.currentImg = self.quadQtd
     end
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
@@ -263,24 +266,6 @@ function Player:isHitted(hurtBox, dt)
         end
     end
 end
-
---[[
-function Player:jumpCheck(dt)
-    if self.isJumping == true then
-        self:jump()
-        self.velY = self.velVert * self.dtJump * 2 
-        self.dtJump = self.dtJump - dt
-        self.y = self.y - self.velY*dt
-        self.velX = self.velHoriz * self.direction
-        self.x = self.x + self.velX*dt
-    end
-    if self.dtJump <= -1 and self.isJumping == true then
-        self.isJumping = false
-        self.dtJump = 1
-        self.velY = 0
-    end
-end
-]]
 
 function Player:isOnFloor()
     return self.state == 'onFloor'
