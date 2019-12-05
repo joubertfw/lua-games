@@ -76,6 +76,7 @@ function Player:update(dt)
     if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
         self:setJumping()
         self:jump(dt)
+        self:animate(dt)
     elseif not self:isOnFloor() then
         self:fall(dt)
     end
@@ -88,16 +89,6 @@ function Player:update(dt)
         --self:animate(dt)
         --self:moveDown(dt)
     end
-    if not love.keyboard.isDown(self.input.btLeft) 
-        and not love.keyboard.isDown(self.input.btRight) 
-        and not love.keyboard.isDown(self.input.btDown)
-        and not love.keyboard.isDown(self.input.btUp) 
-        and not love.keyboard.isDown(self.input.btKick)
-        and not love.keyboard.isDown(self.input.btPunch) then
-        self:stop()
-        self.acelX = 0
-        self.acelY = 750
-    end
 
     if not love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
         self.hitRepeat = false
@@ -106,16 +97,18 @@ function Player:update(dt)
         self.hurtboxWidth = 0
     end
 
-    if (self.dtHit >= 0.2) then
+    if (self.dtHit >= 0.4) then
         self.hurtboxWidth = 0
         self.dtHit = 0
         self.hitRepeat = true
     end
-
+    
     if (self.stateHit == true and not self.hitRepeat) then
+        self:animateHit(dt)
         self.dtTimeFly = 1
         self.dtHit = self.dtHit + dt
     end
+
 
     --self:jumpCheck(dt)
 
@@ -127,14 +120,6 @@ function Player:update(dt)
         self.acelX = 15000
         -- self.velX = -self.velHoriz
     end
-    -- if (self.stateHitted == "none") then
-    --     self.acelX = 0
-    --     -- self.acelX = self.acelX - (self.acelX * dt)
-    -- end
-    -- if (self.stateHitted == "none") then
-    --     self.dtTimeFly = self.dtTimeFly - dt
-    --     -- self.acelX = self.acelX - (self.acelX * dt)
-    -- end
     
     self.velX = (self.velX * 0.95) + self.acelX * dt
     self.x = self.x + self.velX * dt
@@ -156,6 +141,18 @@ function Player:update(dt)
     -- hitboxes updates
     self.hitbox:update(self.x, self.y, self.width, self.height)
     self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
+
+    
+    if not love.keyboard.isDown(self.input.btLeft) 
+        and not love.keyboard.isDown(self.input.btRight) 
+        and not love.keyboard.isDown(self.input.btDown)
+        and not love.keyboard.isDown(self.input.btUp) 
+        and not love.keyboard.isDown(self.input.btKick)
+        and not love.keyboard.isDown(self.input.btPunch) then
+        self:stop()
+        self.acelX = 0
+        self.acelY = 750
+    end
 end
 
 function Player:draw()
@@ -219,14 +216,15 @@ function Player:animate(dt)
     else
         y = h
     end
-    if self.stateHit then
-        self.animVel = 20
-        y = y + h*2
-        self.quadQtd = 9
-    else
-        self:resetQuadQTD()
-        self:resetAnimVel()
-    end
+
+    -- if self.stateHit then
+    --     self.animVel = 20
+    --     y = y + h*2
+    --     self.quadQtd = 9
+    -- else
+    --     self:resetQuadQTD()
+    --     self:resetAnimVel()
+    -- end
 
     self.currentImg = self.currentImg + self.direction*dt*self.animVel
 
@@ -237,6 +235,30 @@ function Player:animate(dt)
         self.currentImg = self.quadQtd
     end
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
+end
+
+function Player:animateHit(dt)
+    local x, y, w, h = self.quad:getViewport()
+    if self.direction == 1 then
+        y = 2*h
+    else
+        y = 3*h
+    end
+    self.animVel = 10
+    self.currentImg = self.currentImg + self.direction*dt*self.animVel
+    self.quadQtd = 9
+
+    if self.currentImg > self.quadQtd then
+        self.currentImg = 0
+    end
+    if self.currentImg < 0 then
+        self.currentImg = self.quadQtd
+    end
+
+    self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
+    
+    self:resetQuadQTD()
+    self:resetAnimVel()
 end
 
 function Player:moveUp(dt)
