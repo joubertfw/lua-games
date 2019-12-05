@@ -6,7 +6,7 @@ function Game:new()
     love.window.setTitle('Rest Home Fight')
     screenHeight = love.graphics.getHeight()
     screenWidth = love.graphics.getWidth()
-    
+    spawnArea = {200, love.graphics.getWidth() - 200}
     util = Util()
 
     background = love.graphics.newImage("assets/image/sky.png")
@@ -35,8 +35,17 @@ function Game:new()
     dtRespawn = {2, 2}
 
     crates = { 
-        Tile(screenWidth/2, screenHeight*0.75, 'assets/image/wooden_crate.png'),
-        Tile(screenWidth/3, screenHeight*0.75, 'assets/image/wooden_crate.png')
+        Tile(spawnArea[1]-200, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1], screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+200, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+400, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+600, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+800, screenHeight*0.95, 'assets/image/floor.png'),
+
+        Tile(spawnArea[2]-600, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[2]-400, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[2]-200, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png')
     }
 end
 
@@ -118,7 +127,7 @@ end
 
 function respawnPlayer(player, i)
     player.velY = 0
-    player.x = (screenWidth/2)  -200*i
+    player.x = spawnArea[i]
     player.y = screenHeight/3
 end
 
