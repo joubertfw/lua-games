@@ -18,8 +18,9 @@ function Player:new(x, y, imgPath, buttons)
     self.stateHitted = 'none'
     self.stateHit = false
     self.hitRepeat = false
-    self.dtHit = 0.0
-    self.dtTimeFly = 1.0
+    self.dtHit = 0
+    self.dtTimeFly = 1
+    self.dtProtected = 0
 
     -- Input
     self.input = Input(buttons)
@@ -48,14 +49,14 @@ end
 function Player:update(dt)
 
     if love.keyboard.isDown(self.input.btPunch) then
-        if (self.dtHit == 0.0 and not self.stateHit) then
+        if (self.dtHit == 0 and not self.stateHit) then
             self.hurtboxWidth = self.width
             self.stateHit = true
         end
         self.hurtboxY = 40
     end
     if love.keyboard.isDown(self.input.btKick) then
-        if (self.dtHit == 0.0 and not self.stateHit) then
+        if (self.dtHit == 0 and not self.stateHit) then
             self.hurtboxWidth = self.width
             self.stateHit = true
         end
