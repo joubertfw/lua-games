@@ -25,8 +25,8 @@ function Game:new()
     state = 'ingame'
     score = 0
     players = {
-        Player(0, 0, 'assets/image/oldman.png', {jump = 'up'}),
-        --Player(50, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', jump = 'i', punch = 'o', kick = 'p'})
+        Player(0, 0, 'assets/image/oldman.png', {jump = 'space'}),
+        Player(50, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', jump = 'i', punch = 'o', kick = 'p'})
     }
     for i, player in pairs(players) do
         respawnPlayer(player, i)
@@ -53,6 +53,8 @@ function Game:update(dt)
             --ingameTrack:play()
         end
     elseif state == 'ingame' then
+        players[2]:isHitted(players[1].hurtbox, dt)
+        players[1]:isHitted(players[2].hurtbox, dt)
         for i, player in pairs(players) do 
             player:update(dt)
             if isBelowScreenView(player) then
@@ -98,6 +100,20 @@ function Game:draw()
     elseif state == 'gameLost' then
 
     end
+    
+    -- DEBUG
+    love.graphics.print("acelX:" .. players[1].acelX, 50, 100)
+    love.graphics.print("velX:" .. players[1].velX, 50, 150)
+    love.graphics.print("dtHit:" .. players[1].dtHit, 50, 200)
+    love.graphics.print("state Hitted:" .. players[1].stateHitted, 50, 250)
+    love.graphics.print("state fly:" .. players[1].dtTimeFly, 50, 300)
+
+    love.graphics.print("acelX:" .. players[2].acelX, 550, 100)
+    love.graphics.print("velX:" .. players[2].velX, 550, 150)
+    love.graphics.print("dtHit:" .. players[2].dtHit, 550, 200)
+    love.graphics.print("state Hitted:" .. players[2].stateHitted, 550, 250)
+    love.graphics.print("state fly:" .. players[2].dtTimeFly, 550, 300)
+    --
 end
 
 function respawnPlayer(player, i)

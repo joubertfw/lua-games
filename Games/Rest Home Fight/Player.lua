@@ -1,21 +1,25 @@
 Player = Object:extend()
 local util = Util()
 
+local hit = ""
+
 function Player:new(x, y, imgPath, buttons)
     -- Position and movement
     self.x, self.y = x, y
     self.direction = 1
-    self.velHoriz = 400
-    self.velVert = 250
+    self.velHoriz = 900
+    self.velVert = 900
     self.velX = 0
     self.velY = 0
-    self.acelX = 700
-    self.acelY = 1000
+    self.acelX = 1
+    self.acelY = 10
     self:resetDtJump()
     self.state = 'falling'
     self.stateHitted = 'none'
     self.stateHit = false
-    self.dtHit = 0
+    self.hitRepeat = false
+    self.dtHit = 0.0
+    self.dtTimeFly = 1.0
 
     -- Input
     self.input = Input(buttons)
@@ -46,15 +50,15 @@ local counter2 = 0
 
 function Player:update(dt)
 
-    if love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
-        if (self.dtHit == 0) then
+    if love.keyboard.isDown(self.input.btPunch) then
+        if (self.dtHit == 0.0 and not self.stateHit) then
             self.hurtboxWidth = self.width
             self.stateHit = true
         end
         self.hurtboxY = 40
     end
-    if love.keyboard.isDown(self.input.btKick) and not love.keyboard.isDown(self.input.btPunch) then
-        if (self.dtHit == 0) then
+    if love.keyboard.isDown(self.input.btKick) then
+        if (self.dtHit == 0.0 and not self.stateHit) then
             self.hurtboxWidth = self.width
             self.stateHit = true
         end
@@ -88,22 +92,63 @@ function Player:update(dt)
     end
     if not love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btDown)and not love.keyboard.isDown(self.input.btUp) then
         self:stop()
+        self.acelX = 0
+        self.acelY = 750
     end
 
-    -- time events check
-    if (self.dtHit >= 0.3) then
+    if not love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
+        self.hitRepeat = false
+        self.stateHit = false
         self.dtHit = 0
         self.hurtboxWidth = 0
-        if not love.keyboard.isDown(self.input.btPunch) and not love.keyboard.isDown(self.input.btKick) then
-            self.stateHit = false
-        end
     end
 
-    if (self.stateHit == true) then
+    if (self.dtHit >= 0.2) then
+        self.hurtboxWidth = 0
+        self.dtHit = 0
+        self.hitRepeat = true
+    end
+
+    if (self.stateHit == true and not self.hitRepeat) then
+        self.dtTimeFly = 1
         self.dtHit = self.dtHit + dt
     end
 
     --self:jumpCheck(dt)
+
+    if (self.stateHitted == "left") then
+        self.acelX = -15000
+        -- self.velX = self.velHoriz
+    end
+    if (self.stateHitted == "right") then
+        self.acelX = 15000
+        -- self.velX = -self.velHoriz
+    end
+    -- if (self.stateHitted == "none") then
+    --     self.acelX = 0
+    --     -- self.acelX = self.acelX - (self.acelX * dt)
+    -- end
+    -- if (self.stateHitted == "none") then
+    --     self.dtTimeFly = self.dtTimeFly - dt
+    --     -- self.acelX = self.acelX - (self.acelX * dt)
+    -- end
+    
+    self.velX = (self.velX * 0.95) + self.acelX * dt
+    self.x = self.x + self.velX * dt
+
+    -- if (self.stateHitted ~= "none") then
+    --     if (self.dtTimeFly < 0.5) then
+    --         self.dtTimeFly = self.dtTimeFly + dt
+    --         if (self.stateHitted == "left") then
+    --             self.acelX = 500
+    --             self:moveLeft(dt)
+    --         elseif (self.stateHitted == "right") then
+    --             self.acelX = -500
+    --             self:moveRight(dt)
+    --         end
+    --     end
+    -- end
+
 
     -- hitboxes updates
     self.hitbox:update(self.x, self.y, self.width, self.height)
@@ -114,12 +159,11 @@ function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
-    love.graphics.print(self.direction, self.x, self.y)
-    love.graphics.print(self.state, self.x, self.y + self.height + 5)
+    -- love.graphics.print(self.direction, self.x, self.y)
+    -- love.graphics.print(self.state, self.x, self.y + self.height + 5)
     --love.graphics.print("stateHit:" .. self.stateHit , 50, 150)
-    love.graphics.print("dtHit:" .. self.dtHit, 50, 200)
-    love.graphics.print("KeypressTest (esc) x:" .. counter, 50, 50)
-    love.graphics.print("KeypressTest (esc) y:" .. counter2, 50, 90)
+    -- love.graphics.print("dtHit:" .. self.dtHit, 50, 200)
+    -- love.graphics.print("HIT:" .. hit, 50, 50)
 
     
     love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
@@ -143,6 +187,7 @@ end
 function Player:jump(dt)
     if self.dtJump > 0 then
         --self:animateJump()
+        self.acelY = 750
         self.velY = (self.velY * 0.95) + self.acelY * dt
         self.y = self.y - self.velY * dt
         self.dtJump = self.dtJump - dt
@@ -201,11 +246,22 @@ function Player:moveDown(dt)
 end
 
 function Player:moveLeft(dt)
-    self.x = self.x + -self.velHoriz*dt
+    self.acelX = -self.velHoriz
 end
 
 function Player:moveRight(dt)
-    self.x = self.x + self.velHoriz*dt
+    self.acelX = self.velHoriz
+end
+
+function Player:isHitted(hurtBox, dt)
+    self:setHittedNone()
+    if (self.hitbox:checkColision(hurtBox)) then
+        if (self.hitbox.x < hurtBox.x) then
+            self:setHittedLeft()
+        else
+            self:setHittedRight()
+        end
+    end
 end
 
 --[[
@@ -252,9 +308,13 @@ function Player:setJumping()
 end
 
 function Player:setHittedLeft()
-    self.state = 'left'
+    self.stateHitted = 'left'
 end
 
 function Player:setHittedRight()
-    self.state = 'right'
+    self.stateHitted = 'right'
+end
+
+function Player:setHittedNone()
+    self.stateHitted = 'none'
 end
