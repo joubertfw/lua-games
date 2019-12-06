@@ -25,8 +25,8 @@ function Game:new()
     state = 'ingame'
     score = 0
     players = {
-        Player(0, 0, 'assets/image/oldman.png', {jump = 'space'}),
-        Player(50, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', jump = 'i', punch = 'o', kick = 'p'})
+        Player(0, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
+        Player(0, 0, 'assets/image/oldman.png', {jump = 'up'})
     }
     for i, player in pairs(players) do
         respawnPlayer(player, i)
@@ -45,7 +45,8 @@ function Game:new()
         Tile(spawnArea[2]-600, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2]-400, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2]-200, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png')
+        Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(screenWidth/3, screenHeight/2, 'assets/image/floor.png', 0.5)
     }
 end
 

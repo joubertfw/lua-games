@@ -52,7 +52,8 @@ function Player:update(dt)
 
     if not self:isOnFloor() and not self:isJumping() or self.dtJump < 0 or (self:isJumping() and not love.keyboard.isDown(self.input.btJump)) or (self.spaceRepeat and self.dtJump < 0.5 and self:isJumping()) then
         self.spaceRepeat = true
-        self.acelY = 750
+        --falling
+        self.acelY = 2000
     else
         if self:isOnFloor() and self.dtJump >= 0.5 and not love.keyboard.isDown(self.input.btJump) then
             self.spaceRepeat = false
@@ -61,7 +62,8 @@ function Player:update(dt)
             self.velY = 0
         end
         if love.keyboard.isDown(self.input.btJump) and self.dtJump > 0 and not self.spaceRepeat then
-            self.acelY = -1500
+            --jumping
+            self.acelY = -3500
             self.dtJump = self.dtJump - dt
         else
             self.acelY = 0
@@ -100,7 +102,7 @@ function Player:update(dt)
         self:animate(dt)
     end
     if not self:isOnFloor() then
-        self:fall(dt)
+        self:stop(true)
     end
     
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
@@ -131,9 +133,6 @@ function Player:update(dt)
         self.dtHit = self.dtHit + dt
     end
 
-
-    --self:jumpCheck(dt)
-
     if (self.stateHitted == "left") then
         self.acelX = -15000
         self.acelY = -8000
@@ -148,13 +147,10 @@ function Player:update(dt)
     self.y = self.y + self.velY * dt
     self.x = self.x + self.velX * dt
 
-
     -- hitboxes updates
     self.hitbox:update(self.x, self.y, self.width, self.height)
     self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
 
-  
-    
     if not love.keyboard.isDown(self.input.btLeft) 
         and not love.keyboard.isDown(self.input.btRight) 
         and not love.keyboard.isDown(self.input.btDown)
@@ -163,15 +159,7 @@ function Player:update(dt)
         and not love.keyboard.isDown(self.input.btPunch) then
         self:stop()
         self.acelX = 0
-        -- self.acelY = 750
     end
-  
-    -- self.acelY = 200
-    -- if (self.state == "onFloor" and self.dtJump < 0) then
-    --     -- self.velY = 0
-    --     self.acelY = 0
-    -- end
-
 end
 
 function Player:draw()
@@ -188,7 +176,8 @@ function Player:draw()
     love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
 end
 
-function Player:stop()
+function Player:stop(jumping)
+    -- TODO: Criar frame fixo de jump
     local x, y, w, h = self.quad:getViewport()
     if self.direction == 1 then 
         self.stopQuad = 5
@@ -199,30 +188,11 @@ function Player:stop()
 end
 
 function Player:fall(dt)
+
 end
 
 function Player:jump(dt)
-    -- self.acelY = 700
-    -- if (self.state == "onFloor" and self.dtJump > 0) then
-    --     self.dtJump = self.dtJump - dt
-    --     self.acelY = 1500
-    --     self.velY = 1500
-    -- else
-    --     self.velY = 0
-    --     self.acelY = 0
-    --     self:setFalling()
-    -- end
-
-    -- if self.dtJump > 0 then
-    --     --self:animateJump()
-    --     self.velY = (self.velY * 0.95) + self.acelY * dt
-    --     self.y = self.y - self.velY * dt
-    --     self.dtJump = self.dtJump - dt
-    -- else
-    --     self.velY = 0
-    --     self.acelY = 0
-    --     self:setFalling()
-    -- end
+    
 end
 
 function Player:resetQuadQTD()
@@ -301,10 +271,16 @@ end
 
 function Player:moveLeft(dt)
     self.acelX = -self.velHoriz
+    if self:isJumping() then
+        self.acelX = self.acelX*2
+    end
 end
 
 function Player:moveRight(dt)
     self.acelX = self.velHoriz
+    if self:isJumping() then
+        self.acelX = self.acelX*1.5
+    end
 end
 
 function Player:isHitted(hurtBox, dt)

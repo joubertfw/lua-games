@@ -1,10 +1,15 @@
 Tile = Object:extend()
 
-function Tile:new(x, y, imgPath)
+function Tile:new(x, y, imgPath, size)
     self.x = x
     self.y = y
+    self.size = size
     self.image = love.graphics.newImage(imgPath)
     self.width, self.height = self.image:getDimensions()
+    if size then
+        self.width = self.width*size
+        self.height = self.height*size
+    end
 end
 
 function Tile:update(x, y)
@@ -12,7 +17,8 @@ function Tile:update(x, y)
 end
 
 function Tile:draw()
-    love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, self.x, self.y, 0, self.size, self.size)
+    love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
 end
 
 function Tile:checkCollision(player)
