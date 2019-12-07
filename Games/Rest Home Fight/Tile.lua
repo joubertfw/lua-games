@@ -1,9 +1,10 @@
 Tile = Object:extend()
 
-function Tile:new(x, y, imgPath, size)
+function Tile:new(x, y, imgPath, isSolid, size)
     self.x = x
     self.y = y
     self.size = size
+    self.isSolid = isSolid or false
     self.image = love.graphics.newImage(imgPath)
     self.width, self.height = self.image:getDimensions()
     if size then
@@ -29,10 +30,22 @@ function Tile:checkPlayerOnTop(player)
         y2 + h2 < y1 + 10
 end
 
+function Tile:checkPlayerBelow(player)
+    --Apenas pra tiles solidos (não atravessáveis por baixo e pelos lados)
+    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
+    return x2 < x1 + w1 and x2 + w2 > x1 and
+        y2 > y1 and
+        y2 > y1 + h1 -10 and
+        y2 < y1 + h1 and
+        self.isSolid
+end
+
 function Tile:checkPlayerOnSide(player)
-    -- TODO checar se o player está colidindo com o lado do tile
+    --Apenas pra tiles solidos (não atravessáveis por baixo e pelos lados)
+    --TODO
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
     return x1 == x2 + w2 and
         y1 <= y2 + h2 and
-        y1 + h1 >= y2
+        y1 + h1 >= y2 and
+        self.isSolid
 end

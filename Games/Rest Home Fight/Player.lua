@@ -1,8 +1,6 @@
 Player = Object:extend()
 local util = Util()
 
-local hit = ""
-
 function Player:new(x, y, imgPath, buttons)
     -- Position and movement
     self.x, self.y = x, y
@@ -52,8 +50,7 @@ function Player:update(dt)
 
     if not self:isOnFloor() and not self:isJumping() or self.dtJump < 0 or (self:isJumping() and not love.keyboard.isDown(self.input.btJump)) or (self.spaceRepeat and self.dtJump < 0.5 and self:isJumping()) then
         self.spaceRepeat = true
-        --falling
-        self.acelY = 2000
+        self:fall()
     else
         if self:isOnFloor() and self.dtJump >= 0.5 and not love.keyboard.isDown(self.input.btJump) then
             self.spaceRepeat = false
@@ -187,8 +184,11 @@ function Player:stop(jumping)
     self.quad:setViewport(w*self.stopQuad, y, w, h)
 end
 
-function Player:fall(dt)
-
+function Player:fall(resetVelY)
+    if resetVelY then
+        self.velY = 0
+    end
+    self.acelY = 2000
 end
 
 function Player:jump(dt)

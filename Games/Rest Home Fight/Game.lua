@@ -46,7 +46,7 @@ function Game:new()
         Tile(spawnArea[2]-400, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2]-200, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(screenWidth/3, screenHeight/1.5, 'assets/image/floor.png', 0.5)
+        Tile(screenWidth/3, screenHeight/2, 'assets/image/floor.png', true, 0.5)
     }
 end
 
@@ -76,7 +76,14 @@ function Game:update(dt)
             end
             local mustFall = true
             for i, crate in pairs(crates) do 
-                if crate:checkPlayerOnTop(player) then
+                if crate.isSolid then
+                    if crate:checkPlayerBelow(player) then
+                        player:fall(true)
+                        player:setFalling()
+                    elseif crate:checkPlayerOnSide(player) then
+                    
+                    end
+                elseif crate:checkPlayerOnTop(player) then
                     player:setOnFloor()
                     mustFall = false
                     --player:resetDtJump()
