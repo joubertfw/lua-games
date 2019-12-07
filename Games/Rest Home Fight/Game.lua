@@ -74,22 +74,27 @@ function Game:update(dt)
                     respawnPlayer(player, i)
                 end
             end
-            local mustFall = true
+            local freeFall = true
             for i, crate in pairs(crates) do 
                 if crate.isSolid then
-                    if crate:checkPlayerBelow(player) then
+                    if crate:checkPlayerOnLeftSide(player.hitbox) then
+                        player:slide()
+                        player:setSlidingRight()
+                        freeFall = false
+                    elseif crate:checkPlayerOnRightSide(player.hitbox) then
+                        player:slide()
+                        player:setSlidingLeft()
+                        freeFall = false
+                    elseif crate:checkPlayerBelow(player.hitbox) then
                         player:fall(true)
                         player:setFalling()
-                    elseif crate:checkPlayerOnSide(player) then
-                    
                     end
-                elseif crate:checkPlayerOnTop(player) then
+                elseif crate:checkPlayerOnTop(player.hitbox) then
                     player:setOnFloor()
-                    mustFall = false
-                    --player:resetDtJump()
+                    freeFall = false
                 end
             end
-            if mustFall and not player:isJumping() then 
+            if freeFall and not player:isJumping() then
                 player:setFalling()
             end
         end

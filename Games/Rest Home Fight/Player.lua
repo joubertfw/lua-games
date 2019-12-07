@@ -42,7 +42,7 @@ function Player:new(x, y, imgPath, buttons)
     self.hurtboxY = 0
     self.hurtboxWidth = 0
     self.hurtboxHeight = 40
-    self.hitbox = HitBox(self.x, self.y, self.width*self.direction, self.height, 0)
+    self.hitbox = HitBox(self.x, self.y, self.width, self.height, 0)
     self.hurtbox = HitBox(self.x, self.y, 0, 0, 1)
 end
 
@@ -84,14 +84,18 @@ function Player:update(dt)
     end
 
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
+        if not self:isSlidingLeft() then
+            self:animate(dt)
+            self:moveLeft(dt)
+        end
         self.direction = -1
-        self:animate(dt)
-        self:moveLeft(dt)
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
+        if not self:isSlidingRight() then
+            self:animate(dt)
+            self:moveRight(dt)
+        end
         self.direction = 1
-        self:animate(dt)
-        self:moveRight(dt)
     end
     if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
         self:setJumping()
@@ -145,7 +149,11 @@ function Player:update(dt)
     self.x = self.x + self.velX * dt
 
     -- hitboxes updates
-    self.hitbox:update(self.x, self.y, self.width, self.height)
+    if self.direction == 1 then
+        self.hitbox:update(self.x + 20, self.y, self.width - 90, self.height)
+    else
+        self.hitbox:update(self.x + 70, self.y, self.width - 90, self.height)
+    end
     self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
 
     if not love.keyboard.isDown(self.input.btLeft) 
@@ -189,6 +197,12 @@ function Player:fall(resetVelY)
         self.velY = 0
     end
     self.acelY = 2000
+end
+
+function Player:slide(resetVelX)
+    self.acelX = 0
+    self.acelY = 100
+    self.velX = 0
 end
 
 function Player:jump(dt)
@@ -271,6 +285,9 @@ end
 
 function Player:moveLeft(dt)
     self.acelX = -self.velHoriz
+    if self.direction == 1 then
+        self.x = self.hitbox.x - self.hitbox.width
+    end
     if self:isJumping() then
         self.acelX = self.acelX*2
     end
@@ -278,6 +295,9 @@ end
 
 function Player:moveRight(dt)
     self.acelX = self.velHoriz
+    if self.direction == -1 then
+        self.x = self.hitbox.x - self.hitbox.width/2
+    end
     if self:isJumping() then
         self.acelX = self.acelX*1.5
     end
@@ -304,6 +324,22 @@ end
 
 function Player:isJumping()
     return self.state == 'jumping'
+end
+
+function Player:isSlidingLeft()
+    return self.state == 'slidingLeft'
+end
+
+function Player:isSlidingRight()
+    return self.state == 'slidingRight'
+end
+
+function Player:setSlidingLeft()
+    self.state = 'slidingLeft'
+end
+
+function Player:setSlidingRight()
+    self.state = 'slidingRight'
 end
 
 function Player:setOnFloor()
