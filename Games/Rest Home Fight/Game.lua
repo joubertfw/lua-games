@@ -6,7 +6,7 @@ function Game:new()
     love.window.setTitle('Rest Home Fight')
     screenHeight = love.graphics.getHeight()
     screenWidth = love.graphics.getWidth()
-    spawnArea = {200, love.graphics.getWidth() - 200}
+    spawnArea = {200, love.graphics.getWidth() - 300}
     util = Util()
 
     background = love.graphics.newImage("assets/image/sky.png")
@@ -35,18 +35,12 @@ function Game:new()
     dtRespawn = {2, 2}
 
     crates = { 
-        Tile(spawnArea[1]-200, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[1], screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+200, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+400, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+600, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+800, screenHeight*0.9, 'assets/image/floor.png'),
-
-        Tile(spawnArea[2]-600, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[2]-400, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[2]-200, screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(spawnArea[2], screenHeight*0.9, 'assets/image/floor.png'),
-        Tile(screenWidth/5, screenHeight/1.5, 'assets/image/floor.png', true, 0.5)
+        Tile(screenWidth/12, screenHeight*0.85, 'assets/image/floor_1.png', true),
+        Tile(screenWidth/6, screenHeight/1.5, 'assets/image/wooden_crate_1.png', false),
+        Tile(screenWidth*0.8, screenHeight/3, 'assets/image/wooden_crate_1.png', false),
+        Tile(screenWidth/12, screenHeight/3, 'assets/image/wooden_crate_1.png', false),
+        Tile(screenWidth*0.7, screenHeight/1.5, 'assets/image/wooden_crate_1.png', false),
+        Tile(screenWidth/2 - 125, screenHeight/2, 'assets/image/wooden_crate_1.png', false)
     }
 end
 
@@ -78,21 +72,19 @@ function Game:update(dt)
             for i, crate in pairs(crates) do 
                 if crate.isSolid then
                     if crate:checkPlayerOnLeftSide(player.hitbox) then
-                        if player:isOnFloor() then
-                            player.velX = 0
-                        else
+                        player.velX = 0
+                        player.x = player.x - 1
+                        if not player:isOnFloor() then
                             player:setSlidingRight()
                             freeFall = false
                         end
-                        player.x = player.x - 1
                     elseif crate:checkPlayerOnRightSide(player.hitbox) then
-                        if player:isOnFloor() then
-                            player.velX = 0
-                        else
+                        player.velX = 0
+                        player.x = player.x + 1
+                        if not player:isOnFloor() then
                             player:setSlidingLeft()
                             freeFall = false
                         end
-                        player.x = player.x + 1
                     elseif crate:checkPlayerBelow(player.hitbox) then
                         player:fall(true)
                         player:setFalling()

@@ -1,29 +1,28 @@
 Player = Object:extend()
 local util = Util()
 
---[[
-local defaults = {
-    quadQtd = 10
-    dtJump = 0.5
-    velHoriz = 900
-    velVert = 900
-    animVel = 10
+local default = {
+    dtJump = 0.4,
+    velHoriz = 900,
+    velVert = 900,
+    acelYOnJump = -3500,
+    acelYOnFall = 2500,
+    acelXOnHitted = 15000,
+    acelYOnHitted = 8000,
+    acelYOnSlide = 2000,
+    animVel = 10,
     quadQtd = 10
 }
-]]
 
 function Player:new(x, y, imgPath, buttons)
     -- Position and movement
     self.x, self.y = x, y
     self.direction = 1
-    self.velHoriz = 900
-    self.velVert = 900
     self.velX = 0
     self.velY = 0
     self.acelX = 1
     self.acelY = 10
-    self:resetDtJump()
-    self.dtJump = -1
+    self.dtJump = default.dtJump
     self.state = 'falling'
     self.stateHitted = 'none'
     self.stateHit = false
@@ -38,9 +37,9 @@ function Player:new(x, y, imgPath, buttons)
     
     -- Quads and animation
     self.direction = 1
-    self:resetAnimVel()
+    self.animVel = default.animVel
     self.image = love.graphics.newImage(imgPath)
-    self:resetQuadQTD()
+    self.quadQtd = default.quadQtd
     self.stopQuad = 4
     self.width = 160
     self.height = 240
@@ -64,11 +63,11 @@ function Player:update(dt)
         and not self:isJumping() --nem pulando
         or self.dtJump < 0 --ou o pulo acabou
         or (self:isJumping() and not love.keyboard.isDown(self.input.btJump)) --ou tava pulando mas parou de apertar
-        or (self.spaceRepeat and self.dtJump < 0.5 and self:isJumping()) then
+        or (self.spaceRepeat and self.dtJump < default.dtJump and self:isJumping()) then
         self.spaceRepeat = true
         self:fall()
     else
-        if self:isOnFloor() and self.dtJump >= 0.5 and not love.keyboard.isDown(self.input.btJump) then
+        if self:isOnFloor() and self.dtJump >= default.dtJump and not love.keyboard.isDown(self.input.btJump) then
             self.spaceRepeat = false
         end
         if self:isOnFloor() and self.dtJump < 0 and love.keyboard.isDown(self.input.btJump) then
@@ -76,7 +75,7 @@ function Player:update(dt)
         end
         if love.keyboard.isDown(self.input.btJump) and self.dtJump > 0 and not self.spaceRepeat then
             --jumping
-            self.acelY = -3500
+            self.acelY = default.acelYOnJump
             self.dtJump = self.dtJump - dt
         else
             self.acelY = 0
@@ -85,7 +84,7 @@ function Player:update(dt)
         if self:isSliding() then
             self:slide()
             -- reseta pulo
-            self.dtJump = 0.5
+            self.dtJump = default.dtJump
             self.spaceRepeat = false
         end
     end
@@ -121,7 +120,6 @@ function Player:update(dt)
     end
     if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
         self:setJumping()
-        self:jump(dt)
         self:animate(dt)
     end
     if not self:isOnFloor() then
@@ -157,12 +155,12 @@ function Player:update(dt)
     end
 
     if (self.stateHitted == "left") then
-        self.acelX = -15000
-        self.acelY = -8000
+        self.acelX = -default.acelXOnHitted
+        self.acelY = -default.acelYOnHitted
     end
     if (self.stateHitted == "right") then
-        self.acelX = 15000
-        self.acelY = -8000
+        self.acelX = default.acelXOnHitted
+        self.acelY = -default.acelYOnHitted
     end
     
     self.velX = (self.velX * 0.95) + self.acelX * dt
@@ -218,29 +216,13 @@ function Player:fall(resetVelY)
     if resetVelY then
         self.velY = 0
     end
-    self.acelY = 2000
+    self.acelY = default.acelYOnFall
 end
 
 function Player:slide()
-    self.acelY = 2000
+    self.acelY = default.acelYOnSlide
     self.acelX = 0
     self.velX = 0
-end
-
-function Player:jump(dt)
-    
-end
-
-function Player:resetQuadQTD()
-    self.quadQtd = 10
-end
-
-function Player:resetDtJump()
-    self.dtJump = 0.5
-end
-
-function Player:resetAnimVel()
-    self.animVel = 10
 end
 
 function Player:animate(dt)
@@ -278,7 +260,7 @@ function Player:animateHit(dt)
     else
         y = 3*h
     end
-    self.animVel = 10
+    self.animVel = default.animVel
     self.currentImg = self.currentImg + self.direction*dt*self.animVel
     self.quadQtd = 9
 
@@ -290,9 +272,8 @@ function Player:animateHit(dt)
     end
 
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
-    
-    self:resetQuadQTD()
-    self:resetAnimVel()
+    self.animVel = default.animVel
+    self.quadQtd = default.quadQtd
 end
 
 -- function Player:moveUp(dt)
@@ -306,7 +287,7 @@ end
 -- end
 
 function Player:moveLeft(dt)
-    self.acelX = -self.velHoriz
+    self.acelX = -default.velHoriz
     if self.direction == 1 then
         self.x = self.hitbox.x - self.hitbox.width
     end
@@ -316,12 +297,12 @@ function Player:moveLeft(dt)
 end
 
 function Player:moveRight(dt)
-    self.acelX = self.velHoriz
+    self.acelX = default.velHoriz
     if self.direction == -1 then
         self.x = self.hitbox.x - self.hitbox.width/3
     end
     if self:isJumping() then
-        self.acelX = self.acelX*1.5
+        self.acelX = self.acelX*2
     end
 end
 
@@ -369,7 +350,7 @@ function Player:setSlidingRight()
 end
 
 function Player:setOnFloor()
-    self:resetDtJump()
+    self.dtJump = default.dtJump
     self.state = 'onFloor'
 end
 
