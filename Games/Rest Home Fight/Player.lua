@@ -5,11 +5,11 @@ local default = {
     dtJump = 0.4,
     velHoriz = 900,
     velVert = 900,
-    acelYOnJump = -3500,
-    acelYOnFall = 2500,
+    velYOnJump = -1200,
+    acelYOnFall = 2000,
     acelXOnHitted = 15000,
     acelYOnHitted = 8000,
-    acelYOnSlide = 100,
+    atritoSlide = 0.5,
     animVel = 5,
     quadQtd = 10
 }
@@ -58,40 +58,9 @@ end
 
 function Player:update(dt)
 
-    -- if not self:isOnFloor() --se nao ta no chao
-    --     and not self:isSliding() -- nem escorregando
-    --     and not self:isJumping() --nem pulando
-    --     or self.dtJump < 0 --ou o pulo acabou
-    --     or (self:isJumping() and not love.keyboard.isDown(self.input.btJump)) --ou tava pulando mas parou de apertar
-    --     or (self.spaceRepeat and self.dtJump < default.dtJump and self:isJumping()) then
-    --     self.spaceRepeat = true
-    --     self:fall()
-    -- else
-    --     if self:isOnFloor() and self.dtJump >= default.dtJump and not love.keyboard.isDown(self.input.btJump) then
-    --         self.spaceRepeat = false
-    --     end
-    --     if self:isOnFloor() and self.dtJump < 0 and love.keyboard.isDown(self.input.btJump) then
-    --         self.velY = 0
-    --     end
-    --     if love.keyboard.isDown(self.input.btJump) and self.dtJump > 0 and not self.spaceRepeat then
-    --         --jumping
-    --         self.acelY = default.acelYOnJump
-    --         self.dtJump = self.dtJump - dt
-    --     else
-    --         self.acelY = 0
-    --         self.velY = 0
-    --     end
-    --     if self:isSliding() then
-    --         self:slide()
-    --         -- reseta pulo
-    --         self.dtJump = default.dtJump
-    --         self.spaceRepeat = false
-    --     end
-    -- end
-
-    self.acelY = 2000
+    self.acelY = default.acelYOnFall
     if (self:isOnFloor() or self:isSliding()) and love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
-        self.velY = -1200
+        self.velY = default.velYOnJump
         self.spaceRepeat = true
     elseif self:isOnFloor() and self.velY >= 0 then
         self.velY = 0
@@ -180,7 +149,7 @@ function Player:update(dt)
     end
     
     self.velX = (self.velX * 0.95) + self.acelX * dt
-    self.velY = ( self.acelY * dt) + (self:isSliding() and self.velY  * 0.5 or self.velY)
+    self.velY = ( self.acelY * dt) + (self:isSliding() and self.velY  * default.atritoSlide or self.velY)
     self.y = self.y + self.velY * dt
     self.x = self.x + self.velX * dt
 
