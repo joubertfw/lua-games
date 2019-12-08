@@ -35,17 +35,17 @@ function Game:new()
     dtRespawn = {2, 2}
 
     crates = { 
-        Tile(spawnArea[1]-200, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[1], screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+200, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+400, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+600, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[1]+800, screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[1]-200, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[1], screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+200, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+400, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+600, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[1]+800, screenHeight*0.9, 'assets/image/floor.png'),
 
-        Tile(spawnArea[2]-600, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[2]-400, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[2]-200, screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png'),
+        Tile(spawnArea[2]-600, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[2]-400, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[2]-200, screenHeight*0.9, 'assets/image/floor.png'),
+        Tile(spawnArea[2], screenHeight*0.9, 'assets/image/floor.png'),
         Tile(screenWidth/5, screenHeight/1.5, 'assets/image/floor.png', true, 0.5)
     }
 end
@@ -78,19 +78,29 @@ function Game:update(dt)
             for i, crate in pairs(crates) do 
                 if crate.isSolid then
                     if crate:checkPlayerOnLeftSide(player.hitbox) then
-                        player:slide()
-                        player:setSlidingRight()
-                        freeFall = false
+                        if player:isOnFloor() then
+                            player.velX = 0
+                        else
+                            player:setSlidingRight()
+                            freeFall = false
+                        end
+                        player.x = player.x - 1
                     elseif crate:checkPlayerOnRightSide(player.hitbox) then
-                        player:slide()
-                        player:setSlidingLeft()
-                        freeFall = false
+                        if player:isOnFloor() then
+                            player.velX = 0
+                        else
+                            player:setSlidingLeft()
+                            freeFall = false
+                        end
+                        player.x = player.x + 1
                     elseif crate:checkPlayerBelow(player.hitbox) then
                         player:fall(true)
                         player:setFalling()
+                    elseif crate:checkPlayerOnTop(player.hitbox) then
+                        player:setOnFloor()
+                        freeFall = false
                     end
-                end
-                if crate:checkPlayerOnTop(player.hitbox) then
+                elseif crate:checkPlayerOnTop(player.hitbox) then
                     player:setOnFloor()
                     freeFall = false
                 end

@@ -83,7 +83,7 @@ function Player:update(dt)
             self.velY = 0
         end
         if self:isSliding() then
-            self.acelY = 2000
+            self:slide()
             -- reseta pulo
             self.dtJump = 0.5
             self.spaceRepeat = false
@@ -222,13 +222,9 @@ function Player:fall(resetVelY)
 end
 
 function Player:slide()
-    if not self:isSliding() then
-        self.velY = 0
-        self.dtJump = 0.5
-    end
+    self.acelY = 2000
     self.acelX = 0
     self.velX = 0
-    self.acelY = 500
 end
 
 function Player:jump(dt)
@@ -322,7 +318,7 @@ end
 function Player:moveRight(dt)
     self.acelX = self.velHoriz
     if self.direction == -1 then
-        self.x = self.hitbox.x - self.hitbox.width/2
+        self.x = self.hitbox.x - self.hitbox.width/3
     end
     if self:isJumping() then
         self.acelX = self.acelX*1.5
