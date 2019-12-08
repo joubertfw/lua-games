@@ -10,7 +10,7 @@ local default = {
     acelXOnHitted = 15000,
     acelYOnHitted = 8000,
     acelYOnSlide = 2000,
-    animVel = 10,
+    animVel = 5,
     quadQtd = 10
 }
 
@@ -120,10 +120,10 @@ function Player:update(dt)
     end
     if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
         self:setJumping()
-        self:animate(dt)
+        self:animateJump(dt)
     end
     if not self:isOnFloor() then
-        self:stop(true)
+        self:animateJump()
     end
     
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
@@ -182,7 +182,9 @@ function Player:update(dt)
         and not love.keyboard.isDown(self.input.btUp)
         and not love.keyboard.isDown(self.input.btKick)
         and not love.keyboard.isDown(self.input.btPunch) then
-        self:stop()
+            if self:isOnFloor() then
+                self:stop()
+            end
         self.acelX = 0
     end
 end
@@ -191,22 +193,17 @@ function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
-    -- love.graphics.print(self.direction, self.x, self.y)
-    -- love.graphics.print(self.state, self.x, self.y + self.height + 5)
-    --love.graphics.print("stateHit:" .. self.stateHit , 50, 150)
-    -- love.graphics.print("dtHit:" .. self.dtHit, 50, 200)
-    -- love.graphics.print("HIT:" .. hit, 50, 50)
-
     
     love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
 end
 
 function Player:stop(jumping)
-    -- TODO: Criar frame fixo de jump
     local x, y, w, h = self.quad:getViewport()
     if self.direction == 1 then 
+        y = 0
         self.stopQuad = 5
     else
+        y = h
         self.stopQuad = 4
     end
     self.quad:setViewport(w*self.stopQuad, y, w, h)
@@ -233,15 +230,6 @@ function Player:animate(dt)
         y = h
     end
 
-    -- if self.stateHit then
-    --     self.animVel = 20
-    --     y = y + h*2
-    --     self.quadQtd = 9
-    -- else
-    --     self:resetQuadQTD()
-    --     self:resetAnimVel()
-    -- end
-
     self.currentImg = self.currentImg + self.direction*dt*self.animVel
 
     if self.currentImg > self.quadQtd then
@@ -251,6 +239,16 @@ function Player:animate(dt)
         self.currentImg = self.quadQtd
     end
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
+end
+
+function Player:animateJump()
+    local x, y, w, h = self.quad:getViewport()
+    if self.direction == 1 then 
+        y = 2*h
+    else
+        y = 3*h
+    end
+    self.quad:setViewport(w*9, y, w, h)
 end
 
 function Player:animateHit(dt)
