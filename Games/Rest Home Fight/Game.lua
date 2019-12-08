@@ -46,7 +46,7 @@ function Game:new()
         Tile(spawnArea[2]-400, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2]-200, screenHeight*0.95, 'assets/image/floor.png'),
         Tile(spawnArea[2], screenHeight*0.95, 'assets/image/floor.png'),
-        Tile(screenWidth/3, screenHeight/2, 'assets/image/floor.png', true, 0.5)
+        Tile(screenWidth/5, screenHeight/1.5, 'assets/image/floor.png', true, 0.5)
     }
 end
 
@@ -74,7 +74,7 @@ function Game:update(dt)
                     respawnPlayer(player, i)
                 end
             end
-            local freeFall = true
+            local freeFall = true --not in collision
             for i, crate in pairs(crates) do 
                 if crate.isSolid then
                     if crate:checkPlayerOnLeftSide(player.hitbox) then
@@ -89,7 +89,8 @@ function Game:update(dt)
                         player:fall(true)
                         player:setFalling()
                     end
-                elseif crate:checkPlayerOnTop(player.hitbox) then
+                end
+                if crate:checkPlayerOnTop(player.hitbox) then
                     player:setOnFloor()
                     freeFall = false
                 end
