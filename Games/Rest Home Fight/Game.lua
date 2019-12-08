@@ -16,13 +16,14 @@ function Game:new()
     ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
     
     menu = MenuScreen(
-        0, 0, 
-        {'Start Game 1P','Start Game 2P', 'Exit'}, 
+        0, 150, 
+        {'Start Game', 'Exit'}, 
         'assets/fonts/vcr.ttf',
-        'assets/image/sky.png',
+        'assets/image/menu.png',
+        'assets/image/box.png',
         0, 0
     )
-    state = 'ingame'
+    state = 'menu'
     score = 0
     players = {
         Player(0, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
@@ -47,10 +48,10 @@ end
 function Game:update(dt)
     if state == 'menu' then
         menu:update(dt)
-        if menu:getSelected() == #menu.options and love.keyboard.isDown("return") then
+        if menu:getState() == #menu.options - 1 then
             --exit
             love.event.quit()
-        elseif menu:getSelected() == 1 then
+        elseif menu:getState() == 0 then
             --begin game
             state = 'ingame'
             menuTrack:stop()
@@ -145,6 +146,10 @@ function Game:draw()
     love.graphics.print("dtJump:" .. players[2].dtJump, 550, 500)
     love.graphics.print("spaceRepeat:" .. ( players[2].spaceRepeat and 'true' or 'false'), 550, 550)
     --
+    love.graphics.print("MENU:" .. menu.yBox, 800, 100)
+    love.graphics.print("MENU:" .. menu.optionSelected, 800, 150)
+    love.graphics.print("MENU:" .. menu.internalState, 800, 200)
+
 end
 
 function respawnPlayer(player, i)

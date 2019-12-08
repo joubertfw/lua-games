@@ -45,7 +45,7 @@ function Player:new(x, y, imgPath, buttons)
     self.height = 240
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
-    
+
     self.life = 100
 
     -- Hitboxes
