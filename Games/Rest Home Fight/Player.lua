@@ -82,6 +82,12 @@ function Player:update(dt)
             self.acelY = 0
             self.velY = 0
         end
+        if self:isSliding() then
+            self.acelY = 2000
+            -- reseta pulo
+            self.dtJump = 0.5
+            self.spaceRepeat = false
+        end
     end
 
     if love.keyboard.isDown(self.input.btPunch) then
