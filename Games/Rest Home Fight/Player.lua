@@ -102,12 +102,12 @@ function Player:update(dt)
         self.direction = 1
     end
     
-    if love.keyboard.isDown(self.input.btJump) and not self:isFalling() then
+    if love.keyboard.isDown(self.input.btJump) and not self:isFalling() and not self:isOnFloor() then
         self:setJumping()
         self:animateJump(dt)
     end
 
-    if not self:isOnFloor() then
+    if not self:isOnFloor() and not self:isOnFloor() then
         self:animateJump()
     end
     
