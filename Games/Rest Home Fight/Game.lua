@@ -91,10 +91,12 @@ function Game:update(dt)
                         player:setFalling()
                     elseif crate:checkPlayerOnTop(player.hitbox) then
                         player:setOnFloor()
+                        player.y = crate.y - player.height + 1
                         freeFall = false
                     end
                 elseif crate:checkPlayerOnTop(player.hitbox) then
                     player:setOnFloor()
+                    player.y = crate.y - player.height + 1
                     freeFall = false
                 end
             end

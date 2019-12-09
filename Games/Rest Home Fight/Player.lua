@@ -41,8 +41,8 @@ function Player:new(x, y, imgPath, buttons)
     self.animVel = default.animVel
     self.image = love.graphics.newImage(imgPath)
     self.quadQtd = default.quadQtd
-    self.width = 160
-    self.height = 240
+    self.width = 140
+    self.height = 210
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
     self.dtAnimateHit = 0
