@@ -91,10 +91,12 @@ function Game:update(dt)
                         player:setFalling()
                     elseif crate:checkPlayerOnTop(player.hitbox) then
                         player:setOnFloor()
+                        player.y = crate.y - player.height + 1
                         freeFall = false
                     end
                 elseif crate:checkPlayerOnTop(player.hitbox) then
                     player:setOnFloor()
+                    player.y = crate.y - player.height + 1
                     freeFall = false
                 end
             end
@@ -130,7 +132,6 @@ function Game:draw()
     -- DEBUG
     love.graphics.print("acelX:" .. players[1].acelX, 50, 100)
     love.graphics.print("velX:" .. players[1].velX, 50, 150)
-    love.graphics.print("state fly:" .. players[1].dtTimeFly, 50, 300)
     love.graphics.print("state:" .. players[1].state, 50, 350)
     love.graphics.print("acelY:" .. players[1].acelY, 50, 400)
     love.graphics.print("velY:" .. players[1].velY, 50, 450)
@@ -139,7 +140,6 @@ function Game:draw()
 
     love.graphics.print("acelX:" .. players[2].acelX, 550, 100)
     love.graphics.print("velX:" .. players[2].velX, 550, 150)
-    love.graphics.print("state fly:" .. players[2].dtTimeFly, 550, 300)
     love.graphics.print("state:" .. players[2].state, 550, 350)
     love.graphics.print("acelY:" .. players[2].acelY, 550, 400)
     love.graphics.print("velY:" .. players[2].velY, 550, 450)

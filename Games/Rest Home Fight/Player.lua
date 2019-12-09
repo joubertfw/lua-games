@@ -11,7 +11,9 @@ local default = {
     acelYOnHitted = 8000,
     atritoSlide = 0.75,
     animVel = 5,
-    quadQtd = 10
+    quadQtd = 10,
+    quadHitQtd = 9,
+    dtAnimateHit = 0.1
 }
 
 function Player:new(x, y, imgPath, buttons)
@@ -29,7 +31,6 @@ function Player:new(x, y, imgPath, buttons)
     self.hitRepeat = false
     self.spaceRepeat = true
     self.dtHit = 0
-    self.dtTimeFly = 1
     self.dtProtected = 0
 
     -- Input
@@ -40,11 +41,11 @@ function Player:new(x, y, imgPath, buttons)
     self.animVel = default.animVel
     self.image = love.graphics.newImage(imgPath)
     self.quadQtd = default.quadQtd
-    self.stopQuad = 4
-    self.width = 160
-    self.height = 240
+    self.width = 140
+    self.height = 210
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
+    self.dtAnimateHit = 0
 
     self.life = 100
 
@@ -139,11 +140,17 @@ function Player:update(dt)
         self.dtHit = 0
         self.hitRepeat = true
     end
-    
-    if (self.stateHit == true and not self.hitRepeat) then
+
+    if self.dtAnimateHit > 0 then
+        self.dtAnimateHit = self.dtAnimateHit - dt
         self:animateHit(dt)
-        self.dtTimeFly = 1
+    end
+    if (self.stateHit == true and not self.hitRepeat) then
         self.dtHit = self.dtHit + dt
+        if self.dtAnimateHit <= 0 then
+            self.dtAnimateHit = default.dtAnimateHit
+            self.currentImg = 0
+        end
     end
 
     if (self.stateHitted == "left") then
@@ -181,14 +188,15 @@ end
 
 function Player:stop(jumping)
     local x, y, w, h = self.quad:getViewport()
+    local stopQuad
     if self.direction == 1 then 
         y = 0
-        self.stopQuad = 5
+        stopQuad = 5
     else
         y = h
-        self.stopQuad = 4
+        stopQuad = 4
     end
-    self.quad:setViewport(w*self.stopQuad, y, w, h)
+    self.quad:setViewport(w*stopQuad, y, w, h)
 end
 
 function Player:fall(resetVelY)
@@ -240,20 +248,16 @@ function Player:animateHit(dt)
     else
         y = 3*h
     end
-    self.animVel = default.animVel
-    self.currentImg = self.currentImg + self.direction*dt*self.animVel
-    self.quadQtd = 9
+    self.currentImg = self.currentImg + self.direction*dt*(10/default.dtAnimateHit)
 
-    if self.currentImg > self.quadQtd then
+    if self.currentImg > default.quadHitQtd then
         self.currentImg = 0
     end
     if self.currentImg < 0 then
-        self.currentImg = self.quadQtd
+        self.currentImg = default.quadHitQtd
     end
 
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
-    self.animVel = default.animVel
-    self.quadQtd = default.quadQtd
 end
 
 -- function Player:moveUp(dt)

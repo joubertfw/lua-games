@@ -27,7 +27,7 @@ function Tile:checkPlayerOnTop(player)
     return x2 < x1 + w1 and x2 + w2 > x1 and
         y1 > y2 and
         y2 + h2 > y1 and
-        y2 + h2 < y1 + 20
+        y2 + h2 < y1 + h1/2
 end
 
 function Tile:checkPlayerBelow(player)
