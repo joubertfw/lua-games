@@ -54,6 +54,8 @@ function Player:new(x, y, imgPath, buttons)
     self.hurtboxHeight = 40
     self.hitbox = HitBox(self.x, self.y, self.width, self.height, 0)
     self.hurtbox = HitBox(self.x, self.y, 0, 0, 1)
+    self.hitType = "punch"
+    self.hittedMult = 1
 end
 
 function Player:update(dt)
@@ -79,6 +81,7 @@ function Player:update(dt)
             self.stateHit = true
         end
         self.hurtboxY = 40
+        self.hitType = "punch"
     end
     if love.keyboard.isDown(self.input.btKick) then
         if (self.dtHit == 0 and not self.stateHit) then
@@ -86,6 +89,7 @@ function Player:update(dt)
             self.stateHit = true
         end
         self.hurtboxY = 150
+        self.hitType = "kick"
     end
 
     if self:isFalling() then
@@ -140,11 +144,12 @@ function Player:update(dt)
     end
 
     if (self.stateHitted == "left") then
-        self.acelX = -default.acelXOnHitted
+        self.acelX = -default.acelXOnHitted*self.hittedMult
         self.acelY = -default.acelYOnHitted
     end
+
     if (self.stateHitted == "right") then
-        self.acelX = default.acelXOnHitted
+        self.acelX = default.acelXOnHitted*self.hittedMult
         self.acelY = -default.acelYOnHitted
     end
     
@@ -277,8 +282,13 @@ function Player:moveRight(dt)
     end
 end
 
-function Player:isHitted(hurtBox, dt)
+function Player:isHitted(hurtBox, type, dt)
     self:setHittedNone()
+    self.hittedMult = 1    
+    if type == "kick" then
+        self.hittedMult = 2
+    end 
+
     if (self.hitbox:checkColision(hurtBox)) then
         if (self.hitbox.x < hurtBox.x) then
             self:setHittedLeft()
@@ -295,7 +305,6 @@ end
 function Player:isFalling()
     return self.state == 'falling'
 end
-
 
 function Player:isSliding()
     return self.state == 'slidingLeft' or self.state == 'slidingRight'
@@ -325,7 +334,6 @@ end
 function Player:setFalling()
     self.state = 'falling'
 end
-
 
 function Player:setHittedLeft()
     self.stateHitted = 'left'

@@ -58,8 +58,8 @@ function Game:update(dt)
             --ingameTrack:play()
         end
     elseif state == 'ingame' then
-        players[2]:isHitted(players[1].hurtbox, dt)
-        players[1]:isHitted(players[2].hurtbox, dt)
+        players[2]:isHitted(players[1].hurtbox, players[1].hitType, dt)
+        players[1]:isHitted(players[2].hurtbox, players[2].hitType, dt)
         for i, player in pairs(players) do 
             player:update(dt)
             if isBelowScreenView(player) then

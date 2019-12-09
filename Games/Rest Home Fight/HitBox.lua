@@ -1,6 +1,6 @@
 HitBox = Object:extend()
 
-function HitBox:new(x, y, width, height, type)
+function HitBox:new(x, y, width, height, type, part)
     self.x = x
     self.y = y
     self.width = width
