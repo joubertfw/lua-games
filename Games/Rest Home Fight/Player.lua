@@ -9,7 +9,7 @@ local default = {
     acelYOnFall = 2000,
     acelXOnHitted = 15000,
     acelYOnHitted = 8000,
-    atritoSlide = 0.5,
+    atritoSlide = 0.75,
     animVel = 5,
     quadQtd = 10
 }
@@ -62,8 +62,8 @@ function Player:update(dt)
     self.acelX = 0
     self:stop()
     self.acelY = default.acelYOnFall
-    if (self:isOnFloor() or self:isSliding()) and love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
-        self.velY = default.velYOnJump
+    if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
+        self.velY = self:isSliding() and default.velYOnJump * 1.5 or default.velYOnJump
         self.spaceRepeat = true
     elseif self:isOnFloor() and self.velY >= 0 then
         self.velY = 0
@@ -73,11 +73,14 @@ function Player:update(dt)
         end
     elseif self:isSliding() then
         self:slide()
+        if not love.keyboard.isDown(self.input.btJump) then
+            self.spaceRepeat = false
+        end
     end
 
     if love.keyboard.isDown(self.input.btPunch) then
         if (self.dtHit == 0 and not self.stateHit) then
-            self.hurtboxWidth = self.width
+            self.hurtboxWidth = self.width/2
             self.stateHit = true
         end
         self.hurtboxY = 40
@@ -85,7 +88,7 @@ function Player:update(dt)
     end
     if love.keyboard.isDown(self.input.btKick) then
         if (self.dtHit == 0 and not self.stateHit) then
-            self.hurtboxWidth = self.width
+            self.hurtboxWidth = self.width/2
             self.stateHit = true
         end
         self.hurtboxY = 150
@@ -161,10 +164,11 @@ function Player:update(dt)
     -- hitboxes updates
     if self.direction == 1 then
         self.hitbox:update(self.x + 20, self.y, self.width - 90, self.height)
+        self.hurtbox:update(self.x + (self.direction*((self.width/2))), self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
     else
         self.hitbox:update(self.x + 70, self.y, self.width - 90, self.height)
+        self.hurtbox:update(self.x, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
     end
-    self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
 end
 
 function Player:draw()
@@ -284,7 +288,7 @@ end
 
 function Player:isHitted(hurtBox, type, dt)
     self:setHittedNone()
-    self.hittedMult = 1    
+    self.hittedMult = 1
     if type == "kick" then
         self.hittedMult = 2
     end 

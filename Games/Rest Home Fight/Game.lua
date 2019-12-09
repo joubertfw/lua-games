@@ -41,7 +41,7 @@ function Game:new()
         Tile(screenWidth*0.8, screenHeight/3, 'assets/image/wooden_crate_1.png', false),
         Tile(screenWidth/12, screenHeight/3, 'assets/image/wooden_crate_1.png', false),
         Tile(screenWidth*0.7, screenHeight/1.5, 'assets/image/wooden_crate_1.png', false),
-        Tile(screenWidth/2 - 125, screenHeight/2, 'assets/image/wooden_crate_1.png', false)
+        Tile(screenWidth/2 - 125, screenHeight/2, 'assets/image/wooden_crate_1.png', true)
     }
 end
 
@@ -74,14 +74,14 @@ function Game:update(dt)
                 if crate.isSolid then
                     if crate:checkPlayerOnLeftSide(player.hitbox) then
                         player.velX = 0
-                        player.x = player.x - 1
+                        -- player.x = player.x - 1
                         if not player:isOnFloor() then
                             player:setSlidingRight()
                             freeFall = false
                         end
                     elseif crate:checkPlayerOnRightSide(player.hitbox) then
                         player.velX = 0
-                        player.x = player.x + 1
+                        -- player.x = player.x + 1
                         if not player:isOnFloor() then
                             player:setSlidingLeft()
                             freeFall = false

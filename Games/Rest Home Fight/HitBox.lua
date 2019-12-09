@@ -5,7 +5,7 @@ function HitBox:new(x, y, width, height, type, part)
     self.y = y
     self.width = width
     self.height = height
-    self.type = type       -- 0 = hitbox, 1 = hurtbox
+    self.type = type  -- 0 = hitbox, 1 = hurtbox
 end
 
 function HitBox:update(x, y, width, height)
