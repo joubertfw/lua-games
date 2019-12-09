@@ -11,7 +11,9 @@ local default = {
     acelYOnHitted = 8000,
     atritoSlide = 0.5,
     animVel = 5,
-    quadQtd = 10
+    quadQtd = 10,
+    quadHitQtd = 9,
+    dtAnimateHit = 0.1
 }
 
 function Player:new(x, y, imgPath, buttons)
@@ -29,7 +31,6 @@ function Player:new(x, y, imgPath, buttons)
     self.hitRepeat = false
     self.spaceRepeat = true
     self.dtHit = 0
-    self.dtTimeFly = 1
     self.dtProtected = 0
 
     -- Input
@@ -45,6 +46,7 @@ function Player:new(x, y, imgPath, buttons)
     self.height = 240
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
     self.currentImg = 0
+    self.dtAnimateHit = 0
 
     self.life = 100
 
@@ -136,11 +138,17 @@ function Player:update(dt)
         self.dtHit = 0
         self.hitRepeat = true
     end
-    
-    if (self.stateHit == true and not self.hitRepeat) then
+
+    if self.dtAnimateHit > 0 then
+        self.dtAnimateHit = self.dtAnimateHit - dt
         self:animateHit(dt)
-        self.dtTimeFly = 1
+    end
+    if (self.stateHit == true and not self.hitRepeat) then
         self.dtHit = self.dtHit + dt
+        if self.dtAnimateHit <= 0 then
+            self.dtAnimateHit = default.dtAnimateHit
+            self.currentImg = 0
+        end
     end
 
     if (self.stateHitted == "left") then
@@ -236,20 +244,16 @@ function Player:animateHit(dt)
     else
         y = 3*h
     end
-    self.animVel = default.animVel
-    self.currentImg = self.currentImg + self.direction*dt*self.animVel
-    self.quadQtd = 9
+    self.currentImg = self.currentImg + self.direction*dt*(10/default.dtAnimateHit)
 
-    if self.currentImg > self.quadQtd then
+    if self.currentImg > default.quadHitQtd then
         self.currentImg = 0
     end
     if self.currentImg < 0 then
-        self.currentImg = self.quadQtd
+        self.currentImg = default.quadHitQtd
     end
 
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
-    self.animVel = default.animVel
-    self.quadQtd = default.quadQtd
 end
 
 -- function Player:moveUp(dt)
