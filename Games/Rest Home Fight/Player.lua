@@ -57,7 +57,8 @@ function Player:new(x, y, imgPath, buttons)
 end
 
 function Player:update(dt)
-
+    self.acelX = 0
+    self:stop()
     self.acelY = default.acelYOnFall
     if (self:isOnFloor() or self:isSliding()) and love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
         self.velY = default.velYOnJump
@@ -102,13 +103,13 @@ function Player:update(dt)
         self.direction = 1
     end
     
-    if love.keyboard.isDown(self.input.btJump) and not self:isFalling() and not self:isOnFloor() then
-        self:setJumping()
-        self:animateJump(dt)
+    if love.keyboard.isDown(self.input.btJump) then
+        if not self:isFalling() and not self.spaceRepeat and not self:isOnFloor() then
+            self:setJumping()
+        end
     end
-
-    if not self:isOnFloor() and not self:isOnFloor() then
-        self:animateJump()
+    if self:isJumping() then
+        self:animateJump(dt)
     end
     
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
@@ -160,18 +161,6 @@ function Player:update(dt)
         self.hitbox:update(self.x + 70, self.y, self.width - 90, self.height)
     end
     self.hurtbox:update(self.x + (self.direction*((self.width/2))) + 10, self.hurtboxY + self.y, self.hurtboxWidth, self.hurtboxHeight)
-
-    if not love.keyboard.isDown(self.input.btLeft) 
-        and not love.keyboard.isDown(self.input.btRight)
-        and not love.keyboard.isDown(self.input.btDown)
-        and not love.keyboard.isDown(self.input.btUp)
-        and not love.keyboard.isDown(self.input.btKick)
-        and not love.keyboard.isDown(self.input.btPunch) then
-            if self:isOnFloor() then
-                self:stop()
-            end
-        self.acelX = 0
-    end
 end
 
 function Player:draw()
