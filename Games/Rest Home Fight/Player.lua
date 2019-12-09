@@ -19,7 +19,6 @@ local default = {
 function Player:new(x, y, imgPath, buttons)
     -- Position and movement
     self.x, self.y = x, y
-    self.direction = 1
     self.velX = 0
     self.velY = 0
     self.acelX = 1
@@ -31,7 +30,6 @@ function Player:new(x, y, imgPath, buttons)
     self.hitRepeat = false
     self.spaceRepeat = true
     self.dtHit = 0
-    self.dtProtected = 0
 
     -- Input
     self.input = Input(buttons)
