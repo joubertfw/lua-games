@@ -26,8 +26,8 @@ function Game:new()
     state = 'menu'
     score = 0
     players = {
-        Player(0, 0, 'assets/image/oldman.png', {up = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
-        Player(0, 0, 'assets/image/oldman.png', {jump = 'up'})
+        Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {up = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
+        Player(0, 0, 'assets/image/namdlo.png', 'assets/image/indicator.png' , {jump = 'up'})
     }
     for i, player in pairs(players) do
         respawnPlayer(player, i)
@@ -156,6 +156,7 @@ function respawnPlayer(player, i)
     player.velY = 0
     player.x = spawnArea[i]
     player.y = screenHeight/3
+    player.indicator = false
 end
 
 function resetDtRespawn(i)

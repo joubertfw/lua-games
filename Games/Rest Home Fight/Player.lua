@@ -13,10 +13,10 @@ local default = {
     animVel = 5,
     quadQtd = 10,
     quadHitQtd = 9,
-    dtAnimateHit = 0.1
+    dtAnimateHit = 0.3
 }
 
-function Player:new(x, y, imgPath, buttons)
+function Player:new(x, y, imgPath, imgIndicator, buttons)
     -- Position and movement
     self.x, self.y = x, y
     self.velX = 0
@@ -30,6 +30,7 @@ function Player:new(x, y, imgPath, buttons)
     self.hitRepeat = false
     self.spaceRepeat = true
     self.dtHit = 0
+    self.indicator = false
 
     -- Input
     self.input = Input(buttons)
@@ -38,6 +39,7 @@ function Player:new(x, y, imgPath, buttons)
     self.direction = 1
     self.animVel = default.animVel
     self.image = love.graphics.newImage(imgPath)
+    self.imageIndicator = love.graphics.newImage(imgIndicator)
     self.quadQtd = default.quadQtd
     self.width = 140
     self.height = 210
@@ -58,9 +60,12 @@ function Player:new(x, y, imgPath, buttons)
 end
 
 function Player:update(dt)
+
     self.acelX = 0
     self:stop()
     self.acelY = default.acelYOnFall
+    self.indicator = self.x < 0 or self.x > love.graphics.getWidth()
+
     if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
         self.velY = self:isSliding() and default.velYOnJump * 1.5 or default.velYOnJump
         self.spaceRepeat = true
@@ -160,6 +165,7 @@ function Player:update(dt)
         self.acelX = default.acelXOnHitted*self.hittedMult
         self.acelY = -default.acelYOnHitted
     end
+
     
     self.velX = (self.velX * 0.95) + self.acelX * dt
     self.velY = ( self.acelY * dt) + (self:isSliding() and self.velY  * default.atritoSlide or self.velY)
@@ -180,6 +186,12 @@ function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
+
+    if self.indicator then
+        local scale = self.x < 0 and 0.4 + (self.x*0.0005) or 0.4 - ((self.x - love.graphics.getWidth())*0.0005)
+        love.graphics.print("SCALE:" .. scale, 800, 500)
+        love.graphics.draw(self.imageIndicator, self.x < 0 and 0 or love.graphics.getWidth() - (self.imageIndicator:getWidth()*scale), self.y, 0, scale,  scale)
+    end
     
     love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
 end
