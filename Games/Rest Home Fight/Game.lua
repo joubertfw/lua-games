@@ -98,7 +98,7 @@ function Game:update(dt)
                     freeFall = false
                 end
             end
-            if freeFall and not player:isJumping() then
+            if freeFall then
                 player:setFalling()
             end
         end

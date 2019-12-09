@@ -88,28 +88,27 @@ function Player:update(dt)
         self.hurtboxY = 150
     end
 
+    if self:isFalling() then
+        self:animateJump(dt)
+    end
+
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         if not self:isSlidingLeft() then
-            self:animate(dt)
+            if not self:isFalling() then
+                self:animate(dt)
+            end
             self:moveLeft(dt)
         end
         self.direction = -1
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
         if not self:isSlidingRight() then
-            self:animate(dt)
+            if not self:isFalling() then
+                self:animate(dt)
+            end
             self:moveRight(dt)
         end
         self.direction = 1
-    end
-    
-    if love.keyboard.isDown(self.input.btJump) then
-        if not self:isFalling() and not self.spaceRepeat and not self:isOnFloor() then
-            self:setJumping()
-        end
-    end
-    if self:isJumping() then
-        self:animateJump(dt)
     end
     
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
@@ -263,7 +262,7 @@ function Player:moveLeft(dt)
     if self.direction == 1 then
         self.x = self.hitbox.x - self.hitbox.width
     end
-    if self:isJumping() then
+    if self:isFalling() and self.spaceRepeat then
         self.acelX = self.acelX*2
     end
 end
@@ -273,7 +272,7 @@ function Player:moveRight(dt)
     if self.direction == -1 then
         self.x = self.hitbox.x - self.hitbox.width/3
     end
-    if self:isJumping() then
+    if self:isFalling() and self.spaceRepeat then
         self.acelX = self.acelX*2
     end
 end
@@ -297,9 +296,6 @@ function Player:isFalling()
     return self.state == 'falling'
 end
 
-function Player:isJumping()
-    return self.state == 'jumping'
-end
 
 function Player:isSliding()
     return self.state == 'slidingLeft' or self.state == 'slidingRight'
@@ -330,9 +326,6 @@ function Player:setFalling()
     self.state = 'falling'
 end
 
-function Player:setJumping()
-    self.state = 'jumping'
-end
 
 function Player:setHittedLeft()
     self.stateHitted = 'left'
