@@ -41,7 +41,6 @@ function Player:new(x, y, imgPath, buttons)
     self.animVel = default.animVel
     self.image = love.graphics.newImage(imgPath)
     self.quadQtd = default.quadQtd
-    self.stopQuad = 4
     self.width = 160
     self.height = 240
     self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.image:getDimensions())
@@ -185,14 +184,15 @@ end
 
 function Player:stop(jumping)
     local x, y, w, h = self.quad:getViewport()
+    local stopQuad
     if self.direction == 1 then 
         y = 0
-        self.stopQuad = 5
+        stopQuad = 5
     else
         y = h
-        self.stopQuad = 4
+        stopQuad = 4
     end
-    self.quad:setViewport(w*self.stopQuad, y, w, h)
+    self.quad:setViewport(w*stopQuad, y, w, h)
 end
 
 function Player:fall(resetVelY)
