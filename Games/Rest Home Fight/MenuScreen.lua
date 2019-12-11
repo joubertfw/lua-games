@@ -16,6 +16,12 @@ function MenuScreen:new(xOptions,yOptions, options, font, bgImg, boxImage, xImg,
     self.offsetY = self.font:getHeight()
 end
 
+function MenuScreen:reset()
+    menu.internalState = -1
+    menu.optionSelected = 0
+    menu.presedKey = false
+end
+
 function MenuScreen:getSelected()
     return self.optionSelected
 end

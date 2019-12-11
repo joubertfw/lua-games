@@ -26,8 +26,8 @@ function Game:new()
     state = 'gameEnd'
     score = 0
     players = {
-        Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {jump = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
-        Player(0, 0, 'assets/image/namdlo.png', 'assets/image/indicator.png' , {jump = 'up'})
+        Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {jump = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}, 1),
+        Player(0, 0, 'assets/image/namdlo.png', 'assets/image/indicator.png' , {jump = 'up'}, 2)
     }
     for i, player in pairs(players) do
         respawnPlayer(player, i)
@@ -61,6 +61,7 @@ function Game:update(dt)
             ingameTrack:play()
         end
     elseif state == 'ingame' then
+        ingameTrack:play()
         players[2]:isHitted(players[1].hurtbox, players[1].hitType, dt)
         players[1]:isHitted(players[2].hurtbox, players[2].hitType, dt)
         for i, player in pairs(players) do 
@@ -107,13 +108,23 @@ function Game:update(dt)
                 player:setFalling()
             end
 
-            if player.life <= 0 then
-
+            if player.lifes <= 0 then
+                if i == 1 then
+                    state = 'gameEnd'
+                    whoWon = 'oldman'
+                else
+                    state = 'gameEnd'
+                    whoWon = 'namdlo'
+                end
             end
         end
 
     elseif state == 'gameEnd' then
         ingameTrack:stop()
+        if love.keyboard.isDown('return') then
+            state = 'menu'
+            resetGame()
+        end
     end
 end
 
@@ -131,10 +142,10 @@ function Game:draw()
     elseif state == 'gameEnd' then
         if whoWon == 'namdlo' then
             love.graphics.draw(love.graphics.newImage('assets/image/namdlo_win.png'), 0, 0)
-            love.graphics.print("Press enter to return", 700, 950)
+            love.graphics.print("Press enter to restart", 700, 950)
         else
             love.graphics.draw(love.graphics.newImage('assets/image/oldman_win.png'), 0, 0)
-            love.graphics.print("Press enter to return", 700, 950)
+            love.graphics.print("Press enter to restart", 700, 950)
         end
     end
     
@@ -162,6 +173,7 @@ function Game:draw()
 end
 
 function respawnPlayer(player, i)
+    player.lifes = player.lifes - 1
     player.velY = 0
     player.x = spawnArea[i]
     player.y = screenHeight/3
@@ -175,11 +187,9 @@ end
 function isBelowScreenView(player)
     return player.y > screenHeight
 end
---[[
---Basic definition for future usage
-function love.keypressed( key, scancode, isrepeat )
-    if key == 'return' then
-        print('Return key pressed')
-    end
+
+function resetGame()
+    menu:reset()
+    players[1].life = 4
+    players[2].life = 4
 end
-]]

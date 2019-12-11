@@ -16,7 +16,7 @@ local default = {
     dtAnimateHit = 0.3
 }
 
-function Player:new(x, y, imgPath, imgIndicator, buttons)
+function Player:new(x, y, imgPath, imgIndicator, buttons, playerNumber)
     -- Position and movement
     self.x, self.y = x, y
     self.velX = 0
@@ -47,7 +47,8 @@ function Player:new(x, y, imgPath, imgIndicator, buttons)
     self.currentImg = 0
     self.dtAnimateHit = 0
 
-    self.life = 100
+    self.lifes = 4
+    self.lifeImg = love.graphics.newImage('assets/image/life.png')
 
     -- Hitboxes
     self.hurtboxY = 0
@@ -186,6 +187,15 @@ function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
     love.graphics.draw(self.image,  self.quad, self.x, self.y, 0)
+    if playerNumber == 1 then
+        for i = 0, self.lifes - 1 do
+            love.graphics.draw(self.lifeImg, 100*i, 50)
+        end
+    else
+        for i = 0, self.lifes - 1 do
+            love.graphics.draw(self.lifeImg, love.graphics.getWidth() - 100*i, 50)
+        end
+    end
 
     if self.indicator then
         local scale = self.x < 0 and 0.4 + (self.x*0.0005) or 0.4 - ((self.x - love.graphics.getWidth())*0.0005)
