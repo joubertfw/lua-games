@@ -304,7 +304,7 @@ function Player:isHitted(hurtBox, type, dt)
     self:setHittedNone()
     self.hittedMult = 1
     if type == "kick" then
-        self.hittedMult = 2
+        self.hittedMult = 4
     end 
 
     if (self.hitbox:checkColision(hurtBox)) then

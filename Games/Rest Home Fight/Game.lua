@@ -23,10 +23,10 @@ function Game:new()
         'assets/image/box.png',
         0, 0
     )
-    state = 'menu'
+    state = 'gameEnd'
     score = 0
     players = {
-        Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {up = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
+        Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {jump = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}),
         Player(0, 0, 'assets/image/namdlo.png', 'assets/image/indicator.png' , {jump = 'up'})
     }
     for i, player in pairs(players) do
@@ -43,11 +43,14 @@ function Game:new()
         Tile(screenWidth*0.7, screenHeight/1.5, 'assets/image/wooden_crate_1.png', false),
         Tile(screenWidth/2 - 125, screenHeight/2, 'assets/image/wooden_crate_1.png', true)
     }
+
+    whoWon = 'none'
 end
 
 function Game:update(dt)
     if state == 'menu' then
         menu:update(dt)
+        menuTrack:play()
         if menu:getState() == #menu.options - 1 then
             --exit
             love.event.quit()
@@ -55,7 +58,7 @@ function Game:update(dt)
             --begin game
             state = 'ingame'
             menuTrack:stop()
-            --ingameTrack:play()
+            ingameTrack:play()
         end
     elseif state == 'ingame' then
         players[2]:isHitted(players[1].hurtbox, players[1].hitType, dt)
@@ -72,14 +75,14 @@ function Game:update(dt)
             local freeFall = true --not in collision
             for i, crate in pairs(crates) do 
                 if crate.isSolid then
-                    if crate:checkPlayerOnLeftSide(player.hitbox) then
+                    if crate:checkPlayerOnLeftSide(player.hitbox) and player.direction == 1 then
                         player.velX = 0
                         -- player.x = player.x - 1
                         if not player:isOnFloor() then
                             player:setSlidingRight()
                             freeFall = false
                         end
-                    elseif crate:checkPlayerOnRightSide(player.hitbox) then
+                    elseif crate:checkPlayerOnRightSide(player.hitbox) and player.direction == -1 then
                         player.velX = 0
                         -- player.x = player.x + 1
                         if not player:isOnFloor() then
@@ -103,12 +106,14 @@ function Game:update(dt)
             if freeFall then
                 player:setFalling()
             end
+
+            if player.life <= 0 then
+
+            end
         end
 
-    elseif state == 'gameWon' then
-
-    elseif state == 'gameLost' then
-
+    elseif state == 'gameEnd' then
+        ingameTrack:stop()
     end
 end
 
@@ -123,10 +128,14 @@ function Game:draw()
         for i, player in pairs(players) do 
             player:draw()
         end
-    elseif state == 'gameWon' then
-
-    elseif state == 'gameLost' then
-
+    elseif state == 'gameEnd' then
+        if whoWon == 'namdlo' then
+            love.graphics.draw(love.graphics.newImage('assets/image/namdlo_win.png'), 0, 0)
+            love.graphics.print("Press enter to return", 700, 950)
+        else
+            love.graphics.draw(love.graphics.newImage('assets/image/oldman_win.png'), 0, 0)
+            love.graphics.print("Press enter to return", 700, 950)
+        end
     end
     
     -- DEBUG
@@ -166,10 +175,11 @@ end
 function isBelowScreenView(player)
     return player.y > screenHeight
 end
-
+--[[
 --Basic definition for future usage
 function love.keypressed( key, scancode, isrepeat )
     if key == 'return' then
         print('Return key pressed')
     end
 end
+]]
