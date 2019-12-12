@@ -151,10 +151,10 @@ function Game:draw()
 end
 
 function respawnPlayer(player, i)
+    player.indicator = false
     player.velY = 0
     player.x = spawnArea[i]
     player.y = screenHeight/3
-    player.indicator = false
 end
 
 function resetDtRespawn(i)
