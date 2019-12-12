@@ -23,7 +23,7 @@ function Game:new()
         'assets/image/box.png',
         0, 0
     )
-    state = 'gameEnd'
+    state = 'menu'
     score = 0
     players = {
         Player(0, 0, 'assets/image/oldman.png', 'assets/image/indicator.png' , {jump = 'w', down = 's', left = 'a', right = 'd', punch = 'f', kick = 'g'}, 1),
@@ -70,6 +70,7 @@ function Game:update(dt)
                 dtRespawn[i] = dtRespawn[i] - dt
                 if dtRespawn[i] < 0 then
                     resetDtRespawn(i)
+                    player.lifes = player.lifes - 1
                     respawnPlayer(player, i)
                 end
             end
@@ -78,14 +79,12 @@ function Game:update(dt)
                 if crate.isSolid then
                     if crate:checkPlayerOnLeftSide(player.hitbox) and player.direction == 1 then
                         player.velX = 0
-                        -- player.x = player.x - 1
                         if not player:isOnFloor() then
                             player:setSlidingRight()
                             freeFall = false
                         end
                     elseif crate:checkPlayerOnRightSide(player.hitbox) and player.direction == -1 then
                         player.velX = 0
-                        -- player.x = player.x + 1
                         if not player:isOnFloor() then
                             player:setSlidingLeft()
                             freeFall = false
@@ -148,32 +147,10 @@ function Game:draw()
             love.graphics.print("Press enter to restart", 700, 950)
         end
     end
-    
-    -- DEBUG
-    love.graphics.print("acelX:" .. players[1].acelX, 50, 100)
-    love.graphics.print("velX:" .. players[1].velX, 50, 150)
-    love.graphics.print("state:" .. players[1].state, 50, 350)
-    love.graphics.print("acelY:" .. players[1].acelY, 50, 400)
-    love.graphics.print("velY:" .. players[1].velY, 50, 450)
-    love.graphics.print("dtJump:" .. players[1].dtJump, 50, 500)
-    love.graphics.print("spaceRepeat:" .. (players[1].spaceRepeat  and 'true' or 'false'), 50, 550)
-
-    love.graphics.print("acelX:" .. players[2].acelX, 550, 100)
-    love.graphics.print("velX:" .. players[2].velX, 550, 150)
-    love.graphics.print("state:" .. players[2].state, 550, 350)
-    love.graphics.print("acelY:" .. players[2].acelY, 550, 400)
-    love.graphics.print("velY:" .. players[2].velY, 550, 450)
-    love.graphics.print("dtJump:" .. players[2].dtJump, 550, 500)
-    love.graphics.print("spaceRepeat:" .. ( players[2].spaceRepeat and 'true' or 'false'), 550, 550)
-    --
-    love.graphics.print("MENU:" .. menu.yBox, 800, 100)
-    love.graphics.print("MENU:" .. menu.optionSelected, 800, 150)
-    love.graphics.print("MENU:" .. menu.internalState, 800, 200)
 
 end
 
 function respawnPlayer(player, i)
-    player.lifes = player.lifes - 1
     player.velY = 0
     player.x = spawnArea[i]
     player.y = screenHeight/3

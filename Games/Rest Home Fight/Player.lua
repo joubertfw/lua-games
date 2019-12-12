@@ -200,11 +200,8 @@ function Player:draw()
 
     if self.indicator then
         local scale = self.x < 0 and 0.4 + (self.x*0.0005) or 0.4 - ((self.x - love.graphics.getWidth())*0.0005)
-        love.graphics.print("SCALE:" .. scale, 800, 500)
         love.graphics.draw(self.imageIndicator, self.x < 0 and 0 or love.graphics.getWidth() - (self.imageIndicator:getWidth()*scale), self.y, 0, scale,  scale)
     end
-    
-    love.graphics.print("dtHit:" .. self.input.btKick, 50, 200)
 end
 
 function Player:stop(jumping)
@@ -228,7 +225,6 @@ function Player:fall(resetVelY)
 end
 
 function Player:slide()
-    --self.acelY = default.acelYOnSlide
     self.acelX = 0
     self.velX = 0
 end
@@ -280,16 +276,6 @@ function Player:animateHit(dt)
 
     self.quad:setViewport(w*math.floor(self.currentImg), y, w, h)
 end
-
--- function Player:moveUp(dt)
---     self.velY = -self.velVert
---     self.y = self.y + self.velY*dt
--- end
-
--- function Player:moveDown(dt)
---     self.velY = self.velVert
---     self.y = self.y + self.velY*dt
--- end
 
 function Player:moveLeft(dt)
     self.acelX = -default.velHoriz
