@@ -111,10 +111,10 @@ function Game:update(dt)
             if player.lifes <= 0 then
                 if i == 1 then
                     state = 'gameEnd'
-                    whoWon = 'oldman'
+                    whoWon = 'namdlo'
                 else
                     state = 'gameEnd'
-                    whoWon = 'namdlo'
+                    whoWon = 'oldman'
                 end
             end
         end
@@ -190,6 +190,6 @@ end
 
 function resetGame()
     menu:reset()
-    players[1].life = 4
-    players[2].life = 4
+    players[1].lifes = 4
+    players[2].lifes = 4
 end
