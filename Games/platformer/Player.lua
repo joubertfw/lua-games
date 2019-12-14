@@ -30,29 +30,27 @@ function Player:initialize(x, y, imgPath, buttons, config)
     
     -- Quads and animation
     if config.image then --Quads-based image (spritesheet)
-        self.imageObj = Image(imgPath, config.image)
+        self.image = Image(imgPath, config.image)
     else --Simple image
-        self.imageObj = Image(imgPath)
+        self.image = Image(imgPath)
     end
     
     -- Attack and damage
     self.buttonRepeat = true
-    self.hitbox = CollisionBox(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height)
-    self.hurtbox = CollisionBox(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height, 'hurtbox')
+    self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width, self.image.height)
+    self.hurtbox = CollisionBox(self.position.x, self.position.y, self.image.width, self.image.height, 'hurtbox')
 end
 
 function Player:update(dt)
 
     self.acel.x = 0
-    self:animateIdle()
+    self:animateIdle(dt)
 
     -- State-based manipulation
     if self:isOnFloor() then
-        self:animate(dt)
         self.acel.y = 0
         self.vel.y = 0
     elseif self:isFalling() then
-        self:animate(dt)
         self.acel.y = default.acelYOnFall
     end
 
@@ -66,29 +64,29 @@ function Player:update(dt)
 
     -- Collision boxes updates
     if self.direction == 1 then
-        self.hitbox:update(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height)
-        self.hurtbox:update(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height)
+        self.hitbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
+        self.hurtbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
     else
-        self.hitbox:update(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height)
-        self.hurtbox:update(self.position.x, self.position.y, self.imageObj.width, self.imageObj.height)
+        self.hitbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
+        self.hurtbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
     end
 end
 
 function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
-    self.imageObj:draw(self.position.x, self.position.y)
+    self.image:draw(self.position.x, self.position.y)
 end
 
 function Player:listenInput(dt)
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
-        self:animate(dt)
         self:moveLeft(dt)
+        self:animate(dt)
         self.direction = -1
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
-        self:animate(dt)
         self:moveRight(dt)
+        self:animate(dt)
         self.direction = 1
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
@@ -101,35 +99,40 @@ function Player:listenInput(dt)
     end
 end
 
-function Player:animateIdle()
-    --TODO: fix 
-    local stopQuad
-    if self.direction == 1 then 
-        y = 0
-        stopQuad = 5
+function Player:animateIdle(dt)
+    local currentCol = self.image.currentCol + self.direction*dt*self.image.animVel
+
+    if self.direction == 1 then
+        row = 0
+        if currentCol > self.image.quadConfig.idleCols then
+            currentCol = 0
+        end
     else
-        y = self.imageObj.height
-        stopQuad = 4
+        row = self.image.height*11
+        if currentCol < 0 then
+            currentCol = self.image.quadConfig.idleCols - 1
+        end
     end
-    self.imageObj:update(stopQuad, y)
+
+    self.image:update(currentCol, row)
 end
 
 function Player:animate(dt)
+    local currentCol = self.image.currentCol + self.direction*dt*self.image.animVel
+
     if self.direction == 1 then
-        y = 0
+        row = self.image.height
+        if currentCol > self.image.quadConfig.moveCols then
+            currentCol = 0
+        end
     else
-        y = self.imageObj.height*11
+        row = self.image.height*12
+        if currentCol < 0 then
+            currentCol = self.image.quadConfig.moveCols - 1
+        end
     end
 
-    local currentImg = self.imageObj.currentImg + self.direction*dt*self.imageObj.animVel
-
-    if currentImg > self.imageObj.quadQtd then
-        currentImg = 0
-    end
-    if currentImg < 0 then
-        currentImg = self.imageObj.quadQtd
-    end
-    self.imageObj:update(currentImg, y)
+    self.image:update(currentCol, row)
 end
 
 function Player:moveUp(dt)

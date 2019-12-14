@@ -13,7 +13,7 @@ function Game:initialize()
 
     --Imgs
     backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
-    gameEndImg = love.graphics.newImage('assets/image/namdlo_win.png')
+    --gameEndImg = love.graphics.newImage('assets/image/namdlo_win.png')
 
     --Font
     font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
@@ -37,8 +37,12 @@ function Game:initialize()
 
     --Entities creation
     spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y/2}}
+    imgConfig = {quadWidth = 200, quadHeight = 200, animVel = 7, 
+                cols = 9, rows = 22, 
+                idleCols = 5, moveCols = 8,
+                imageScale = 1}
     players = {
-        Player(0, 0, 'assets/image/player/santa.png', nil, {image = {quadWidth = 200, quadHeight = 200, animVel = 10, quadQtd = 9, imageScale = 2}})
+        Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
     }
     
     for i, player in pairs(players) do
@@ -72,7 +76,7 @@ function Game:update(dt)
             for i, tile in pairs(tiles) do
                 if tile:checkObjOnTop(player.hitbox) then
                     player:setOnFloor()
-                    player.y = tile.y - player.imageObj.height + 1
+                    player.y = tile.y - player.image.height + 1
                     freeFall = false
                 end
             end
