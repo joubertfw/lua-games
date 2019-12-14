@@ -122,18 +122,18 @@ end
 
 function Player:moveUp(dt)
     self.vel.y = -default.velVert
-    self.y = self.y + self.vel.y*dt
+    self.position.y = self.position.y + self.vel.y*dt
 end
 
 function Player:moveDown(dt)
     self.vel.y = default.velVert
-    self.y = self.y + self.vel.y*dt
+    self.position.y = self.position.y + self.vel.y*dt
 end
 
 function Player:moveLeft(dt)
     self.acel.x = -default.velHoriz
     if self.direction == 1 then
-        self.position.x = self.position.x + self.hitbox.width
+        self.position.x = self.position.x + self.hitbox.width*1.25
     end
     if self:isFalling() and self.buttonRepeat then
         self.acel.x = self.acel.x*2
@@ -143,7 +143,7 @@ end
 function Player:moveRight(dt)
     self.acel.x = default.velHoriz
     if self.direction == -1 then
-        self.position.x = self.position.x - self.hitbox.width
+        self.position.x = self.position.x - self.hitbox.width*1.25
     end
     if self:isFalling() and self.buttonRepeat then
         self.acel.x = self.acel.x*2

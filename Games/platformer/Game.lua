@@ -9,6 +9,10 @@ function Game:initialize()
     love.window.setMode(1920, 1080)
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
+    camera = Camera()
+    camera:setFollowLerp(0.1)
+    camera:setFollowStyle('PLATFORMER')
+
     util = Util()
 
     --Imgs
@@ -40,16 +44,13 @@ function Game:initialize()
     imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, 
                 idleCols = 5, moveCols = 8}
-    players = {
-        Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
-    }
-    
-    for i, player in pairs(players) do
-        spawnPlayer(player, i)
-    end
+    player = Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
+
+    spawnPlayer(player, 1)
 
     tiles = {
-        Tile(screenDimensions.x/12, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true)
+        Tile(screenDimensions.x/12, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true),
+        Tile(screenDimensions.x, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true)
     }
 end
 
@@ -68,22 +69,21 @@ function Game:update(dt)
         end
 
     elseif state == 'ingame' then
+        camera:update(dt)
+        camera:follow(player.hitbox.x, player.hitbox.y)
         --ingameTrack:play()
         local freeFall = true --not in collision
-        for i, player in pairs(players) do 
-            player:update(dt)
-            for i, tile in pairs(tiles) do
-                if tile:checkObjOnTop(player.hitbox) then
-                    player:setOnFloor()
-                    player.y = tile.y - player.image.height + 1
-                    freeFall = false
-                end
-            end
-            if freeFall then
-                player:setFalling()
+        player:update(dt)
+        for i, tile in pairs(tiles) do
+            if tile:checkObjOnTop(player.hitbox) then
+                player:setOnFloor()
+                player.y = tile.y - player.image.height + 1
+                freeFall = false
             end
         end
-
+        if freeFall then
+            player:setFalling()
+        end
     elseif state == 'gameEnd' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
@@ -97,13 +97,14 @@ function Game:draw()
     if state == 'menu' then
         menu:draw()
     elseif state == 'ingame' then
+        camera:attach()
         love.graphics.draw(backgroundImg, 0, 0)
         for i, tile in pairs(tiles) do 
             tile:draw()
-        end
-        for i, player in pairs(players) do 
-            player:draw()
-        end
+        end 
+        player:draw()
+        camera:detach()
+        camera:draw()
     elseif state == 'gameEnd' then
         love.graphics.draw(gameEndImg, 0, 0)
     end
