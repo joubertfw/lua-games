@@ -77,7 +77,7 @@ function Game:update(dt)
         for i, tile in pairs(tiles) do
             if tile:checkObjOnTop(player.hitbox) then
                 player:setOnFloor()
-                player.y = tile.y - player.image.height + 1
+                player.position.y = tile.y - player.hitbox.height*2.2
                 freeFall = false
             end
         end
