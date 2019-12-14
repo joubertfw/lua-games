@@ -37,10 +37,9 @@ function Game:initialize()
 
     --Entities creation
     spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y/2}}
-    imgConfig = {quadWidth = 200, quadHeight = 200, animVel = 7, 
-                cols = 9, rows = 22, 
-                idleCols = 5, moveCols = 8,
-                imageScale = 1}
+    imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
+                cols = 9, rows = 11, 
+                idleCols = 5, moveCols = 8}
     players = {
         Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
     }

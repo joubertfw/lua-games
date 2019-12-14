@@ -3,7 +3,6 @@ Image = class('Image')
 function Image:initialize(path, quadConfig)
     self.drawable = love.graphics.newImage(path)
     self.quadConfig = quadConfig
-    self.imageScale = quadConfig.imageScale or 1
     if quadConfig then
         self.width = quadConfig.quadWidth
         self.height = quadConfig.quadHeight
@@ -24,11 +23,11 @@ function Image:update(currentCol, row)
     end
 end
 
-function Image:draw(x, row)
+function Image:draw(x, row, direction)
     if self.quadConfig then
-        love.graphics.draw(self.drawable, self.quad, x, row, 0, self.imageScale)
+        love.graphics.draw(self.drawable, self.quad, x, row, 0, direction, 1)
     else
-        love.graphics.draw(self.drawable, x, row, 0, self.imageScale)
+        love.graphics.draw(self.drawable, x, row, 0, direction, 1)
     end
 end
 

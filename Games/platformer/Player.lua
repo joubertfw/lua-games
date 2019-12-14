@@ -37,8 +37,8 @@ function Player:initialize(x, y, imgPath, buttons, config)
     
     -- Attack and damage
     self.buttonRepeat = true
-    self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width, self.image.height)
-    self.hurtbox = CollisionBox(self.position.x, self.position.y, self.image.width, self.image.height, 'hurtbox')
+    self.hitbox = CollisionBox(0, 0, 0, 0)
+    self.hurtbox = CollisionBox(0, 0, 0, 0, 'hurtbox')
 end
 
 function Player:update(dt)
@@ -63,19 +63,14 @@ function Player:update(dt)
     self.position.x = self.position.x + self.vel.x * dt
 
     -- Collision boxes updates
-    if self.direction == 1 then
-        self.hitbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
-        self.hurtbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
-    else
-        self.hitbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
-        self.hurtbox:update(self.position.x, self.position.y, self.image.width, self.image.height)
-    end
+    self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
+    self.hurtbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
 end
 
 function Player:draw()
     self.hitbox:draw()
     self.hurtbox:draw()
-    self.image:draw(self.position.x, self.position.y)
+    self.image:draw(self.position.x, self.position.y, self.direction)
 end
 
 function Player:listenInput(dt)
@@ -100,36 +95,26 @@ function Player:listenInput(dt)
 end
 
 function Player:animateIdle(dt)
-    local currentCol = self.image.currentCol + self.direction*dt*self.image.animVel
-
-    if self.direction == 1 then
-        row = 0
-        if currentCol > self.image.quadConfig.idleCols then
-            currentCol = 0
-        end
-    else
-        row = self.image.height*11
-        if currentCol < 0 then
-            currentCol = self.image.quadConfig.idleCols - 1
-        end
+    local currentCol = self.image.currentCol + dt*self.image.animVel
+    row = 0
+    if currentCol > self.image.quadConfig.idleCols then
+        currentCol = 0
+    end
+    if currentCol < 0 then
+        currentCol = self.image.quadConfig.idleCols - 1
     end
 
     self.image:update(currentCol, row)
 end
 
 function Player:animate(dt)
-    local currentCol = self.image.currentCol + self.direction*dt*self.image.animVel
-
-    if self.direction == 1 then
-        row = self.image.height
-        if currentCol > self.image.quadConfig.moveCols then
-            currentCol = 0
-        end
-    else
-        row = self.image.height*12
-        if currentCol < 0 then
-            currentCol = self.image.quadConfig.moveCols - 1
-        end
+    local currentCol = self.image.currentCol + dt*self.image.animVel
+    row = self.image.height
+    if currentCol > self.image.quadConfig.moveCols then
+        currentCol = 0
+    end
+    if currentCol < 0 then
+        currentCol = self.image.quadConfig.moveCols - 1
     end
 
     self.image:update(currentCol, row)
@@ -148,7 +133,7 @@ end
 function Player:moveLeft(dt)
     self.acel.x = -default.velHoriz
     if self.direction == 1 then
-        self.position.x = self.hitbox.x - self.hitbox.width
+        self.position.x = self.position.x + self.hitbox.width
     end
     if self:isFalling() and self.buttonRepeat then
         self.acel.x = self.acel.x*2
@@ -158,7 +143,7 @@ end
 function Player:moveRight(dt)
     self.acel.x = default.velHoriz
     if self.direction == -1 then
-        self.position.x = self.hitbox.x - self.hitbox.width/3
+        self.position.x = self.position.x - self.hitbox.width
     end
     if self:isFalling() and self.buttonRepeat then
         self.acel.x = self.acel.x*2
