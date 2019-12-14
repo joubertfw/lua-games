@@ -26,7 +26,7 @@ function CollisionBox:draw()
     else
         love.graphics.setColor(1, 1, 1)
     end
-    love.graphics.rectangle( "line", self.x, self.y, self.width, self.height)
+    love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
     love.graphics.setColor(1, 1, 1, 1)
 end
 

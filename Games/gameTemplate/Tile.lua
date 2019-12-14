@@ -22,36 +22,34 @@ function Tile:draw()
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
 end
 
-function Tile:checkPlayerOnTop(player)
-    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
+function Tile:checkObjOnTop(obj, offset)
+    offset = offset or 0
+    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return x2 < x1 + w1 and x2 + w2 > x1 and
         y1 > y2 and
         y2 + h2 > y1 and
-        y2 + h2 < y1 + h1/2
+        y2 + h2 < y1 + h1 + offset
 end
 
-function Tile:checkPlayerBelow(player)
-    --Apenas pra tiles solidos (não atravessáveis por baixo e pelos lados)
-    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
+function Tile:checkObjBelow(obj, offset)
+    offset = offset or 0
+    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return x2 < x1 + w1 and x2 + w2 > x1 and
         y2 > y1 and
-        y2 > y1 + h1 -20 and
-        y2 < y1 + h1 and
-        self.isSolid
+        y2 > y1 + h1 + offset and
+        y2 < y1 + h1
 end
 
-function Tile:checkPlayerOnLeftSide(player)
-    --Apenas pra tiles solidos (não atravessáveis por baixo e pelos lados)
-    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
+function Tile:checkObjOnLeftSide(obj, offset)
+    offset = offset or 0
+    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return y2 < y1 + h1 and y2 + h2 > y1 and
-        x2 + w2 > x1 and x2 + w2 < x1 + 20 and
-        self.isSolid
+        x2 + w2 > x1 and x2 + w2 < x1 + offset
 end
 
-function Tile:checkPlayerOnRightSide(player)
-    --Apenas pra tiles solidos (não atravessáveis por baixo e pelos lados)
-    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, player.x, player.y, player.width, player.height
+function Tile:checkObjOnRightSide(obj, offset)
+    offset = offset or 0
+    local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return y2 < y1 + h1 and y2 + h2 > y1 and
-        x2 < x1 + w1 and x2 > x1 + w1 - 20 and
-        self.isSolid
+        x2 < x1 + w1 and x2 > x1 + w1 + offset
 end

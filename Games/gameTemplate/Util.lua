@@ -15,7 +15,7 @@ function Util:isOutOfScreen(obj, side, offset)
     elseif side == 'left' then
         return obj.x + obj.width + offset < 0
     elseif side == 'right' then
-        obj.x > love.graphics.getWidth() + offset
+        return obj.x > love.graphics.getWidth() + offset
     else
         print('You must pass a valid side as arg for isOutOfScreen()')
     end
