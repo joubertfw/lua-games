@@ -10,6 +10,7 @@ function love.load ()
     require('Player')
     require('Image')
     require('Tile')
+    require('Item')
 
     game = Game()
 end

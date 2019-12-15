@@ -52,6 +52,11 @@ function Game:initialize()
         Tile(screenDimensions.x/12, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true),
         Tile(screenDimensions.x, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true)
     }
+    items = {
+        Item(screenDimensions.x, screenDimensions.y/2, 'assets/image/misc/cacetinho.png')
+    }
+
+    score = 0
 end
 
 function Game:update(dt)
@@ -74,6 +79,14 @@ function Game:update(dt)
         --ingameTrack:play()
         local freeFall = true --not in collision
         player:update(dt)
+        for i, item in pairs(items) do
+            item:update()
+            if item:checkCollision(player.hitbox) then
+                score = score + 1
+                table.remove(items, i)
+                --gotCacetinhoFX()
+            end
+        end
         for i, tile in pairs(tiles) do
             if tile:checkObjOnTop(player.hitbox) then
                 player:setOnFloor()
@@ -102,12 +115,25 @@ function Game:draw()
         for i, tile in pairs(tiles) do 
             tile:draw()
         end 
+        for i, item in pairs(items) do
+            item:draw()
+        end
         player:draw()
         camera:detach()
         camera:draw()
     elseif state == 'gameEnd' then
         love.graphics.draw(gameEndImg, 0, 0)
     end
+
+    -- DEBUG
+    local base = 500
+    love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
+    love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
+    love.graphics.print("state:" .. player.state, 50, base + 150)
+    love.graphics.print("acel.x:" .. player.acel.y, 50, base + 200)
+    love.graphics.print("vel.x:" .. player.vel.y, 50, base + 250)
+    love.graphics.print("buttonRepeat:" .. (player.buttonRepeat  and 'true' or 'false'), 50, base + 300)
+    love.graphics.print("score:" .. score, 50, base + 350)
 
 end
 

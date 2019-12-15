@@ -30,7 +30,7 @@ function CollisionBox:draw()
     love.graphics.setColor(1, 1, 1, 1)
 end
 
-function CollisionBox:checkColision(other)
+function CollisionBox:checkCollision(other)
     return verifyPoints(self.x, self.y, self.width, self.height, other.x, other.y, other.width, other.height)
 end
 
