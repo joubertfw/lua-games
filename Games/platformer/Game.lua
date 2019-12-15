@@ -47,7 +47,7 @@ function Game:initialize()
     imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, 
                 idleCols = 5, moveCols = 8, punchCols = 5}
-    player = Player(0, 0, 'assets/image/player/santa.png', nil,  imgConfig)
+    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  imgConfig)
 
     spawnPlayer(player, 1)
 
