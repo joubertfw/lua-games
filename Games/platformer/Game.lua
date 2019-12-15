@@ -43,8 +43,8 @@ function Game:initialize()
     spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y/2}}
     imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, 
-                idleCols = 5, moveCols = 8}
-    player = Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
+                idleCols = 5, moveCols = 8, punchCols = 5}
+    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'}, {image = imgConfig})
 
     spawnPlayer(player, 1)
 
@@ -126,7 +126,7 @@ function Game:draw()
     end
 
     -- DEBUG
-    local base = 500
+    local base = 450
     love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
     love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
     love.graphics.print("state:" .. player.state, 50, base + 150)
@@ -134,6 +134,9 @@ function Game:draw()
     love.graphics.print("vel.x:" .. player.vel.y, 50, base + 250)
     love.graphics.print("buttonRepeat:" .. (player.buttonRepeat  and 'true' or 'false'), 50, base + 300)
     love.graphics.print("score:" .. score, 50, base + 350)
+    love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
+    love.graphics.print("hitRepeat:" .. (player.hitRepeat and 'true' or 'false'), 50, base + 450)
+    love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 
 end
 
