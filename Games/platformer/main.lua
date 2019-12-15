@@ -1,6 +1,7 @@
 function love.load ()
     class = require('lib.middleclass')
     Camera = require 'lib.Camera'
+    json = require("Json")
 
     require('Game')
     require('CollisionBox')

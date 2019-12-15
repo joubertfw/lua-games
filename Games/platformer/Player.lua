@@ -29,8 +29,8 @@ function Player:initialize(x, y, imgPath, buttons, config)
     self.input = Input(buttons)
     
     -- Quads and animation
-    if config.image then --Quads-based image (spritesheet)
-        self.image = Image(imgPath, config.image)
+    if config then --Quads-based image (spritesheet)
+        self.image = Image(imgPath, config)
     else --Simple image
         self.image = Image(imgPath)
     end

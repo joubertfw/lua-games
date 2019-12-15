@@ -4,6 +4,7 @@ local default = {
 
 }
 
+
 function Game:initialize()
     -- Window configuration
     love.window.setMode(1920, 1080)
@@ -38,24 +39,21 @@ function Game:initialize()
     )
 
     state = 'menu'
+    map = jsonToMap('/assets/maps/winter.json')
+    tiles = renderMap(map,  '/assets/maps/tilemap.png')
 
     --Entities creation
     spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y/2}}
     imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, 
                 idleCols = 5, moveCols = 8}
-    player = Player(0, 0, 'assets/image/player/santa.png', nil, {image = imgConfig})
+    player = Player(0, 0, 'assets/image/player/santa.png', nil,  imgConfig)
 
     spawnPlayer(player, 1)
 
-    tiles = {
-        Tile(screenDimensions.x/12, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true),
-        Tile(screenDimensions.x, screenDimensions.y*0.85, 'assets/image/scenario/floor_1.png', true)
-    }
     items = {
         Item(screenDimensions.x, screenDimensions.y/2, 'assets/image/misc/cacetinho.png')
     }
-
     score = 0
 end
 
@@ -107,14 +105,28 @@ function Game:update(dt)
 end
 
 function Game:draw()
+    love.graphics.draw(backgroundImg, 0, 0)
+    
     if state == 'menu' then
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
-        love.graphics.draw(backgroundImg, 0, 0)
+        -- love.graphics.draw(backgroundImg, 0, 0)
+
         for i, tile in pairs(tiles) do 
             tile:draw()
         end 
+
+        -- DEBUG TILES
+        -- love.graphics.setColor( 0, 0, 0, 1 )
+        -- for i,layer in pairs(map.layers) do
+        --     for j, number in pairs(layer.data) do
+        --             -- table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, true, '/assets/maps/tilemap.png', getTile(number, map.tilewidth, map.tileheight)))
+        --         love.graphics.print(number.. ' ' .. math.floor(number/5) ..' ' .. (((number-1)%5)), ((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight)
+        --     end
+        -- end
+        -- love.graphics.setColor( 1, 1, 1, 0 )
+
         for i, item in pairs(items) do
             item:draw()
         end
@@ -145,4 +157,29 @@ end
 function resetGame()
     --Reset things to default values
     menu:reset()
+end
+
+function getTile(number, tilewidth, tileheight)
+    return {quadWidth = tilewidth, quadHeight = tileheight, animVel = 1, cols = 5, rows = 4, idleCols = 0, moveCols = 0, currentCol =(number-1)%5, row = math.floor((number-1)/5)*128}
+end
+
+function jsonToMap(file)
+    local f = io.open(arg[1] ..file, "rb")
+    local lines = {}
+    lines = f:read("*a")
+
+    return json.decode(lines);
+end
+
+function renderMap(map, tilemap)
+    local solidBlocks = {[5] = true, [8] = true, [10] = true, [17] = true, [18] = true}
+    local tiles = {}
+    for i,layer in pairs(map.layers) do
+        for j, number in pairs(layer.data) do
+            if number ~= 0 then
+                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, not (solidBlocks[number]), tilemap, getTile(number, map.tilewidth, map.tileheight)))
+            end
+        end
+    end
+    return tiles
 end
