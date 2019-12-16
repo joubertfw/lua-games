@@ -5,7 +5,9 @@ local default = {
     dtJump = 0.4,
     velHoriz = 900,
     velVert = 900,
-    acelYOnFall = 2000,
+    acelYOnJump = -3000,
+    velYOnJump = -1000,
+    acelYOnFall = 1000,
     dtPunch = 0.2
 }
 
@@ -14,10 +16,10 @@ function Player:initialize(x, y, imgPath, buttons, config)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
-    self.dtJump = default.dtJump
-    self.state = 'onFloor'
+    self.state = 'falling'
     self.direction = 1
-    self.jumpRepeat = true
+    self.dtJump = default.dtJump
+    self.jumpRepeat = false
 
     -- Input
     self.input = Input(buttons)
@@ -38,26 +40,35 @@ end
 
 function Player:update(dt)
 
+    self.acel.y = default.acelYOnFall
+    self:listenInput(dt)
     -- State-based manipulation
+
     if self:isOnFloor() then
-        self.acel.y = 0
-        self.vel.y = 0
-    elseif self:isFalling() then
-        self.acel.y = default.acelYOnFall
+        if self.vel.y >= 0 then
+            self.acel.y = 0
+            self.vel.y = 0
+        end
+        if not love.keyboard.isDown(self.input.btJump) then
+            self.jumpRepeat = false
+        else
+            if not self.jumpRepeat then
+                self.acel.y = default.acelYOnJump
+                self.vel.y = default.velYOnJump
+                self.jumpRepeat = true
+            else
+            end
+        end
     end
 
-    self:listenInput(dt)
+    self:calculatePosition(dt)
     
-    -- After attributes-manipulation update
-    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
-    self.vel.y = self.vel.y + self.acel.y * dt
-    self.position.y = self.position.y + self.vel.y * dt
-    self.position.x = self.position.x + self.vel.x * dt
-
     -- Collision boxes updates
     self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
     self.hurtbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
-
+    
+    -- After attributes-manipulation update
+    
     --Idle animation
     if not love.keyboard.isDown(self.input.btLeft) 
         and not love.keyboard.isDown(self.input.btRight)
@@ -73,8 +84,16 @@ end
 
 function Player:draw()
     self.hitbox:draw()
-    self.hurtbox:draw()
+    self.hurtbox:draw()    
     self.image:draw(self.position.x, self.position.y, self.direction)
+
+
+    love.graphics.points( self.hitbox.x, self.hitbox.y )
+    love.graphics.print( "y", self.hitbox.x, self.hitbox.y )
+
+    love.graphics.points(self.hitbox.x , self.hitbox.y + self.hitbox.height)
+    love.graphics.print( "y+h", self.hitbox.x + self.hitbox.width, self.hitbox.y + self.hitbox.height )
+
 end
 
 function Player:listenInput(dt)
@@ -94,11 +113,17 @@ function Player:listenInput(dt)
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
         --self:animate(dt)
-        self:moveUp(dt)
+        -- self:moveUp(dt)
     end
     if love.keyboard.isDown(self.input.btDown) and not love.keyboard.isDown(self.input.btUp) then
         self:animate(dt)
         self:moveDown(dt)
+    end
+
+    if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
+        -- self.vel.y = default.velYOnJump -- * 1.5 or default.velYOnJump
+        self:moveUp(dt)
+        self.spaceRepeat = true
     end
 
     --Attack verification
@@ -146,14 +171,23 @@ function Player:animate(dt)
     self.image:update(currentCol, row)
 end
 
+function Player:calculatePosition(dt)
+    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
+    self.vel.y = self.vel.y + self.acel.y * dt
+    self.vel.y = self.vel.y < 1000 and self.vel.y or 1000
+    self.position.y = self.position.y + self.vel.y * dt
+    self.position.x = self.position.x + self.vel.x * dt
+end
+
 function Player:moveUp(dt)
-    self.vel.y = -default.velVert
-    self.position.y = self.position.y + self.vel.y*dt
+    self.acel.y = -default.velYOnJump
+    -- self:setFalling()
+    -- self.position.y = self.position.y + self.vel.y*dt
 end
 
 function Player:moveDown(dt)
-    self.vel.y = default.velVert
-    self.position.y = self.position.y + self.vel.y*dt
+    self.acel.y = default.velVert
+    -- self.position.y = self.position.y + self.vel.y*dt
 end
 
 function Player:moveLeft(dt)
@@ -195,4 +229,24 @@ end
 
 function Player:setFalling()
     self.state = 'falling'
+end
+
+function Player:isSliding()
+    return self.state == 'slidingLeft' or self.state == 'slidingRight'
+end
+
+function Player:isSlidingLeft()
+    return self.state == 'slidingLeft'
+end
+
+function Player:isSlidingRight()
+    return self.state == 'slidingRight'
+end
+
+function Player:setSlidingLeft()
+    self.state = 'slidingLeft'
+end
+
+function Player:setSlidingRight()
+    self.state = 'slidingRight'
 end
