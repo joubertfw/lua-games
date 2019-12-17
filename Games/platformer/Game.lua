@@ -44,7 +44,7 @@ function Game:initialize()
     tiles = renderMap(map,  '/assets/maps/tilemap.png')
 
     --Player creation
-    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y*1.3}}
+    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y*1.2}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
     player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
@@ -88,6 +88,7 @@ function Game:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
         --ingameTrack:play()
         player:update(dt)
+        -- itens check
         for i, item in pairs(items) do
             item:update()
             if item:checkCollision(player.hitbox) then
@@ -99,16 +100,12 @@ function Game:update(dt)
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
         end
-        local freeFall = true --not in collision
+        player:setFalling()
         for i, tile in pairs(tiles) do
-            if tile:checkObjOnTop(player.hitbox) then
+            if tile:checkObjOnTop(player.hitbox, 10) then
                 player:setOnFloor()
-                player.position.y = tile.y - player.hitbox.height*2.2
-                freeFall = false
+                break
             end
-        end
-        if freeFall then
-            player:setFalling()
         end
     elseif state == 'gameEnd' then
         --ingameTrack:stop()
@@ -157,16 +154,15 @@ function Game:draw()
 
     -- DEBUG
     local base = 450
-    love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
-    love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
-    love.graphics.print("state:" .. player.state, 50, base + 150)
-    love.graphics.print("acel.x:" .. player.acel.y, 50, base + 200)
-    love.graphics.print("vel.x:" .. player.vel.y, 50, base + 250)
-    love.graphics.print("buttonRepeat:" .. (player.buttonRepeat  and 'true' or 'false'), 50, base + 300)
-    love.graphics.print("score:" .. score, 50, base + 350)
-    love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
-    love.graphics.print("hitRepeat:" .. (player.hitRepeat and 'true' or 'false'), 50, base + 450)
-    love.graphics.print("fps: " .. fps, 50, base + 500)
+    -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
+    -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
+    love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
+    love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
+    love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
+    -- love.graphics.print("score:" .. score, 50, base + 350)
+    -- love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
+    -- love.graphics.print("hitRepeat:" .. (player.hitRepeat and 'true' or 'false'), 50, base + 450)
+    -- love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 
 end
 

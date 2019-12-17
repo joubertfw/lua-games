@@ -30,37 +30,53 @@ end
 
 function Tile:draw()
     self.image:draw(self.x, self.y, 1)
-    -- love.graphics.draw(self.image, self.x, self.y, 0, self.size, self.size)
+
+    -- DEBUG
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
+
+    love.graphics.setColor( 0, 0, 0, 1 )
+
+    love.graphics.setPointSize(10)
+
+    love.graphics.points( self.x, self.y )
+    love.graphics.print( "y", self.x, self.y )
+
+    love.graphics.points( self.x + self.width, self.y + self.height )
+    love.graphics.print( "y+h", self.x + self.width, self.y + self.height )
+
+    love.graphics.setColor( 1, 1, 1, 1 )
 end
 
 function Tile:checkObjOnTop(obj, offset)
     offset = offset or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
-    return self.isSolid and x2 < x1 + w1 and x2 + w2 > x1 and
-        y1 > y2 and
-        y2 + h2 > y1 and
-        y2 + h2 < y1 + h1 + offset
+    return self.isSolid and 
+        x2 < x1 + w1 and 
+        x2 + w2 > x1 and
+        y1 <= (y2 + h2) + offset and
+        y1 > (y2 + h2) - offset
 end
 
 function Tile:checkObjBelow(obj, offset)
-    offset = offset or 0
+    offset = offset and offset or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
-    return self.isSolid and x2 < x1 + w1 and x2 + w2 > x1 and
+    return self.isSolid and 
+        x2 < x1 + w1 and
+        x2 + w2 > x1 and
         y2 > y1 and
         y2 > y1 + h1 + offset and
         y2 < y1 + h1
 end
 
 function Tile:checkObjOnLeftSide(obj, offset)
-    offset = offset or 0
+    offset = offset and offset or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid and y2 < y1 + h1 and y2 + h2 > y1 and
         x2 + w2 > x1 and x2 + w2 < x1 + offset
 end
 
 function Tile:checkObjOnRightSide(obj, offset)
-    offset = offset or 0
+    offset = offset and offset or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid  and y2 < y1 + h1 and y2 + h2 > y1 and
         x2 < x1 + w1 and x2 > x1 + w1 + offset
