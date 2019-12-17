@@ -12,6 +12,7 @@ function Game:initialize()
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
+    camera:setBounds(0, 0, 6400, 1340)
     camera:setFollowLerp(0.1)
     camera:setFollowStyle('PLATFORMER')
 
@@ -107,6 +108,9 @@ function Game:update(dt)
                 break
             end
         end
+        if util:isOutOfScreen(player.hitbox, 'down', 1000) then
+            spawnPlayer(player, 1)
+        end
     elseif state == 'gameEnd' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
@@ -125,7 +129,7 @@ function Game:draw()
         camera:attach()
         -- love.graphics.draw(backgroundImg, 0, 0)
 
-        for i, tile in pairs(tiles) do 
+        for i, tile in pairs(tiles) do
             tile:draw()
         end
         for i, enemie in pairs(enemies) do
@@ -169,6 +173,8 @@ end
 function spawnPlayer(player, i)
     player.position.x = spawnArea[i].x
     player.position.y = spawnArea[i].y
+    player.vel.y = 0
+    player.vel.x = 0
 end
 
 function spawnEnemie(spawn, imgConfig)
