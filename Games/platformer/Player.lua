@@ -1,6 +1,8 @@
 Player = class('Player')
 local util = Util()
 
+--These values are global for every instance
+--When overritten, all instances are affected
 local default = {
     dtJump = 0.4,
     velHoriz = 900,
@@ -15,7 +17,7 @@ function Player:initialize(x, y, imgPath, buttons, config)
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
     self.dtJump = default.dtJump
-    self.state = 'onFloor'
+    self.state = 'falling'
     self.direction = 1
     self.jumpRepeat = true
 
@@ -28,9 +30,9 @@ function Player:initialize(x, y, imgPath, buttons, config)
     else --Simple image
         self.image = Image(imgPath)
     end
-    self.dtPunch = 0
     
     -- Attack and damage
+    self.dtPunch = 0
     self.hitRepeat = false
     self.hitbox = CollisionBox(0, 0, 0, 0)
     self.hurtbox = CollisionBox(0, 0, 0, 0, 'hurtbox')
@@ -80,14 +82,14 @@ end
 function Player:listenInput(dt)
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         self:moveLeft(dt)
-        if not self:isPunching() then
+        if not self:isPunching() and not self:isFalling() then
             self:animate(dt)
         end
         self.direction = -1
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
         self:moveRight(dt)
-        if not self:isPunching() then
+        if not self:isPunching() and not self:isFalling() then
             self:animate(dt)
         end
         self.direction = 1
@@ -129,10 +131,6 @@ end
 function Player:animatePunch(dt)
     local currentCol = self.image.currentCol + (dt*self.image.animVel)/default.dtPunch*0.6
     row = 2*self.image.height
-    -- if currentCol > self.image.quadConfig.punchCols then
-    --     currentCol = 0
-    -- end
-
     self.image:update(currentCol, row)
 end
 

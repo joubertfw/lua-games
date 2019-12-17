@@ -1,9 +1,10 @@
 Game = class('Game')
 
+--These values are global for every instance
+--When overritten, all instances are affected
 local default = {
 
 }
-
 
 function Game:initialize()
     -- Window configuration
@@ -42,22 +43,33 @@ function Game:initialize()
     map = jsonToMap('/assets/maps/winter.json')
     tiles = renderMap(map,  '/assets/maps/tilemap.png')
 
-    --Entities creation
-    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y/2}}
-    imgConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
-                cols = 9, rows = 11, 
-                idleCols = 5, moveCols = 8, punchCols = 5}
-    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  imgConfig)
-
+    --Player creation
+    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y*1.3}}
+    playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
+                cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
+    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
     spawnPlayer(player, 1)
 
+    --Enemies creation
+    enemies = {}
+    enemieSpawns = {{x = screenDimensions.x*0.8, y = screenDimensions.y*1.34, range = 12, color = 'red', direction = -1},
+                    {x = screenDimensions.x*0.45, y = screenDimensions.y*0.98, range = 4.5, color = 'blue', direction = 1}}
+    enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
+    for i, spawn in pairs(enemieSpawns) do
+        table.insert(enemies, spawnEnemie(spawn, enemieConfig))
+    end
+
+    --Items creation
     items = {
         Item(screenDimensions.x, screenDimensions.y/2, 'assets/image/misc/cacetinho.png')
     }
+
     score = 0
+    fps = 0
 end
 
 function Game:update(dt)
+    fps = 1/dt
     if state == 'menu' then
         menu:update(dt)
         --menuTrack:play()
@@ -75,7 +87,6 @@ function Game:update(dt)
         camera:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
         --ingameTrack:play()
-        local freeFall = true --not in collision
         player:update(dt)
         for i, item in pairs(items) do
             item:update()
@@ -85,6 +96,10 @@ function Game:update(dt)
                 --gotCacetinhoFX()
             end
         end
+        for i, enemie in pairs(enemies) do
+            enemie:update(dt)
+        end
+        local freeFall = true --not in collision
         for i, tile in pairs(tiles) do
             if tile:checkObjOnTop(player.hitbox) then
                 player:setOnFloor()
@@ -115,7 +130,10 @@ function Game:draw()
 
         for i, tile in pairs(tiles) do 
             tile:draw()
-        end 
+        end
+        for i, enemie in pairs(enemies) do
+            enemie:draw()
+        end
 
         -- DEBUG TILES
         -- love.graphics.setColor( 0, 0, 0, 1 )
@@ -148,13 +166,17 @@ function Game:draw()
     love.graphics.print("score:" .. score, 50, base + 350)
     love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
     love.graphics.print("hitRepeat:" .. (player.hitRepeat and 'true' or 'false'), 50, base + 450)
-    love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
+    love.graphics.print("fps: " .. fps, 50, base + 500)
 
 end
 
 function spawnPlayer(player, i)
     player.position.x = spawnArea[i].x
     player.position.y = spawnArea[i].y
+end
+
+function spawnEnemie(spawn, imgConfig)
+    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, imgConfig)
 end
 
 function resetGame()
