@@ -7,8 +7,8 @@ local default = {
     dtJump = 0.4,
     velHoriz = 900,
     velVert = 900,
-    acelYOnJump = -3000,
-    velYOnJump = -1000,
+    acelYOnJump = -1500,
+    velYOnJump = -600,
     acelYOnFall = 1000,
     dtPunch = 0.2
 }

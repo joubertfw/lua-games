@@ -40,11 +40,11 @@ function Game:initialize()
     )
 
     state = 'menu'
-    map = jsonToMap('/assets/maps/winter.json')
-    tiles = renderMap(map,  '/assets/maps/tilemap.png')
+    map = jsonToMap('/assets/maps/winter2.json')
+    tiles = renderMap(map,  '/assets/maps/platformPack_tilesheet.png')
 
     --Player creation
-    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y*1.2}}
+    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y-(screenDimensions.y/2)}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
     player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
@@ -181,7 +181,7 @@ function resetGame()
 end
 
 function getTile(number, tilewidth, tileheight)
-    return {quadWidth = tilewidth, quadHeight = tileheight, animVel = 1, cols = 5, rows = 4, idleCols = 0, moveCols = 0, currentCol =(number-1)%5, row = math.floor((number-1)/5)*128}
+    return {quadWidth = tilewidth, quadHeight = tileheight, animVel = 1, cols = 14, rows = 7, idleCols = 0, moveCols = 0, currentCol =(number-1)%14, row = math.floor((number-1)/13)*64}
 end
 
 function jsonToMap(file)
@@ -193,12 +193,11 @@ function jsonToMap(file)
 end
 
 function renderMap(map, tilemap)
-    local solidBlocks = {[5] = true, [8] = true, [10] = true, [17] = true, [18] = true}
     local tiles = {}
     for i,layer in pairs(map.layers) do
         for j, number in pairs(layer.data) do
             if number ~= 0 then
-                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, not (solidBlocks[number]), tilemap, getTile(number, map.tilewidth, map.tileheight)))
+                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)))
             end
         end
     end
