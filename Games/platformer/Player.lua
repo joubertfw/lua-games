@@ -73,14 +73,11 @@ function Player:update(dt)
     
     --Idle animation
     if not love.keyboard.isDown(self.input.btLeft) 
-        and not love.keyboard.isDown(self.input.btRight)
-        and not love.keyboard.isDown(self.input.btDown)
-        and not love.keyboard.isDown(self.input.btUp)
-        and not love.keyboard.isDown(self.input.btPunch) then
+        and not love.keyboard.isDown(self.input.btRight) then
             if self:isOnFloor() and not self:isPunching() then
                 self:animateIdle(dt)
             end
-        self.acel.x = 0
+            self.acel.x = 0
     end
 end
 
@@ -115,11 +112,11 @@ function Player:listenInput(dt)
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
         --self:animate(dt)
-        -- self:moveUp(dt)
+        --self:moveUp(dt)
     end
     if love.keyboard.isDown(self.input.btDown) and not love.keyboard.isDown(self.input.btUp) then
-        self:animate(dt)
-        self:moveDown(dt)
+        --self:animate(dt)
+        --self:moveDown(dt) buga o pulo se apertar junto
     end
 
     if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
