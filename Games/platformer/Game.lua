@@ -45,7 +45,7 @@ function Game:initialize()
     tiles = renderMap(map,  '/assets/maps/platformPack_tilesheet.png')
 
     --Player creation
-    spawnArea = {{x = screenDimensions.x/2, y = screenDimensions.y-(screenDimensions.y/2)}}
+    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
     player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
@@ -53,8 +53,12 @@ function Game:initialize()
 
     --Enemies creation
     enemies = {}
-    enemieSpawns = {{x = screenDimensions.x*0.8, y = screenDimensions.y*1.34, range = 12, color = 'red', direction = -1},
-                    {x = screenDimensions.x*0.45, y = screenDimensions.y*0.98, range = 4.5, color = 'blue', direction = 1}}
+    enemieSpawns = {{x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, color = 'red', direction = 1},
+                    {x = screenDimensions.x*1.3, y = screenDimensions.y*0.98, range = 7.8, color = 'blue', direction = -1},
+                    {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, color = 'blue', direction = 1},
+                    {x = screenDimensions.x*2.05, y = screenDimensions.y*0.98, range = 3, color = 'red', direction = 1},
+                    {x = screenDimensions.x*2.6, y = screenDimensions.y*0.98, range = 1, color = 'blue', direction = 1}
+                }
     enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
     for i, spawn in pairs(enemieSpawns) do
         table.insert(enemies, spawnEnemie(spawn, enemieConfig))
@@ -62,7 +66,7 @@ function Game:initialize()
 
     --Items creation
     items = {
-        Item(screenDimensions.x, screenDimensions.y/2, 'assets/image/misc/cacetinho.png')
+        Item(screenDimensions.x, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
     }
 
     score = 0
@@ -100,6 +104,9 @@ function Game:update(dt)
         end
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
+            if player:isPunching() then
+                enemie:isHitted(player.hurtbox)
+            end
         end
         player:setFalling()
         for i, tile in pairs(tiles) do
@@ -158,14 +165,15 @@ function Game:draw()
 
     -- DEBUG
     local base = 450
+    love.graphics.print("isPunching: " .. (player:isPunching() and 'true' or 'false'), 50, base)
+    love.graphics.print("stateHitted: " .. enemies[1].stateHitted, 50, base + 50)
     -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
     -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
-    love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
-    love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
-    love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
+    --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
+    --love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
+    --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
     -- love.graphics.print("score:" .. score, 50, base + 350)
     -- love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
-    -- love.graphics.print("hitRepeat:" .. (player.hitRepeat and 'true' or 'false'), 50, base + 450)
     -- love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 
 end

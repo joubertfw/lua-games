@@ -5,6 +5,8 @@ Enemie = class('Enemie')
 local default = {
     acelOnWalking = 400,
     acelOnPursuiting = 600,
+    acelYOnHitted = 8000,
+    acelXOnHitted = 15000,
     dtKick = 0.2,
     dtStop = 2
 }
@@ -31,10 +33,13 @@ function Enemie:initialize(x, y, direction, imgPath, dtWalking, config)
     self.dtKick = 0
     self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height)
     self.hurtbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height, 'hurtbox')
+    self.stateHitted = 'none'
 end
 
 function Enemie:update(dt)
-    if self.state == 'walking' then
+    self:setHittedNone()
+
+    if self:isWalking() then
         if self.dtStop > 0 then
             --stoped
             self.dtStop = self.dtStop - dt
@@ -59,18 +64,46 @@ function Enemie:update(dt)
     --     self:animate(dt)
     end
 
-    -- After attributes-manipulation update
-    --self.vel.y = self.vel.y + self.acel.y * dt
-    --self.position.y = self.position.y + self.vel.y * dt
-    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
-    self.position.x = self.position.x + self.vel.x * dt
+    self:takeHit()
 
-    self.hitbox:update(self.position.x, self.position.y, self.image.width*self.direction, self.image.height)
+    -- After attributes-manipulation update
+    self:calculatePosition(dt)
+
+    self.hitbox:update(self.position.x + 25*self.direction, self.position.y + self.image.height/10, self.direction*(self.image.width/2), self.image.height*0.85)
 end
 
 function Enemie:draw()
     self.hitbox:draw()
     self.image:draw(self.position.x, self.position.y, self.direction)
+end
+
+function Enemie:isHitted(hurtBox)
+    if (self.hitbox:checkCollision(hurtBox)) then
+        if (self.hitbox.x < hurtBox.x) then
+            self.stateHitted = 'left'
+        else
+            self.stateHitted = 'right'
+        end
+    end
+end
+
+function Enemie:takeHit()
+    if (self.stateHitted == "left") then
+        self.acelX = -default.acelXOnHitted
+        self:stop()
+        --self.acelY = -default.acelYOnHitted
+    elseif (self.stateHitted == "right") then
+        self.acelX = default.acelXOnHitted
+        --self.acelY = -default.acelYOnHitted
+        self:stop()
+    end
+end
+
+function Enemie:calculatePosition(dt)
+    --self.vel.y = self.vel.y + self.acel.y * dt
+    --self.position.y = self.position.y + self.vel.y * dt
+    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
+    self.position.x = self.position.x + self.vel.x * dt
 end
 
 function Enemie:stop()
@@ -93,18 +126,22 @@ function Enemie:rotate()
     self.position.x = self.position.x - self.direction*self.image.width
 end
 
-function Player:isWalking()
+function Enemie:isWalking()
     return self.state == 'walking'
 end
 
-function Player:isPursuiting()
+function Enemie:isPursuiting()
     return self.state == 'pursuiting'
 end
 
-function Player:setWalking()
+function Enemie:setWalking()
     self.state = 'walking'
 end
 
-function Player:setPursuiting()
+function Enemie:setPursuiting()
     self.state = 'pursuiting'
+end
+
+function Enemie:setHittedNone()
+    self.stateHitted = 'none'
 end

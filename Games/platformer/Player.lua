@@ -8,7 +8,7 @@ local default = {
     velHoriz = 900,
     velVert = 900,
     acelYOnJump = -2500,
-    velYOnJump = -1200,
+    velYOnJump = -800,
     acelYOnFall = 2000,
     dtPunch = 0.2
 }
@@ -66,8 +66,8 @@ function Player:update(dt)
     self:calculatePosition(dt)
     
     -- Collision boxes updates
-    self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
-    self.hurtbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 20), self.image.height/3.5)
+    self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 30), self.image.height/3.5)
+    self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 30), self.image.height/10)
     
     -- After attributes-manipulation update
     
@@ -86,12 +86,16 @@ function Player:draw()
     self.hurtbox:draw()    
     self.image:draw(self.position.x, self.position.y, self.direction)
 
+    -- love.graphics.points( self.hitbox.x, self.hitbox.y )
+    -- love.graphics.print( "y", self.hitbox.x, self.hitbox.y )
 
-    love.graphics.points( self.hitbox.x, self.hitbox.y )
-    love.graphics.print( "y", self.hitbox.x, self.hitbox.y )
+    -- love.graphics.points(self.hitbox.x , self.hitbox.y + self.hitbox.height)
+    -- love.graphics.print( "y+h", self.hitbox.x + self.hitbox.width, self.hitbox.y + self.hitbox.height )
+    -- love.graphics.points( self.hurtbox.x, self.hurtbox.y )
+    -- love.graphics.print( "y", self.hurtbox.x, self.hurtbox.y )
 
-    love.graphics.points(self.hitbox.x , self.hitbox.y + self.hitbox.height)
-    love.graphics.print( "y+h", self.hitbox.x + self.hitbox.width, self.hitbox.y + self.hitbox.height )
+    -- love.graphics.points(self.hurtbox.x , self.hurtbox.y + self.hurtbox.height)
+    -- love.graphics.print( "y+h", self.hurtbox.x + self.hurtbox.width, self.hurtbox.y + self.hurtbox.height )
 
 end
 
