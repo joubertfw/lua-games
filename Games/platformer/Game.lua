@@ -12,7 +12,7 @@ function Game:initialize()
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
-    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 128x128
+    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
     camera:setFollowStyle('PLATFORMER')
 
@@ -71,7 +71,6 @@ function Game:initialize()
         Item(screenDimensions.x*2.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
     }
 
-    score = 0
     fps = 0
 end
 
@@ -95,13 +94,12 @@ function Game:update(dt)
         camera:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
         --ingameTrack:play()
-        player:update(dt)
         -- itens check
         for i, item in pairs(items) do
             item:update()
             if item:checkCollision(player.hitbox) then
-                score = score + 1
                 table.remove(items, i)
+                -- make player invencible for a sec
                 gotCacetinhoFX()
             end
         end
@@ -113,14 +111,27 @@ function Game:update(dt)
         end
         player:setFalling()
         for i, tile in pairs(tiles) do
-            if tile:checkObjOnTop(player.hitbox, 10) then
+            if tile:checkObjOnLeftSide(player.hitbox) and player.direction == 1 then
+                player.vel.x = 0
+                player.position.x = player.position.x - 0.5
+                if not player:isOnFloor() then
+                    player:setSlidingRight()
+                end
+            elseif tile:checkObjOnRightSide(player.hitbox) and player.direction == -1 then
+                player.vel.x = 0
+                player.position.x = player.position.x + 0.5
+                if not player:isOnFloor() then
+                    player:setSlidingLeft()
+                end
+            elseif tile:checkObjOnTop(player.hitbox, 10) then
                 player:setOnFloor()
                 break
-            end --elseif not player:isOnFloor() then check if player is sliding on sides
+            end
         end
         if util:isOutOfScreen(player.hitbox, 'down', 1000) then
             spawnPlayer(player, 1)
         end
+        player:update(dt)
     elseif state == 'gameEnd' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
@@ -177,7 +188,6 @@ function Game:draw()
     --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
     --love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
     --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
-    -- love.graphics.print("score:" .. score, 50, base + 350)
     -- love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
     -- love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 

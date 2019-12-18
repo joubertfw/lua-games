@@ -48,7 +48,7 @@ function Tile:draw()
 end
 
 function Tile:checkObjOnTop(obj, offset)
-    offset = offset or 0
+    offset = offset and offset or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid and 
         x2 < x1 + w1 and 
@@ -69,17 +69,17 @@ function Tile:checkObjBelow(obj, offset)
 end
 
 function Tile:checkObjOnLeftSide(obj, offset)
-    offset = offset and offset or 0
+    offset = offset and offset or 10
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid and y2 < y1 + h1 and y2 + h2 > y1 and
         x2 + w2 > x1 and x2 + w2 < x1 + offset
 end
 
 function Tile:checkObjOnRightSide(obj, offset)
-    offset = offset and offset or 0
+    offset = offset and offset or 10
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid  and y2 < y1 + h1 and y2 + h2 > y1 and
-        x2 < x1 + w1 and x2 > x1 + w1 + offset
+        x2 < x1 + w1 and x2 > x1 + w1 - offset
 end
 
 function Tile:setQuad(x, y, width, height)

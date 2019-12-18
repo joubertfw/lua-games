@@ -61,6 +61,10 @@ function Player:update(dt)
             else
             end
         end
+    elseif self:isSlidingLeft() then
+        self.vel.x = 0
+    elseif self:isSlidingRight() then
+        self.vel.x = 0
     end
 
     -- After attributes-manipulation update
