@@ -168,6 +168,8 @@ function Game:draw()
     local base = 450
     love.graphics.print("isPunching: " .. (player:isPunching() and 'true' or 'false'), 50, base)
     love.graphics.print("stateHitted: " .. enemies[1].stateHitted, 50, base + 50)
+    love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
+    love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
     -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
     -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
     --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)

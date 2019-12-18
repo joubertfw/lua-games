@@ -125,8 +125,8 @@ function Player:listenInput(dt)
 
     if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
         -- self.vel.y = default.velYOnJump -- * 1.5 or default.velYOnJump
-        self:moveUp(dt)
-        self.spaceRepeat = true
+        -- self:moveUp(dt)
+        -- self.spaceRepeat = true
     end
 
     --Attack verification
