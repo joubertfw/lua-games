@@ -8,11 +8,11 @@ local default = {
 
 function Game:initialize()
     -- Window configuration
-    love.window.setMode(1920, 1080)
+    love.window.setMode(1920, 1080, {fullscreen = true})
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
-    camera:setBounds(0, 0, 6400, 1340)
+    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 128x128
     camera:setFollowLerp(0.1)
     camera:setFollowStyle('PLATFORMER')
 
@@ -67,7 +67,8 @@ function Game:initialize()
 
     --Items creation
     items = {
-        Item(screenDimensions.x, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
+        Item(screenDimensions.x, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png'),
+        Item(screenDimensions.x*2.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
     }
 
     score = 0
@@ -76,12 +77,13 @@ end
 
 function Game:update(dt)
     fps = 1/dt
+
     if state == 'menu' then
         menu:update(dt)
         --menuTrack:play()
         if menu:getState() == #menu.options - 1 then
             --exit
-            love.event.quit()
+            closeGame()
         elseif menu:getState() == 0 then
             --begin game
             state = 'ingame'
@@ -114,7 +116,7 @@ function Game:update(dt)
             if tile:checkObjOnTop(player.hitbox, 10) then
                 player:setOnFloor()
                 break
-            end
+            end --elseif not player:isOnFloor() then check if player is sliding on sides
         end
         if util:isOutOfScreen(player.hitbox, 'down', 1000) then
             spawnPlayer(player, 1)
@@ -223,4 +225,8 @@ end
 
 function gotCacetinhoFX()
     gotCacetinhoMp3:play()
+end
+
+function closeGame()
+    love.event.quit()
 end

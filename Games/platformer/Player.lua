@@ -44,8 +44,8 @@ function Player:update(dt)
 
     self.acel.y = default.acelYOnFall
     self:listenInput(dt)
-    -- State-based manipulation
 
+    -- State-based manipulation
     if self:isOnFloor() then
         if self.vel.y >= 0 then
             self.acel.y = 0
@@ -63,13 +63,12 @@ function Player:update(dt)
         end
     end
 
+    -- After attributes-manipulation update
     self:calculatePosition(dt)
     
     -- Collision boxes updates
     self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 30), self.image.height/3.5)
     self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 30), self.image.height/10)
-    
-    -- After attributes-manipulation update
     
     --Idle animation
     if not love.keyboard.isDown(self.input.btLeft) 
@@ -83,7 +82,9 @@ end
 
 function Player:draw()
     self.hitbox:draw()
-    self.hurtbox:draw()    
+    if self:isPunching() then
+        self.hurtbox:draw()
+    end
     self.image:draw(self.position.x, self.position.y, self.direction)
 
     -- love.graphics.points( self.hitbox.x, self.hitbox.y )
@@ -139,6 +140,8 @@ function Player:listenInput(dt)
     if self.dtPunch > 0 then
         self:animatePunch(dt)
         self.dtPunch = self.dtPunch - dt
+    elseif love.keyboard.isDown(self.input.btPunch) then
+        self.hitRepeat = true
     else
         self.hitRepeat = false
     end
@@ -210,7 +213,7 @@ function Player:moveRight(dt)
 end
 
 function Player:isPunching()
-    return self.dtJump > 0 and self.hitRepeat
+    return self.dtPunch > 0 and self.hitRepeat
 end
 
 function Player:isOnFloor()
