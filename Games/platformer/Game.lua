@@ -29,6 +29,7 @@ function Game:initialize()
     --Audio
     --menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
     --ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
+    gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
     
     --Menu Screen
     menu = MenuScreen(
@@ -99,7 +100,7 @@ function Game:update(dt)
             if item:checkCollision(player.hitbox) then
                 score = score + 1
                 table.remove(items, i)
-                --gotCacetinhoFX()
+                gotCacetinhoFX()
             end
         end
         for i, enemie in pairs(enemies) do
@@ -216,4 +217,8 @@ function renderMap(map, tilemap)
         end
     end
     return tiles
+end
+
+function gotCacetinhoFX()
+    gotCacetinhoMp3:play()
 end
