@@ -47,41 +47,41 @@ function Tile:draw()
     love.graphics.setColor( 1, 1, 1, 1 )
 end
 
-function Tile:checkObjOnTop(obj, offset)
-    offset = offset and offset or 0
+function Tile:checkObjOnTop(obj, innerRange, deadzone)
+    innerRange = innerRange and innerRange or 0
+    deadzone = deadzone and deadzone or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid and 
-        x2 < x1 + w1 and 
-        x2 + w2 > x1 and
-        y1 <= (y2 + h2) + offset and
-        y1 > (y2 + h2) - offset
+        x2 + deadzone/2 < x1 + w1 and 
+        x2 + w2 - deadzone/2> x1 and
+        y1 <= (y2 + h2) + innerRange and
+        y1 > (y2 + h2) - innerRange
 end
 
-function Tile:checkObjBelow(obj, offset)
-    offset = offset and offset or 0
+function Tile:checkObjBelow(obj, innerRange, deadzone)
+    innerRange = innerRange and innerRange or 0
+    deadzone = deadzone and deadzone or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
     return self.isSolid and 
-        x2 < x1 + w1 and
-        x2 + w2 > x1 and
+        x2 + deadzone/2 < x1 + w1 and
+        x2 + w2 - deadzone/2> x1 and
         y2 > y1 and
-        y2 > y1 + h1 + offset and
+        y2 > y1 + h1 + innerRange and
         y2 < y1 + h1
 end
 
-function Tile:checkObjOnLeftSide(obj, offset)
-    offset = offset and offset or 10
+function Tile:checkObjOnLeftSide(obj, innerRange, deadzone)
+    innerRange = innerRange and innerRange or 10
+    deadzone = deadzone and deadzone or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
-    return self.isSolid and y2 < y1 + h1 and y2 + h2 > y1 and
-        x2 + w2 > x1 and x2 + w2 < x1 + offset
+    return self.isSolid and y2 + deadzone/2 < y1 + h1 and y2 + h2 - deadzone/2 > y1 and
+        x2 + w2 > x1 and x2 + w2 < x1 + innerRange
 end
 
-function Tile:checkObjOnRightSide(obj, offset)
-    offset = offset and offset or 10
+function Tile:checkObjOnRightSide(obj, innerRange, deadzone)
+    innerRange = innerRange and innerRange or 10
+    deadzone = deadzone and deadzone or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
-    return self.isSolid  and y2 < y1 + h1 and y2 + h2 > y1 and
-        x2 < x1 + w1 and x2 > x1 + w1 - offset
-end
-
-function Tile:setQuad(x, y, width, height)
-    
+    return self.isSolid  and y2 + deadzone/2 < y1 + h1 and y2 + h2 - deadzone/2 > y1 and
+        x2 < x1 + w1 and x2 > x1 + w1 - innerRange
 end

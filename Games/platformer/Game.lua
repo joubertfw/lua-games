@@ -123,7 +123,8 @@ function Game:update(dt)
                 if not player:isOnFloor() then
                     player:setSlidingLeft()
                 end
-            elseif tile:checkObjOnTop(player.hitbox, 10) then
+            elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
+                player.position.y = tile.y - player.hitbox.height*2.3
                 player:setOnFloor()
                 break
             end
