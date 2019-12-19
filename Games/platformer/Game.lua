@@ -21,6 +21,7 @@ function Game:initialize()
     --Imgs
     backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
     --gameEndImg = love.graphics.newImage('assets/image/namdlo_win.png')
+    lifeImg = love.graphics.newImage("assets/image/misc/hat.png")
 
     --Font
     font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
@@ -111,25 +112,30 @@ function Game:update(dt)
         end
         player:setFalling()
         for i, tile in pairs(tiles) do
-            if tile:checkObjOnLeftSide(player.hitbox) and player.direction == 1 then
+            if tile:checkObjOnLeftSide(player.hitbox, nil, 32) and player.direction == 1 then
                 player.vel.x = 0
                 player.position.x = player.position.x - 0.5
                 if not player:isOnFloor() then
                     player:setSlidingRight()
                 end
-            elseif tile:checkObjOnRightSide(player.hitbox) and player.direction == -1 then
+            elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
                 player.vel.x = 0
                 player.position.x = player.position.x + 0.5
                 if not player:isOnFloor() then
                     player:setSlidingLeft()
                 end
             elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
+                --this keeps the player always on same level when on floor
                 player.position.y = tile.y - player.hitbox.height*2.3
                 player:setOnFloor()
                 break
             end
         end
         if util:isOutOfScreen(player.hitbox, 'down', 1000) then
+            player.lifes = player.lifes - 1
+            if player.lifes == 0 then
+                --game over
+            end
             spawnPlayer(player, 1)
         end
         player:update(dt)
@@ -149,7 +155,6 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
-        -- love.graphics.draw(backgroundImg, 0, 0)
 
         for i, tile in pairs(tiles) do
             tile:draw()
@@ -157,22 +162,15 @@ function Game:draw()
         for i, enemie in pairs(enemies) do
             enemie:draw()
         end
-
-        -- DEBUG TILES
-        -- love.graphics.setColor( 0, 0, 0, 1 )
-        -- for i,layer in pairs(map.layers) do
-        --     for j, number in pairs(layer.data) do
-        --             -- table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, true, '/assets/maps/tilemap.png', getTile(number, map.tilewidth, map.tileheight)))
-        --         love.graphics.print(number.. ' ' .. math.floor(number/5) ..' ' .. (((number-1)%5)), ((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight)
-        --     end
-        -- end
-        -- love.graphics.setColor( 1, 1, 1, 0 )
-
         for i, item in pairs(items) do
             item:draw()
         end
         player:draw()
+        
         camera:detach()
+        for i = 0, player.lifes - 1 do
+            love.graphics.draw(lifeImg, 120*i, 50)
+        end
         camera:draw()
     elseif state == 'gameEnd' then
         love.graphics.draw(gameEndImg, 0, 0)

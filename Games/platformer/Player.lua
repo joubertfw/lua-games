@@ -34,6 +34,7 @@ function Player:initialize(x, y, imgPath, buttons, config)
     end
     
     -- Attack and damage
+    self.lifes = 3
     self.dtPunch = 0
     self.hitRepeat = false
     self.hitbox = CollisionBox(0, 0, 0, 0)
