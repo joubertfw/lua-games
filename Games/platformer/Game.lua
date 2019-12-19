@@ -27,8 +27,8 @@ function Game:initialize()
     love.graphics.setFont(font)
     
     --Audio
-    --menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
-    --ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
+    menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
+    ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
     gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
     
     --Menu Screen
@@ -79,21 +79,21 @@ function Game:update(dt)
 
     if state == 'menu' then
         menu:update(dt)
-        --menuTrack:play()
+        menuTrack:play()
         if menu:getState() == #menu.options - 1 then
             --exit
             closeGame()
         elseif menu:getState() == 0 then
             --begin game
             state = 'ingame'
-            --menuTrack:stop()
-            --ingameTrack:play()
+            menuTrack:stop()
+            ingameTrack:play()
         end
 
     elseif state == 'ingame' then
         camera:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
-        --ingameTrack:play()
+        ingameTrack:play()
         -- itens check
         for i, item in pairs(items) do
             item:update()
@@ -133,7 +133,7 @@ function Game:update(dt)
         end
         player:update(dt)
     elseif state == 'gameEnd' then
-        --ingameTrack:stop()
+        ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
             resetGame()
