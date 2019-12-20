@@ -4,11 +4,10 @@ Enemie = class('Enemie')
 --When overritten, all instances are affected
 local default = {
     acelOnWalking = 400,
-    acelOnPursuiting = 600,
-    acelYOnHitted = 8000,
-    acelXOnHitted = 15000,
+    acelYOnHitted = 2000,
     dtKick = 0.2,
-    dtStop = 2
+    dtStop = 2,
+    dtDieAnimation = 5
 }
 
 function Enemie:initialize(x, y, direction, imgPath, dtWalking, config)
@@ -33,13 +32,15 @@ function Enemie:initialize(x, y, direction, imgPath, dtWalking, config)
     self.dtKick = 0
     self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height)
     self.hurtbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height, 'hurtbox')
-    self.stateHitted = 'none'
+    self.isHitted = false
+    self.dtDieAnimation = -default.dtDieAnimation/2
 end
 
 function Enemie:update(dt)
-    self:setHittedNone()
-
-    if self:isWalking() then
+    if self.isHitted then
+        self.dtDieAnimation = self.dtDieAnimation + dt*8
+        self:die()
+    elseif self:isWalking() then
         if self.dtStop > 0 then
             --stoped
             self.dtStop = self.dtStop - dt
@@ -59,12 +60,7 @@ function Enemie:update(dt)
             self.dtStop = default.dtStop
             self.dtWalking = self.defaultDtWalking
         end
-    -- elseif self.state == 'pursuiting' then
-    --     self.acel.x = default.acelOnPursuiting
-    --     self:animate(dt)
     end
-
-    self:takeHit()
 
     -- After attributes-manipulation update
     self:calculatePosition(dt)
@@ -77,33 +73,23 @@ function Enemie:draw()
     self.image:draw(self.position.x, self.position.y, self.direction)
 end
 
-function Enemie:isHitted(hurtBox)
+function Enemie:wasHitted(hurtBox)
     if (self.hitbox:checkCollision(hurtBox)) then
-        if (self.hitbox.x < hurtBox.x) then
-            self.stateHitted = 'left'
-        else
-            self.stateHitted = 'right'
-        end
+        self.isHitted = true
         return true
     end
     return false
 end
 
-function Enemie:takeHit()
-    if (self.stateHitted == "left") then
-        self.acelX = -default.acelXOnHitted
-        self:stop()
-        --self.acelY = -default.acelYOnHitted
-    elseif (self.stateHitted == "right") then
-        self.acelX = default.acelXOnHitted
-        --self.acelY = -default.acelYOnHitted
-        self:stop()
-    end
+function Enemie:die()
+    self.acel.y = default.acelYOnHitted*self.dtDieAnimation
+    local x, y, w, h = self.image.quad:getViewport()
+    self.image.quad:setViewport(0, y, w, h)
 end
 
 function Enemie:calculatePosition(dt)
-    --self.vel.y = self.vel.y + self.acel.y * dt
-    --self.position.y = self.position.y + self.vel.y * dt
+    self.vel.y = (self.vel.y * 0.95) + self.acel.y * dt
+    self.position.y = self.position.y + self.vel.y * dt
     self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
     self.position.x = self.position.x + self.vel.x * dt
 end
@@ -132,18 +118,10 @@ function Enemie:isWalking()
     return self.state == 'walking'
 end
 
-function Enemie:isPursuiting()
-    return self.state == 'pursuiting'
-end
-
 function Enemie:setWalking()
     self.state = 'walking'
 end
 
-function Enemie:setPursuiting()
-    self.state = 'pursuiting'
-end
-
-function Enemie:setHittedNone()
-    self.stateHitted = 'none'
+function Enemie:isAlreadyDead()
+    return self.isHitted and self.dtDieAnimation > default.dtDieAnimation
 end

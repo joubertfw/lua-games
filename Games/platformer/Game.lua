@@ -109,14 +109,18 @@ function Game:update(dt)
         end
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
-            if player:isPunching() and enemie:isHitted(player.hurtbox) then
+            if enemie:isAlreadyDead() then
+                table.remove(enemies, i)
+            elseif not enemie.isHitted then
+                if player:isPunching() and enemie:wasHitted(player.hurtbox) then
                 punchMp3:play()
-            end
-            if player.hitbox:checkCollision(enemie.hitbox) and not player.isInvencible then
-                loseLife()
-                hurtMp3:play()
-                player.isInvencible = true
-                player:setInvencibleDt()
+                end
+                if player.hitbox:checkCollision(enemie.hitbox) and not player.isInvencible then
+                    loseLife()
+                    hurtMp3:play()
+                    player.isInvencible = true
+                    player:setInvencibleDt()
+                end
             end
         end
         player:setFalling()
@@ -184,10 +188,10 @@ function Game:draw()
 
     -- DEBUG
     local base = 450
-    love.graphics.print("isPunching: " .. (player:isPunching() and 'true' or 'false'), 50, base)
-    love.graphics.print("stateHitted: " .. enemies[1].stateHitted, 50, base + 50)
-    love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
-    love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
+    -- love.graphics.print("isPunching: " .. (player:isPunching() and 'true' or 'false'), 50, base)
+    -- love.graphics.print("isHitted: " .. (enemies[1].isHitted and 'true' or 'false'), 50, base + 50)
+    -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
+    -- love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
     -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
     -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
     --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
