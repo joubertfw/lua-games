@@ -71,7 +71,6 @@ function Game:initialize()
         Item(screenDimensions.x, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png'),
         Item(screenDimensions.x*2.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
     }
-
     fps = 0
 end
 
@@ -100,7 +99,9 @@ function Game:update(dt)
             item:update()
             if item:checkCollision(player.hitbox) then
                 table.remove(items, i)
-                -- make player invencible for a sec
+                player.isCacetinhoPowered = true
+                player.isInvencible = true
+                player:setInvencibleDt(true)
                 gotCacetinhoFX()
             end
         end
@@ -108,6 +109,11 @@ function Game:update(dt)
             enemie:update(dt)
             if player:isPunching() then
                 enemie:isHitted(player.hurtbox)
+            end
+            if player.hitbox:checkCollision(enemie.hitbox) and not player.isInvencible then
+                looseLife()
+                player.isInvencible = true
+                player:setInvencibleDt()
             end
         end
         player:setFalling()
@@ -132,10 +138,7 @@ function Game:update(dt)
             end
         end
         if util:isOutOfScreen(player.hitbox, 'down', 1000) then
-            player.lifes = player.lifes - 1
-            if player.lifes == 0 then
-                --game over
-            end
+            looseLife()
             spawnPlayer(player, 1)
         end
         player:update(dt)
@@ -190,6 +193,13 @@ function Game:draw()
     -- love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
     -- love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 
+end
+
+function looseLife()
+    player.lifes = player.lifes - 1
+    if player.lifes == 0 then
+        --game over
+    end
 end
 
 function spawnPlayer(player, i)

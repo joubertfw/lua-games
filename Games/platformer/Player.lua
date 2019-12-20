@@ -10,7 +10,9 @@ local default = {
     acelYOnJump = -2500,
     velYOnJump = -800,
     acelYOnFall = 2000,
-    dtPunch = 0.2
+    dtPunch = 0.2,
+    dtInvencibleCacetinho = 5,
+    dtInvencible = 2
 }
 
 function Player:initialize(x, y, imgPath, buttons, config)
@@ -39,6 +41,9 @@ function Player:initialize(x, y, imgPath, buttons, config)
     self.hitRepeat = false
     self.hitbox = CollisionBox(0, 0, 0, 0)
     self.hurtbox = CollisionBox(0, 0, 0, 0, 'hurtbox')
+    self.dtInvencible = 0
+    self.isInvencible = false
+    self.isCacetinhoPowered = false
 end
 
 function Player:update(dt)
@@ -83,6 +88,13 @@ function Player:update(dt)
             end
             self.acel.x = 0
     end
+
+    if self.dtInvencible > 0 then
+        self.dtInvencible = self.dtInvencible - dt
+    else
+        self.isInvencible = false
+        self.isCacetinhoPowered = false
+    end
 end
 
 function Player:draw()
@@ -90,7 +102,19 @@ function Player:draw()
     if self:isPunching() then
         self.hurtbox:draw()
     end
-    self.image:draw(self.position.x, self.position.y, self.direction)
+    if self.isCacetinhoPowered then
+        local r, g, b, a = love.graphics.getColor()
+        love.graphics.setColor(love.math.random(), love.math.random(), love.math.random(), 1)
+        self.image:draw(self.position.x, self.position.y, self.direction)
+        love.graphics.setColor(r, g, b, a)
+    elseif self.isInvencible then
+        local r, g, b, a = love.graphics.getColor()
+        love.graphics.setColor(r, g, b, love.math.random())
+        self.image:draw(self.position.x, self.position.y, self.direction)
+        love.graphics.setColor(r, g, b, a)
+    else
+        self.image:draw(self.position.x, self.position.y, self.direction)
+    end
 
     -- love.graphics.points( self.hitbox.x, self.hitbox.y )
     -- love.graphics.print( "y", self.hitbox.x, self.hitbox.y )
@@ -256,4 +280,12 @@ end
 
 function Player:setSlidingRight()
     self.state = 'slidingRight'
+end
+
+function Player:setInvencibleDt(cacetinho)
+    if cacetinho then
+        self.dtInvencible = default.dtInvencibleCacetinho
+    else
+        self.dtInvencible = default.dtInvencible
+    end
 end
