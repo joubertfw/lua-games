@@ -49,7 +49,8 @@ function Game:initialize()
     tiles = renderMap(map,  '/assets/maps/platformPack_tilesheet.png')
 
     --Player creation
-    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
+    --spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
+    spawnArea = {{x = screenDimensions.x*2.7, y = screenDimensions.y*0.8}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
     player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
@@ -57,12 +58,23 @@ function Game:initialize()
 
     --Enemies creation
     enemies = {}
-    enemieSpawns = {{x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, color = 'red', direction = 1},
-                    {x = screenDimensions.x*1.3, y = screenDimensions.y*0.98, range = 7.8, color = 'blue', direction = -1},
-                    {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, color = 'blue', direction = 1},
-                    {x = screenDimensions.x*2.05, y = screenDimensions.y*0.98, range = 3, color = 'red', direction = 1},
-                    {x = screenDimensions.x*2.6, y = screenDimensions.y*0.98, range = 1, color = 'blue', direction = 1}
-                }
+    enemieSpawns = {
+        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.98, range = 3, stop = 1, color = 'red', direction = -1},
+        {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, stop = 1.5, color = 'blue', direction = 1},
+        {x = screenDimensions.x*0.6, y = screenDimensions.y*0.86, range = 2, stop = 2, color = 'red', direction = -1},
+        {x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'red', direction = 1},
+        {x = screenDimensions.x, y = screenDimensions.y*0.98, range = 2, stop = 2, color = 'blue', direction = 1},
+        {x = screenDimensions.x*1.3, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'blue', direction = -1},
+        {x = screenDimensions.x*1.4, y = screenDimensions.y*0.86, range = 2, stop = 0.5, color = 'red', direction = 1},
+        {x = screenDimensions.x*1.63, y = screenDimensions.y*0.74, range = 2, stop = 1, color = 'blue', direction = -1},
+        {x = screenDimensions.x*1.73, y = screenDimensions.y*0.62, range = 2, stop = 1.5, color = 'blue', direction = 1},
+        {x = screenDimensions.x*1.78, y = screenDimensions.y*0.62, range = 1.5, stop = 1, color = 'red', direction = -1},
+        {x = screenDimensions.x*2.05, y = screenDimensions.y*0.98, range = 3, stop = 1.5, color = 'red', direction = 1},
+        {x = screenDimensions.x*2.2, y = screenDimensions.y*0.98, range = 3.5, stop = 0.5, color = 'blue', direction = -1},
+        {x = screenDimensions.x*2.33, y = screenDimensions.y*0.98, range = 1, stop = 1, color = 'red', direction = -1},
+        {x = screenDimensions.x*2.6, y = screenDimensions.y*0.98, range = 1, stop = 0.2, color = 'blue', direction = 1},
+        {x = screenDimensions.x*2.97, y = screenDimensions.y*0.8, range = 2, stop = 0.5, color = 'blue', direction = 1}
+    }
     enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
     for i, spawn in pairs(enemieSpawns) do
         table.insert(enemies, spawnEnemie(spawn, enemieConfig))
@@ -70,8 +82,8 @@ function Game:initialize()
 
     --Items creation
     items = {
-        Item(screenDimensions.x, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*2.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png')
+        Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
+        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png')
     }
     fps = 0
 end
@@ -169,11 +181,11 @@ function Game:draw()
         for i, tile in pairs(tiles) do
             tile:draw()
         end
-        for i, enemie in pairs(enemies) do
-            enemie:draw()
-        end
         for i, item in pairs(items) do
             item:draw()
+        end
+        for i, enemie in pairs(enemies) do
+            enemie:draw()
         end
         player:draw()
         
@@ -217,7 +229,7 @@ function spawnPlayer(player, i)
 end
 
 function spawnEnemie(spawn, imgConfig)
-    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, imgConfig)
+    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
 end
 
 function resetGame()

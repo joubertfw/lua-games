@@ -6,11 +6,10 @@ local default = {
     acelOnWalking = 400,
     acelYOnHitted = 2000,
     dtKick = 0.2,
-    dtStop = 2,
     dtDieAnimation = 5
 }
 
-function Enemie:initialize(x, y, direction, imgPath, dtWalking, config)
+function Enemie:initialize(x, y, direction, imgPath, dtWalking, stopedTime, config)
     -- Position and movement
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
@@ -20,6 +19,7 @@ function Enemie:initialize(x, y, direction, imgPath, dtWalking, config)
     self.defaultDtWalking = dtWalking
     self.dtWalking = dtWalking
     self.dtStop = 0
+    self.stopedTime = stopedTime
     
     --Quads and animation
     if config then --Quads-based image (spritesheet)
@@ -57,7 +57,7 @@ function Enemie:update(dt)
             self.dtWalking = self.dtWalking - dt
             self:animate(dt)
         else
-            self.dtStop = default.dtStop
+            self.dtStop = self.stopedTime
             self.dtWalking = self.defaultDtWalking
         end
     end
@@ -84,7 +84,7 @@ end
 function Enemie:die()
     self.acel.y = default.acelYOnHitted*self.dtDieAnimation
     local x, y, w, h = self.image.quad:getViewport()
-    self.image.quad:setViewport(0, y, w, h)
+    self.image.quad:setViewport(w*2, h, w, h)
 end
 
 function Enemie:calculatePosition(dt)
