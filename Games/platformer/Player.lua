@@ -12,7 +12,7 @@ local default = {
     acelYOnFall = 2000,
     dtPunch = 0.2,
     dtInvencibleCacetinho = 5,
-    dtInvencible = 2
+    dtInvencible = 1.5
 }
 
 function Player:initialize(x, y, imgPath, buttons, config)
@@ -78,7 +78,7 @@ function Player:update(dt)
     
     -- Collision boxes updates
     self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 30), self.image.height/3.5)
-    self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 30), self.image.height/10)
+    self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 20), self.image.height/10)
     
     --Idle animation
     if not love.keyboard.isDown(self.input.btLeft) 

@@ -31,6 +31,8 @@ function Game:initialize()
     menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
     ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
     gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
+    punchMp3 = love.audio.newSource("assets/audio/punch.mp3", "stream")
+    hurtMp3 = love.audio.newSource("assets/audio/hurt.mp3", "stream")
     
     --Menu Screen
     menu = MenuScreen(
@@ -102,16 +104,17 @@ function Game:update(dt)
                 player.isCacetinhoPowered = true
                 player.isInvencible = true
                 player:setInvencibleDt(true)
-                gotCacetinhoFX()
+                gotCacetinhoMp3:play()
             end
         end
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
-            if player:isPunching() then
-                enemie:isHitted(player.hurtbox)
+            if player:isPunching() and enemie:isHitted(player.hurtbox) then
+                punchMp3:play()
             end
             if player.hitbox:checkCollision(enemie.hitbox) and not player.isInvencible then
-                looseLife()
+                loseLife()
+                hurtMp3:play()
                 player.isInvencible = true
                 player:setInvencibleDt()
             end
@@ -138,7 +141,7 @@ function Game:update(dt)
             end
         end
         if util:isOutOfScreen(player.hitbox, 'down', 1000) then
-            looseLife()
+            loseLife()
             spawnPlayer(player, 1)
         end
         player:update(dt)
@@ -195,7 +198,7 @@ function Game:draw()
 
 end
 
-function looseLife()
+function loseLife()
     player.lifes = player.lifes - 1
     if player.lifes == 0 then
         --game over
@@ -240,10 +243,6 @@ function renderMap(map, tilemap)
         end
     end
     return tiles
-end
-
-function gotCacetinhoFX()
-    gotCacetinhoMp3:play()
 end
 
 function closeGame()

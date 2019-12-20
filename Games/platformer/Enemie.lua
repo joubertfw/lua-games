@@ -84,7 +84,9 @@ function Enemie:isHitted(hurtBox)
         else
             self.stateHitted = 'right'
         end
+        return true
     end
+    return false
 end
 
 function Enemie:takeHit()
