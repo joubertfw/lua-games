@@ -1,17 +1,15 @@
 Item = class('Item')
 
-function Item:initialize(x, y, imgPath, isStatic)
+function Item:initialize(x, y, imgPath, isBomba)
     self.x = x
     self.y = y
     self.image = love.graphics.newImage(imgPath)
     self.width, self.height = self.image:getDimensions()
-    self.isStatic = isStatic
+    self.isBomba = isBomba
 end
 
 function Item:update(dt)
-    if not isStatic then
-
-    end
+    
 end
 
 function Item:draw()

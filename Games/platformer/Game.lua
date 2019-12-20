@@ -20,7 +20,8 @@ function Game:initialize()
 
     --Imgs
     backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
-    --gameEndImg = love.graphics.newImage('assets/image/namdlo_win.png')
+    gameWonImg = love.graphics.newImage('assets/image/game_won.png')
+    gameOverImg = love.graphics.newImage('assets/image/game_over.png')
     lifeImg = love.graphics.newImage("assets/image/misc/hat.png")
 
     --Font
@@ -83,7 +84,8 @@ function Game:initialize()
     --Items creation
     items = {
         Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png')
+        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
+        Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
     }
     fps = 0
 end
@@ -112,11 +114,15 @@ function Game:update(dt)
         for i, item in pairs(items) do
             item:update()
             if item:checkCollision(player.hitbox) then
-                table.remove(items, i)
-                player.isCacetinhoPowered = true
-                player.isInvencible = true
-                player:setInvencibleDt(true)
-                gotCacetinhoMp3:play()
+                if item.isBomba then
+                    state = 'gameWon'
+                else
+                    table.remove(items, i)
+                    player.isCacetinhoPowered = true
+                    player.isInvencible = true
+                    player:setInvencibleDt(true)
+                    gotCacetinhoMp3:play()
+                end
             end
         end
         for i, enemie in pairs(enemies) do
@@ -161,7 +167,13 @@ function Game:update(dt)
             spawnPlayer(player, 1)
         end
         player:update(dt)
-    elseif state == 'gameEnd' then
+    elseif state == 'gameWon' then
+        ingameTrack:stop()
+        if love.keyboard.isDown('return') then
+            state = 'menu'
+            resetGame()
+        end
+    elseif state == 'gameOver' then
         ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
@@ -194,8 +206,10 @@ function Game:draw()
             love.graphics.draw(lifeImg, 120*i, 50)
         end
         camera:draw()
-    elseif state == 'gameEnd' then
-        love.graphics.draw(gameEndImg, 0, 0)
+    elseif state == 'gameWon' then
+        love.graphics.draw(gameWonImg, 0, 0)
+    elseif state == 'gameOver' then
+        love.graphics.draw(gameOverImg, 0, 0)
     end
 
     -- DEBUG
@@ -217,7 +231,7 @@ end
 function loseLife()
     player.lifes = player.lifes - 1
     if player.lifes == 0 then
-        --game over
+        state = 'gameOver'
     end
 end
 
