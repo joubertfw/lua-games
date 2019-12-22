@@ -46,12 +46,11 @@ function Game:initialize()
     )
 
     state = 'menu'
-    map = jsonToMap('/assets/maps/winter2.json')
-    tiles = renderMap(map,  '/assets/maps/platformPack_tilesheet.png')
+    map = jsonToMap('assets/maps/winter2.json')
+    tiles = renderMap(map,  'assets/maps/platformPack_tilesheet.png')
 
     --Player creation
-    --spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
-    spawnArea = {{x = screenDimensions.x*2.7, y = screenDimensions.y*0.8}}
+    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
                 cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
     player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
@@ -248,7 +247,8 @@ end
 
 function resetGame()
     --Reset things to default values
-    menu:reset()
+    --menu:reset()
+    love.event.quit("restart")
 end
 
 function getTile(number, tilewidth, tileheight)
@@ -256,9 +256,7 @@ function getTile(number, tilewidth, tileheight)
 end
 
 function jsonToMap(file)
-    local f = io.open(arg[1] ..file, "rb")
-    local lines = {}
-    lines = f:read("*a")
+    local lines = love.filesystem.read(file)
 
     return json.decode(lines);
 end
