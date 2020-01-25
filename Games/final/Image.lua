@@ -7,8 +7,7 @@ function Image:initialize(path, quadConfig)
         self.width = quadConfig.quadWidth
         self.height = quadConfig.quadHeight
         self.animVel = quadConfig.animVel
-        self.quadQtd = quadConfig.quadQtd
-        self.currentCol = quadConfig.currentCol and quadConfig.currentCol or 0
+        self.currentCol = 0
         self.row = quadConfig.row
         self.quad = love.graphics.newQuad(0, 0, self.width, self.height, self.drawable:getDimensions())
     else

@@ -1,14 +1,35 @@
 Game = class('Game')
 
---These values are global for every instance
---When overritten, all instances are affected
-local default = {
+function initState()
+    state = 'menu'
+    menu:reset()
+    --Player creation
+    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
+    playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
+                cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
+    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
+    spawnPlayer(player, 1)
 
-}
+    --Enemies creation
+    enemies = {}
+    enemieSpawns = {
+        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.8, range = 3, stop = 1, direction = -1}
+    }
+    for i, spawn in pairs(enemieSpawns) do
+        table.insert(enemies, spawnEnemie(spawn))
+    end
+
+    --Items creation
+    items = {
+        Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
+        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
+        Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
+    }
+end
 
 function Game:initialize()
     -- Window configuration
-    love.window.setMode(1920, 1080, {fullscreen = true})
+    love.window.setMode(1920, 1080, {fullscreen = false})
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
@@ -29,9 +50,8 @@ function Game:initialize()
     love.graphics.setFont(font)
     
     --Audio
-    menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
-    ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
-    gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
+    --menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
+    --ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
     punchMp3 = love.audio.newSource("assets/audio/punch.mp3", "stream")
     hurtMp3 = love.audio.newSource("assets/audio/hurt.mp3", "stream")
     
@@ -45,47 +65,12 @@ function Game:initialize()
         0, 0
     )
 
-    state = 'menu'
+    -- Reading map files
     map = jsonToMap('assets/maps/winter2.json')
     tiles = renderMap(map,  'assets/maps/platformPack_tilesheet.png')
 
-    --Player creation
-    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
-    playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
-                cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
-    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
-    spawnPlayer(player, 1)
+    initState()
 
-    --Enemies creation
-    enemies = {}
-    enemieSpawns = {
-        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.98, range = 3, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, stop = 1.5, color = 'blue', direction = 1},
-        {x = screenDimensions.x*0.6, y = screenDimensions.y*0.86, range = 2, stop = 2, color = 'red', direction = -1},
-        {x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'red', direction = 1},
-        {x = screenDimensions.x, y = screenDimensions.y*0.98, range = 2, stop = 2, color = 'blue', direction = 1},
-        {x = screenDimensions.x*1.3, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'blue', direction = -1},
-        {x = screenDimensions.x*1.4, y = screenDimensions.y*0.86, range = 2, stop = 0.5, color = 'red', direction = 1},
-        {x = screenDimensions.x*1.63, y = screenDimensions.y*0.74, range = 2, stop = 1, color = 'blue', direction = -1},
-        {x = screenDimensions.x*1.73, y = screenDimensions.y*0.62, range = 2, stop = 1.5, color = 'blue', direction = 1},
-        {x = screenDimensions.x*1.78, y = screenDimensions.y*0.62, range = 1.5, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*2.05, y = screenDimensions.y*0.98, range = 3, stop = 1.5, color = 'red', direction = 1},
-        {x = screenDimensions.x*2.2, y = screenDimensions.y*0.98, range = 3.5, stop = 0.5, color = 'blue', direction = -1},
-        {x = screenDimensions.x*2.33, y = screenDimensions.y*0.98, range = 1, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*2.6, y = screenDimensions.y*0.98, range = 1, stop = 0.2, color = 'blue', direction = 1},
-        {x = screenDimensions.x*2.97, y = screenDimensions.y*0.8, range = 2, stop = 0.5, color = 'blue', direction = 1}
-    }
-    enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
-    for i, spawn in pairs(enemieSpawns) do
-        table.insert(enemies, spawnEnemie(spawn, enemieConfig))
-    end
-
-    --Items creation
-    items = {
-        Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
-    }
     fps = 0
 end
 
@@ -94,21 +79,21 @@ function Game:update(dt)
 
     if state == 'menu' then
         menu:update(dt)
-        menuTrack:play()
+        --menuTrack:play()
         if menu:getState() == #menu.options - 1 then
             --exit
             closeGame()
         elseif menu:getState() == 0 then
             --begin game
             state = 'ingame'
-            menuTrack:stop()
-            ingameTrack:play()
+            --menuTrack:stop()
+            --ingameTrack:play()
         end
 
     elseif state == 'ingame' then
         camera:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
-        ingameTrack:play()
+        --ingameTrack:play()
         -- itens check
         for i, item in pairs(items) do
             item:update()
@@ -120,10 +105,10 @@ function Game:update(dt)
                     player.isCacetinhoPowered = true
                     player.isInvencible = true
                     player:setInvencibleDt(true)
-                    gotCacetinhoMp3:play()
                 end
             end
         end
+        
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
             if enemie:isAlreadyDead() then
@@ -167,16 +152,16 @@ function Game:update(dt)
         end
         player:update(dt)
     elseif state == 'gameWon' then
-        ingameTrack:stop()
+        --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
-            resetGame()
+            initState()
         end
     elseif state == 'gameOver' then
-        ingameTrack:stop()
+        --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
-            resetGame()
+            initState()
         end
     end
 end
@@ -241,14 +226,8 @@ function spawnPlayer(player, i)
     player.vel.x = 0
 end
 
-function spawnEnemie(spawn, imgConfig)
-    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
-end
-
-function resetGame()
-    --Reset things to default values
-    --menu:reset()
-    love.event.quit("restart")
+function spawnEnemie(spawn)
+    return Skeleton(spawn.x, spawn.y, spawn.direction, 'assets/image/enemies/skeleton/skeleton.png', spawn.range, spawn.stop)
 end
 
 function getTile(number, tilewidth, tileheight)
