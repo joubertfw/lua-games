@@ -1,13 +1,8 @@
 Game = class('Game')
 
---These values are global for every instance
---When overritten, all instances are affected
-local inicialState = {
-
-}
-
 function initState()
     state = 'menu'
+    menu:reset()
     --Player creation
     spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
@@ -21,18 +16,7 @@ function initState()
         {x = screenDimensions.x*0.43, y = screenDimensions.y*0.98, range = 3, stop = 1, color = 'red', direction = -1},
         {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, stop = 1.5, color = 'blue', direction = 1},
         {x = screenDimensions.x*0.6, y = screenDimensions.y*0.86, range = 2, stop = 2, color = 'red', direction = -1},
-        {x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'red', direction = 1},
-        {x = screenDimensions.x, y = screenDimensions.y*0.98, range = 2, stop = 2, color = 'blue', direction = 1},
-        {x = screenDimensions.x*1.3, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'blue', direction = -1},
-        {x = screenDimensions.x*1.4, y = screenDimensions.y*0.86, range = 2, stop = 0.5, color = 'red', direction = 1},
-        {x = screenDimensions.x*1.63, y = screenDimensions.y*0.74, range = 2, stop = 1, color = 'blue', direction = -1},
-        {x = screenDimensions.x*1.73, y = screenDimensions.y*0.62, range = 2, stop = 1.5, color = 'blue', direction = 1},
-        {x = screenDimensions.x*1.78, y = screenDimensions.y*0.62, range = 1.5, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*2.05, y = screenDimensions.y*0.98, range = 3, stop = 1.5, color = 'red', direction = 1},
-        {x = screenDimensions.x*2.2, y = screenDimensions.y*0.98, range = 3.5, stop = 0.5, color = 'blue', direction = -1},
-        {x = screenDimensions.x*2.33, y = screenDimensions.y*0.98, range = 1, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*2.6, y = screenDimensions.y*0.98, range = 1, stop = 0.2, color = 'blue', direction = 1},
-        {x = screenDimensions.x*2.97, y = screenDimensions.y*0.8, range = 2, stop = 0.5, color = 'blue', direction = 1}
+        {x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'red', direction = 1}
     }
     enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
     for i, spawn in pairs(enemieSpawns) do
@@ -45,11 +29,12 @@ function initState()
         Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
         Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
     }
+    eskeleton = Eskeleton(spawnArea[1].x, spawnArea[1].y, 'assets/image/enemies/eskeleton/eskeleton.png')
 end
 
 function Game:initialize()
     -- Window configuration
-    love.window.setMode(1920, 1080, {fullscreen = true})
+    love.window.setMode(1920, 1080, {fullscreen = false})
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
@@ -72,7 +57,6 @@ function Game:initialize()
     --Audio
     --menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
     --ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
-    gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
     punchMp3 = love.audio.newSource("assets/audio/punch.mp3", "stream")
     hurtMp3 = love.audio.newSource("assets/audio/hurt.mp3", "stream")
     
@@ -126,10 +110,10 @@ function Game:update(dt)
                     player.isCacetinhoPowered = true
                     player.isInvencible = true
                     player:setInvencibleDt(true)
-                    gotCacetinhoMp3:play()
                 end
             end
         end
+        eskeleton:update(dt)
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
             if enemie:isAlreadyDead() then
@@ -204,6 +188,7 @@ function Game:draw()
         for i, enemie in pairs(enemies) do
             enemie:draw()
         end
+        eskeleton:draw()
         player:draw()
         
         camera:detach()
@@ -248,7 +233,7 @@ function spawnPlayer(player, i)
 end
 
 function spawnEnemie(spawn, imgConfig)
-    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
+    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/eskimo/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
 end
 
 function getTile(number, tilewidth, tileheight)
