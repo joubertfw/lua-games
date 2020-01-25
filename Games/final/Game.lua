@@ -2,53 +2,12 @@ Game = class('Game')
 
 --These values are global for every instance
 --When overritten, all instances are affected
-local default = {
+local inicialState = {
 
 }
 
-function Game:initialize()
-    -- Window configuration
-    love.window.setMode(1920, 1080, {fullscreen = true})
-    love.window.setTitle('Rest Home Fight')
-    screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
-    camera = Camera()
-    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
-    camera:setFollowLerp(0.1)
-    camera:setFollowStyle('PLATFORMER')
-
-    util = Util()
-
-    --Imgs
-    backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
-    gameWonImg = love.graphics.newImage('assets/image/game_won.png')
-    gameOverImg = love.graphics.newImage('assets/image/game_over.png')
-    lifeImg = love.graphics.newImage("assets/image/misc/hat.png")
-
-    --Font
-    font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
-    love.graphics.setFont(font)
-    
-    --Audio
-    menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
-    ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
-    gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
-    punchMp3 = love.audio.newSource("assets/audio/punch.mp3", "stream")
-    hurtMp3 = love.audio.newSource("assets/audio/hurt.mp3", "stream")
-    
-    --Menu Screen
-    menu = MenuScreen(
-        0, 150, 
-        {'Start Game', 'Exit'}, 
-        'assets/fonts/vcr.ttf',
-        'assets/image/menu/background.png',
-        'assets/image/menu/selectionBox.png',
-        0, 0
-    )
-
+function initState()
     state = 'menu'
-    map = jsonToMap('assets/maps/winter2.json')
-    tiles = renderMap(map,  'assets/maps/platformPack_tilesheet.png')
-
     --Player creation
     spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
     playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
@@ -86,6 +45,53 @@ function Game:initialize()
         Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
         Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
     }
+end
+
+function Game:initialize()
+    -- Window configuration
+    love.window.setMode(1920, 1080, {fullscreen = true})
+    love.window.setTitle('Rest Home Fight')
+    screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
+    camera = Camera()
+    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
+    camera:setFollowLerp(0.1)
+    camera:setFollowStyle('PLATFORMER')
+
+    util = Util()
+
+    --Imgs
+    backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
+    gameWonImg = love.graphics.newImage('assets/image/game_won.png')
+    gameOverImg = love.graphics.newImage('assets/image/game_over.png')
+    lifeImg = love.graphics.newImage("assets/image/misc/hat.png")
+
+    --Font
+    font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
+    love.graphics.setFont(font)
+    
+    --Audio
+    --menuTrack = love.audio.newSource("assets/audio/menu.mp3", "stream")
+    --ingameTrack = love.audio.newSource("assets/audio/ingame.mp3", "stream")
+    gotCacetinhoMp3 = love.audio.newSource("assets/audio/gotCacetinho.mp3", "stream")
+    punchMp3 = love.audio.newSource("assets/audio/punch.mp3", "stream")
+    hurtMp3 = love.audio.newSource("assets/audio/hurt.mp3", "stream")
+    
+    --Menu Screen
+    menu = MenuScreen(
+        0, 150, 
+        {'Start Game', 'Exit'}, 
+        'assets/fonts/vcr.ttf',
+        'assets/image/menu/background.png',
+        'assets/image/menu/selectionBox.png',
+        0, 0
+    )
+
+    -- Reading map files
+    map = jsonToMap('assets/maps/winter2.json')
+    tiles = renderMap(map,  'assets/maps/platformPack_tilesheet.png')
+
+    initState()
+
     fps = 0
 end
 
@@ -94,21 +100,21 @@ function Game:update(dt)
 
     if state == 'menu' then
         menu:update(dt)
-        menuTrack:play()
+        --menuTrack:play()
         if menu:getState() == #menu.options - 1 then
             --exit
             closeGame()
         elseif menu:getState() == 0 then
             --begin game
             state = 'ingame'
-            menuTrack:stop()
-            ingameTrack:play()
+            --menuTrack:stop()
+            --ingameTrack:play()
         end
 
     elseif state == 'ingame' then
         camera:update(dt)
         camera:follow(player.hitbox.x, player.hitbox.y)
-        ingameTrack:play()
+        --ingameTrack:play()
         -- itens check
         for i, item in pairs(items) do
             item:update()
@@ -167,16 +173,16 @@ function Game:update(dt)
         end
         player:update(dt)
     elseif state == 'gameWon' then
-        ingameTrack:stop()
+        --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
-            resetGame()
+            initState()
         end
     elseif state == 'gameOver' then
-        ingameTrack:stop()
+        --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             state = 'menu'
-            resetGame()
+            initState()
         end
     end
 end
@@ -243,12 +249,6 @@ end
 
 function spawnEnemie(spawn, imgConfig)
     return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/enemie/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
-end
-
-function resetGame()
-    --Reset things to default values
-    --menu:reset()
-    love.event.quit("restart")
 end
 
 function getTile(number, tilewidth, tileheight)
