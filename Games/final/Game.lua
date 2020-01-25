@@ -3,17 +3,16 @@ Game = class('Game')
 function initState()
     state = 'menu'
     menu:reset()
+    
     --Player creation
     spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
-    playerConfig = {quadWidth = 300, quadHeight = 300, animVel = 7, 
-                cols = 9, rows = 11, idleCols = 5, moveCols = 8, punchCols = 5}
-    player = Player(0, 0, 'assets/image/player/santa.png', {left = 'a', right = 'd', up = 'w', down = 's'},  playerConfig)
+    player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
     spawnPlayer(player, 1)
 
     --Enemies creation
     enemies = {}
     enemieSpawns = {
-        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.8, range = 3, stop = 1, direction = -1}
+        {x = screenDimensions.x*0.55, y = screenDimensions.y*0.78, range = 3, stop = 1, direction = 1}
     }
     for i, spawn in pairs(enemieSpawns) do
         table.insert(enemies, spawnEnemie(spawn))
@@ -67,7 +66,7 @@ function Game:initialize()
 
     -- Reading map files
     map = jsonToMap('assets/maps/winter2.json')
-    tiles = renderMap(map,  'assets/maps/platformPack_tilesheet.png')
+    tiles = renderMap(map,'assets/maps/platformPack_tilesheet.png')
 
     initState()
 
@@ -114,7 +113,7 @@ function Game:update(dt)
             if enemie:isAlreadyDead() then
                 table.remove(enemies, i)
             elseif not enemie.isHitted then
-                if player:isPunching() and enemie:wasHitted(player.hurtbox) then
+                if player:isAttacking() and enemie:wasHitted(player.hurtbox) then
                 punchMp3:play()
                 end
                 if player.hitbox:checkCollision(enemie.hitbox) and not player.isInvencible then
@@ -141,7 +140,7 @@ function Game:update(dt)
                 end
             elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
                 --this keeps the player always on same level when on floor
-                player.position.y = tile.y - player.hitbox.height*2.3
+                player.position.y = tile.y - player.hitbox.height*1.3
                 player:setOnFloor()
                 break
             end
@@ -198,7 +197,7 @@ function Game:draw()
 
     -- DEBUG
     local base = 450
-    -- love.graphics.print("isPunching: " .. (player:isPunching() and 'true' or 'false'), 50, base)
+    -- love.graphics.print("isAttacking: " .. (player:isAttacking() and 'true' or 'false'), 50, base)
     -- love.graphics.print("isHitted: " .. (enemies[1].isHitted and 'true' or 'false'), 50, base + 50)
     -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
     -- love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
