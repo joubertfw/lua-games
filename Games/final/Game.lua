@@ -13,14 +13,10 @@ function initState()
     --Enemies creation
     enemies = {}
     enemieSpawns = {
-        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.98, range = 3, stop = 1, color = 'red', direction = -1},
-        {x = screenDimensions.x*0.53, y = screenDimensions.y*0.86, range = 3, stop = 1.5, color = 'blue', direction = 1},
-        {x = screenDimensions.x*0.6, y = screenDimensions.y*0.86, range = 2, stop = 2, color = 'red', direction = -1},
-        {x = screenDimensions.x*0.83, y = screenDimensions.y*0.98, range = 7.8, stop = 2, color = 'red', direction = 1}
+        {x = screenDimensions.x*0.43, y = screenDimensions.y*0.8, range = 3, stop = 1, direction = -1}
     }
-    enemieConfig = {quadWidth = 100, quadHeight = 100, animVel = 6, cols = 4, rows = 3}
     for i, spawn in pairs(enemieSpawns) do
-        table.insert(enemies, spawnEnemie(spawn, enemieConfig))
+        table.insert(enemies, spawnEnemie(spawn))
     end
 
     --Items creation
@@ -29,7 +25,6 @@ function initState()
         Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
         Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
     }
-    eskeleton = Eskeleton(spawnArea[1].x, spawnArea[1].y, 'assets/image/enemies/eskeleton/eskeleton.png')
 end
 
 function Game:initialize()
@@ -113,7 +108,7 @@ function Game:update(dt)
                 end
             end
         end
-        eskeleton:update(dt)
+        
         for i, enemie in pairs(enemies) do
             enemie:update(dt)
             if enemie:isAlreadyDead() then
@@ -188,7 +183,6 @@ function Game:draw()
         for i, enemie in pairs(enemies) do
             enemie:draw()
         end
-        eskeleton:draw()
         player:draw()
         
         camera:detach()
@@ -232,8 +226,8 @@ function spawnPlayer(player, i)
     player.vel.x = 0
 end
 
-function spawnEnemie(spawn, imgConfig)
-    return Enemie(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/eskimo/'..spawn.color..'.png', spawn.range, spawn.stop, imgConfig)
+function spawnEnemie(spawn)
+    return Skeleton(spawn.x, spawn.y, spawn.direction, 'assets/image/enemies/skeleton/skeleton.png', spawn.range, spawn.stop)
 end
 
 function getTile(number, tilewidth, tileheight)

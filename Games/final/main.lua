@@ -11,7 +11,7 @@ function love.load ()
     require('Image')
     require('Player')
     require('Enemie')
-    require('Eskeleton')
+    require('Skeleton')
     require('Tile')
     require('Item')
 
