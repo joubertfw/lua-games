@@ -8,18 +8,17 @@ local default = {
     animVel = 5,
     idleCols = 4,
     walkCols = 6,
-    jumpCols = 10,
+    jumpCols = 5,
     slideCols = 2,
     attackCols = 7,
-    deathCols = 8,
+    deathCols = 7,
     rows = 6,
-    dtJump = 0.4,
     velHoriz = 900,
     velVert = 900,
     acelYOnJump = -2500,
     velYOnJump = -800,
     acelYOnFall = 2000,
-    dtAttack = 0.2,
+    dtAttack = 0.5,
     dtInvencible = 1.5
 }
 
@@ -28,7 +27,6 @@ function Player:initialize(x, y, imgPath, buttons)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
-    self.dtJump = default.dtJump
     self.state = 'falling'
     self.direction = 1
     self.jumpRepeat = false
@@ -68,7 +66,6 @@ function Player:update(dt)
                 self.acel.y = default.acelYOnJump
                 self.vel.y = default.velYOnJump
                 self.jumpRepeat = true
-            else
             end
         end
     elseif self:isSlidingLeft() then
@@ -82,7 +79,7 @@ function Player:update(dt)
     
     -- Collision boxes updates
     self.hitbox:update(self.position.x + 70*self.direction, self.position.y + self.image.height/4.5, self.direction*self.image.width/3, self.image.height*0.75)
-    self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 20), self.image.height/10)
+    self.hurtbox:update(self.position.x + 110*self.direction, self.position.y + self.image.height/3, self.direction*self.image.width/3, self.image.height/2)
     
     --Idle animation
     if not love.keyboard.isDown(self.input.btLeft)
@@ -91,6 +88,10 @@ function Player:update(dt)
                 self:animateIdle(dt)
             end
             self.acel.x = 0
+    end
+
+    if self.jumpRepeat then
+        self:animateJump(dt)
     end
 
     if self.dtInvencible > 0 then
@@ -189,9 +190,18 @@ function Player:animateIdle(dt)
     self.image:update(currentCol, row)
 end
 
-function Player:animateAttack(dt)
-    local currentCol = self.image.currentCol + (dt*self.image.animVel)/default.dtAttack*0.6
+function Player:animateJump(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel*2
     row = 2*self.image.height
+    if currentCol > self.image.quadConfig.jumpCols then
+        currentCol = 0
+    end
+    self.image:update(currentCol, row)
+end
+
+function Player:animateAttack(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel/default.dtAttack*1.3
+    row = 4*self.image.height
     self.image:update(currentCol, row)
 end
 
@@ -257,7 +267,6 @@ function Player:isFalling()
 end
 
 function Player:setOnFloor()
-    self.dtJump = default.dtJump
     self.state = 'onFloor'
 end
 
