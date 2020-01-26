@@ -19,7 +19,8 @@ local default = {
     velYOnJump = -800,
     acelYOnFall = 2000,
     dtAttack = 0.5,
-    dtInvencible = 1.5
+    dtInvencible = 1.5,
+    atritoSlide = 0.75
 }
 
 function Player:initialize(x, y, imgPath, buttons)
@@ -90,7 +91,9 @@ function Player:update(dt)
             self.acel.x = 0
     end
 
-    if self.jumpRepeat then
+    if self:isSliding() then
+        self:animateSlide(dt)
+    elseif self.jumpRepeat then
         self:animateJump(dt)
     end
 
@@ -137,23 +140,23 @@ function Player:listenInput(dt)
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         self:moveLeft(dt)
         if not self:isAttacking() and not self:isFalling() then
-            self:animate(dt)
+            self:animateWalk(dt)
         end
         self.direction = -1
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
         self:moveRight(dt)
         if not self:isAttacking() and not self:isFalling() then
-            self:animate(dt)
+            self:animateWalk(dt)
         end
         self.direction = 1
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
-        --self:animate(dt)
+        --self:animateWalk(dt)
         --self:moveUp(dt)
     end
     if love.keyboard.isDown(self.input.btDown) and not love.keyboard.isDown(self.input.btUp) then
-        --self:animate(dt)
+        --self:animateWalk(dt)
         --self:moveDown(dt) buga o pulo se apertar junto
     end
 
@@ -205,8 +208,8 @@ function Player:animateAttack(dt)
     self.image:update(currentCol, row)
 end
 
-function Player:animate(dt)
-    local currentCol = self.image.currentCol + dt*self.image.animVel
+function Player:animateWalk(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel*1.5
     row = self.image.height
     if currentCol > self.image.quadConfig.walkCols then
         currentCol = 0
@@ -215,9 +218,19 @@ function Player:animate(dt)
     self.image:update(currentCol, row)
 end
 
+function Player:animateSlide(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel
+    row = 3*self.image.height
+    if currentCol > self.image.quadConfig.slideCols then
+        currentCol = 0
+    end
+
+    self.image:update(currentCol, row)
+end
+
 function Player:calculatePosition(dt)
     self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
-    self.vel.y = self.vel.y + self.acel.y * dt
+    self.vel.y = ( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y)
     self.vel.y = self.vel.y < 1000 and self.vel.y or 1000
     self.position.y = self.position.y + self.vel.y * dt
     self.position.x = self.position.x + self.vel.x * dt

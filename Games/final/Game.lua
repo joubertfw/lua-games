@@ -134,7 +134,7 @@ function Game:update(dt)
                 end
             elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
                 player.vel.x = 0
-                player.position.x = player.position.x + 0.5
+                player.position.x = player.position.x + 0.15
                 if not player:isOnFloor() then
                     player:setSlidingLeft()
                 end
