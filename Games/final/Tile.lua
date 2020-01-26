@@ -6,6 +6,7 @@ function Tile:initialize(x, y, tileNumber)
     self.tileNumber = tileNumber
     self.width = 64
     self.height = 64
+    self.isRamp = false
 end
 
 function Tile:getTileNumber()

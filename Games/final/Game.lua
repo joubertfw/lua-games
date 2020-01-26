@@ -74,10 +74,9 @@ function Game:initialize()
     -- map = jsonToMap('assets/maps/winter2.json')
     map = require('assets/maps/Map1')
     tiles, backtiles = renderMap(map)
-    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
+    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
     initState()
-
     camera = Camera(player.position.x, player.position.y)
     -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
@@ -194,7 +193,7 @@ function Game:draw()
         for i, enemie in pairs(skeletons) do
             enemie:draw()
         end
-        player:draw()               
+        player:draw()
         camera:detach()
         for i = 0, player.lifes - 1 do
             love.graphics.draw(lifeImg, 120*i, 50)

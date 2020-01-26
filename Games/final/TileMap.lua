@@ -14,7 +14,7 @@ end
 
 function TileMap:draw()
     for i, tile in pairs(self.tiles) do
-        self.quad:setViewport((tile.tileNumber - 1) * self.tileSize % self.width , math.floor((tile.tileNumber - 1) / (self.width / self.tileSize)) * self.tileSize , self.tileSize, self.tileSize, self.width, self.height)
+        self.quad:setViewport(((tile.tileNumber - 1) * self.tileSize % self.width), (math.floor((tile.tileNumber + 1) / (self.width / self.tileSize)) * self.tileSize) + 1 , self.tileSize, self.tileSize, self.width, self.height)
         love.graphics.draw(self.tileset, self.quad, tile.x, tile.y, 0)
     end
 end
