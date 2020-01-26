@@ -10,13 +10,23 @@ function initState()
     spawnPlayer(player, 1)
 
     --Enemies creation
-    enemies = {}
-    enemieSpawns = {
+    skeletons = {}
+    skeletonSpawns = {
         {x = screenDimensions.x*0.55, y = screenDimensions.y*0.78, range = 3, stop = 1, direction = 1}
     }
-    for i, spawn in pairs(enemieSpawns) do
-        table.insert(enemies, spawnEnemie(spawn))
+    for i, spawn in pairs(skeletonSpawns) do
+        table.insert(skeletons, spawnSkeleton(spawn))
     end
+    
+    --[[
+    npcs = {}
+    npcSpawns = {
+        {x = screenDimensions.x*0.55, y = screenDimensions.y*0.78, type = 'archer', range = 3, stop = 1, config = {}}
+    }
+    for i, spawn in pairs(npcSpawns) do
+        table.insert(npcs, spawnNPC(spawn))
+    end
+    ]]
 
     --Items creation
     items = {
@@ -108,10 +118,10 @@ function Game:update(dt)
             end
         end
         
-        for i, enemie in pairs(enemies) do
+        for i, enemie in pairs(skeletons) do
             enemie:update(dt)
             if enemie:isAlreadyDead() then
-                table.remove(enemies, i)
+                table.remove(skeletons, i)
             elseif not enemie.isHitted then
                 if player:isAttacking() and enemie:wasHitted(player.hurtbox) then
                 punchMp3:play()
@@ -128,12 +138,14 @@ function Game:update(dt)
         for i, tile in pairs(tiles) do
             if tile:checkObjOnLeftSide(player.hitbox, nil, 32) and player.direction == 1 then
                 player.vel.x = 0
-                player.position.x = player.position.x - 0.5
+                --this prevents player from getting into the wall
+                player.position.x = player.position.x - 0.15
                 if not player:isOnFloor() then
                     player:setSlidingRight()
                 end
             elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
                 player.vel.x = 0
+                --this prevents player from getting into the wall
                 player.position.x = player.position.x + 0.15
                 if not player:isOnFloor() then
                     player:setSlidingLeft()
@@ -179,7 +191,7 @@ function Game:draw()
         for i, item in pairs(items) do
             item:draw()
         end
-        for i, enemie in pairs(enemies) do
+        for i, enemie in pairs(skeletons) do
             enemie:draw()
         end
         player:draw()
@@ -198,7 +210,7 @@ function Game:draw()
     -- DEBUG
     local base = 450
     -- love.graphics.print("isAttacking: " .. (player:isAttacking() and 'true' or 'false'), 50, base)
-    -- love.graphics.print("isHitted: " .. (enemies[1].isHitted and 'true' or 'false'), 50, base + 50)
+    -- love.graphics.print("isHitted: " .. (skeletons[1].isHitted and 'true' or 'false'), 50, base + 50)
     -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
     -- love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
     -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
@@ -225,7 +237,11 @@ function spawnPlayer(player, i)
     player.vel.x = 0
 end
 
-function spawnEnemie(spawn)
+function spawnNPC(spawn)
+    return NPC(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/'..spawn.type..'.png', spawn.config)
+end
+
+function spawnSkeleton(spawn)
     return Skeleton(spawn.x, spawn.y, spawn.direction, 'assets/image/enemies/skeleton/skeleton.png', spawn.range, spawn.stop)
 end
 
