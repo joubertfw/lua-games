@@ -39,7 +39,7 @@ end
 function Game:initialize()
     -- Window configuration
     love.window.setMode(1920, 1080, {fullscreen = false})
-    love.window.setTitle('Rest Home Fight')
+    love.window.setTitle('Game Jam Final')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
 
     util = Util()
@@ -186,8 +186,8 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
-        tilemap:draw()
         backTilemap:draw()
+        tilemap:draw()
         for i, item in pairs(items) do
             item:draw()
         end
