@@ -146,11 +146,11 @@ function Player:listenInput(dt)
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
         --self:animate(dt)
-        --self:moveUp(dt)
+        self:moveUp(dt)
     end
     if love.keyboard.isDown(self.input.btDown) and not love.keyboard.isDown(self.input.btUp) then
         --self:animate(dt)
-        --self:moveDown(dt) buga o pulo se apertar junto
+        -- self:moveDown(dt) --buga o pulo se apertar junto
     end
 
     if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
@@ -211,7 +211,7 @@ function Player:calculatePosition(dt)
 end
 
 function Player:moveUp(dt)
-    self.acel.y = -default.velYOnJump
+    self.acel.y = default.velYOnJump
     -- self:setFalling()
     -- self.position.y = self.position.y + self.vel.y*dt
 end
