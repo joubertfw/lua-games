@@ -8,6 +8,10 @@ function Tile:initialize(x, y, tileNumber)
     self.height = 64
 end
 
+function Tile:getTileNumber()
+    return self.tileNumber
+end
+
 function Tile:checkObjOnTop(obj, innerRange, deadzone)
     innerRange = innerRange and innerRange or 0
     deadzone = deadzone and deadzone or 0

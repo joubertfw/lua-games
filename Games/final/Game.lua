@@ -73,11 +73,9 @@ function Game:initialize()
     -- Reading map files
     -- map = jsonToMap('assets/maps/winter2.json')
     map = require('assets/maps/Map1')
-
-    tiles, back = renderMap(map)
+    tiles, backtiles = renderMap(map)
+    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
-    backTilemap = TileMap(back, 'assets/maps/Tileset.png')
-
     initState()
 
     camera = Camera(player.position.x, player.position.y)
@@ -98,7 +96,6 @@ function Game:update(dt)
             closeGame()
         elseif menu:getState() == 0 then
             --begin game
-            
             state = 'ingame'
             --menuTrack:stop()
             --ingameTrack:play()
@@ -140,28 +137,28 @@ function Game:update(dt)
             end
         end
         player:setFalling()
-        for i, tile in pairs(tiles) do
-            if tile:checkObjOnLeftSide(player.hitbox, nil, 32) and player.direction == 1 then
-                player.vel.x = 0
-                --this prevents player from getting into the wall
-                player.position.x = player.position.x - 0.15
-                if not player:isOnFloor() then
-                    player:setSlidingRight()
-                end
-            elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
-                player.vel.x = 0
-                --this prevents player from getting into the wall
-                player.position.x = player.position.x + 0.15
-                if not player:isOnFloor() then
-                    player:setSlidingLeft()
-                end
-            elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
-                --this keeps the player always on same level when on floor
-                player.position.y = tile.y - player.hitbox.height*1.3
-                player:setOnFloor()
-                break
-            end
-        end
+       for i, tile in pairs(tiles) do
+           if tile:checkObjOnLeftSide(player.hitbox, nil, 32) and player.direction == 1 then
+               player.vel.x = 0
+               --this prevents player from getting into the wall
+               player.position.x = player.position.x - 0.15
+               if not player:isOnFloor() then
+                   player:setSlidingRight()
+               end
+           elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
+               player.vel.x = 0
+               --this prevents player from getting into the wall
+               player.position.x = player.position.x + 0.15
+               if not player:isOnFloor() then
+                   player:setSlidingLeft()
+               end
+           elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
+               --this keeps the player always on same level when on floor
+               player.position.y = tile.y - player.hitbox.height*1.3
+               player:setOnFloor()
+               break
+           end
+       end
         if util:isOutOfScreen(player.hitbox, 'down', 1000000) then
             loseLife()
             spawnPlayer(player, 1)
@@ -189,16 +186,15 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
-        backTilemap:draw()
         tilemap:draw()
+        backTilemap:draw()
         for i, item in pairs(items) do
             item:draw()
         end
         for i, enemie in pairs(skeletons) do
             enemie:draw()
         end
-        player:draw()
-        
+        player:draw()               
         camera:detach()
         for i = 0, player.lifes - 1 do
             love.graphics.draw(lifeImg, 120*i, 50)
@@ -249,15 +245,14 @@ function spawnSkeleton(spawn)
 end
 
 function renderMap(map)
-    local tiles = {}
-    local backtiles = {}
+    local tiles, backtiles = {}, {}
     for i,layer in pairs(map.layers) do
         for j, number in pairs(layer.data) do
             if number ~= 0 then
-                if i == 3 then
-                    table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
+                if layer.id == 1 then
+                    table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))
                 else
-                    table.insert(backtiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
+                    table.insert(backtiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))
                 end
             end
         end
