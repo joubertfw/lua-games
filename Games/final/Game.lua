@@ -5,14 +5,14 @@ function initState()
     menu:reset()
     
     --Player creation
-    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*3}}
+    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*3.5}}
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
     spawnPlayer(player, 1)
 
     --Enemies creation
     skeletons = {}
     skeletonSpawns = {
-        {x = screenDimensions.x*0.55, y = screenDimensions.y*0.78, range = 3, stop = 1, direction = 1}
+        {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
     }
     for i, spawn in pairs(skeletonSpawns) do
         table.insert(skeletons, spawnSkeleton(spawn))
@@ -41,10 +41,6 @@ function Game:initialize()
     love.window.setMode(1920, 1080, {fullscreen = false})
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
-    camera = Camera()
-    -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
-    camera:setFollowLerp(0.1)
-    camera:setFollowStyle('PLATFORMER')
 
     util = Util()
 
@@ -84,6 +80,11 @@ function Game:initialize()
     --     tilemap = TileMap(tiles, 'assets/maps/tilemap.png')
     --   end)
     initState()
+
+    camera = Camera(player.position.x, player.position.y)
+    -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
+    camera:setFollowLerp(0.1)
+    camera:setFollowStyle('PLATFORMER')
 
     fps = 0
 end

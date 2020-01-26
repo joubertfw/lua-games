@@ -25,6 +25,8 @@ SOFTWARE.
 local function lerp(a, b, x) return a + (b - a)*x end
 local function csnap(v, x) return math.ceil(v/x)*x - x/2 end
 
+--https://github.com/adnzzzzZ/STALKER-X
+
 -- Shake according to https://jonny.morrill.me/en/blog/gamedev-how-to-implement-a-camera-shake-effect/
 local function newShake(amplitude, duration, frequency)
     local self = {
