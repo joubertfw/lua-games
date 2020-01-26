@@ -19,11 +19,7 @@ function NPC:initialize(x, y, direction, imgPath, config)
     self.dtStop = 0
     
     --Quads and animation
-    if config then --Quads-based image (spritesheet)
-        self.image = Image(imgPath, config)
-    else --Simple image
-        self.image = Image(imgPath)
-    end
+    self.image = Image(imgPath, config)
     
     -- Attack and damage
     self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height)
