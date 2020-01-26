@@ -37,22 +37,12 @@ function Skeleton:initialize(x, y, direction, imgPath, dtWalking, idleTime)
     self.hitbox = CollisionBox(0, 0, 0, 0)
     self.hurtbox = CollisionBox(0, 0, 0, 0, 'hurtbox')
     self.isHitted = false
+    self.dtAttack = default.dtAttack
     self.dtDieAnimation = -default.dtDieAnimation/2
 end
 
 function Skeleton:update(dt)
     -- State-based manipulation
-    --[[
-        if self.isHitted then
-            
-        elseif self:isIdle() then
-            self:animateIdle(dt)
-        elseif self:isWalking() then
-            self:animateWalk(dt)
-        elseif self:isAttacking() then
-            self:animateAttack(dt)
-        end
-    ]]
     if self.isHitted then
         self.dtDieAnimation = self.dtDieAnimation + dt*8
         self:die()
@@ -155,7 +145,7 @@ end
 
 function Skeleton:rotate()
     self.direction = -self.direction
-    self.position.x = self.position.x - self.direction*self.image.width
+    self.position.x = self.position.x - self.direction*self.image.width/1.5
 end
 
 function Skeleton:isWalking()

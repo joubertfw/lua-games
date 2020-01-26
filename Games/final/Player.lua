@@ -1,26 +1,33 @@
 Player = class('Player')
-local util = Util()
 
 --These values are global for every instance
 --When overritten, all instances are affected
 local default = {
-    dtJump = 0.4,
+    quadWidth = 200,
+    quadHeight = 148,
+    animVel = 5,
+    idleCols = 4,
+    walkCols = 6,
+    jumpCols = 5,
+    slideCols = 2,
+    attackCols = 7,
+    deathCols = 7,
+    rows = 6,
     velHoriz = 900,
     velVert = 900,
     acelYOnJump = -2500,
     velYOnJump = -800,
     acelYOnFall = 2000,
-    dtPunch = 0.2,
-    dtInvencibleCacetinho = 5,
-    dtInvencible = 1.5
+    dtAttack = 0.5,
+    dtInvencible = 1.5,
+    atritoSlide = 0.75
 }
 
-function Player:initialize(x, y, imgPath, buttons, config)
+function Player:initialize(x, y, imgPath, buttons)
     -- Position and movement
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
-    self.dtJump = default.dtJump
     self.state = 'falling'
     self.direction = 1
     self.jumpRepeat = false
@@ -29,15 +36,11 @@ function Player:initialize(x, y, imgPath, buttons, config)
     self.input = Input(buttons)
     
     -- Quads and animation
-    if config then --Quads-based image (spritesheet)
-        self.image = Image(imgPath, config)
-    else --Simple image
-        self.image = Image(imgPath)
-    end
+    self.image = Image(imgPath, default)
     
     -- Attack and damage
     self.lifes = 3
-    self.dtPunch = 0
+    self.dtAttack = 0
     self.hitRepeat = false
     self.hitbox = CollisionBox(0, 0, 0, 0)
     self.hurtbox = CollisionBox(0, 0, 0, 0, 'hurtbox')
@@ -64,7 +67,6 @@ function Player:update(dt)
                 self.acel.y = default.acelYOnJump
                 self.vel.y = default.velYOnJump
                 self.jumpRepeat = true
-            else
             end
         end
     elseif self:isSlidingLeft() then
@@ -77,29 +79,34 @@ function Player:update(dt)
     self:calculatePosition(dt)
     
     -- Collision boxes updates
-    self.hitbox:update(self.position.x + 10*self.direction, self.position.y + self.image.height/2.7, self.direction*(self.image.width/3 - 30), self.image.height/3.5)
-    self.hurtbox:update(self.position.x + 60*self.direction, self.position.y + self.image.height/2.1, self.direction*(self.image.width/4 - 20), self.image.height/10)
+    self.hitbox:update(self.position.x + 70*self.direction, self.position.y + self.image.height/4.5, self.direction*self.image.width/3, self.image.height*0.75)
+    self.hurtbox:update(self.position.x + 110*self.direction, self.position.y + self.image.height/3, self.direction*self.image.width/3, self.image.height/2)
     
     --Idle animation
-    if not love.keyboard.isDown(self.input.btLeft) 
+    if not love.keyboard.isDown(self.input.btLeft)
         and not love.keyboard.isDown(self.input.btRight) then
-            if self:isOnFloor() and not self:isPunching() then
+            if self:isOnFloor() and not self:isAttacking() then
                 self:animateIdle(dt)
             end
             self.acel.x = 0
+    end
+
+    if self:isSliding() then
+        self:animateSlide(dt)
+    elseif self.jumpRepeat then
+        self:animateJump(dt)
     end
 
     if self.dtInvencible > 0 then
         self.dtInvencible = self.dtInvencible - dt
     else
         self.isInvencible = false
-        self.isCacetinhoPowered = false
     end
 end
 
 function Player:draw()
     self.hitbox:draw()
-    if self:isPunching() then
+    if self:isAttacking() then
         self.hurtbox:draw()
     end
     if self.isCacetinhoPowered then
@@ -132,25 +139,25 @@ end
 function Player:listenInput(dt)
     if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
         self:moveLeft(dt)
-        if not self:isPunching() and not self:isFalling() then
-            self:animate(dt)
+        if not self:isAttacking() and not self:isFalling() then
+            self:animateWalk(dt)
         end
         self.direction = -1
     end
     if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
         self:moveRight(dt)
-        if not self:isPunching() and not self:isFalling() then
-            self:animate(dt)
+        if not self:isAttacking() and not self:isFalling() then
+            self:animateWalk(dt)
         end
         self.direction = 1
     end
     if love.keyboard.isDown(self.input.btUp) and not love.keyboard.isDown(self.input.btDown) then
-        --self:animate(dt)
-        self:moveUp(dt)
+        --self:animateWalk(dt)
+        --self:moveUp(dt)
     end
     if love.keyboard.isDown(self.input.btDown) and not love.keyboard.isDown(self.input.btUp) then
-        --self:animate(dt)
-        -- self:moveDown(dt) --buga o pulo se apertar junto
+        --self:animateWalk(dt)
+        --self:moveDown(dt) buga o pulo se apertar junto
     end
 
     if love.keyboard.isDown(self.input.btJump) and not self.spaceRepeat then
@@ -160,16 +167,16 @@ function Player:listenInput(dt)
     end
 
     --Attack verification
-    if love.keyboard.isDown(self.input.btPunch) and not self.hitRepeat then
+    if love.keyboard.isDown(self.input.btAttack) and not self.hitRepeat then
         self.image.currentCol = 0
-        self.dtPunch = default.dtPunch
+        self.dtAttack = default.dtAttack
         self.hitRepeat = true
     end
     --Attacking
-    if self.dtPunch > 0 then
-        self:animatePunch(dt)
-        self.dtPunch = self.dtPunch - dt
-    elseif love.keyboard.isDown(self.input.btPunch) then
+    if self.dtAttack > 0 then
+        self:animateAttack(dt)
+        self.dtAttack = self.dtAttack - dt
+    elseif love.keyboard.isDown(self.input.btAttack) then
         self.hitRepeat = true
     else
         self.hitRepeat = false
@@ -186,16 +193,35 @@ function Player:animateIdle(dt)
     self.image:update(currentCol, row)
 end
 
-function Player:animatePunch(dt)
-    local currentCol = self.image.currentCol + (dt*self.image.animVel)/default.dtPunch*0.6
+function Player:animateJump(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel*2
     row = 2*self.image.height
+    if currentCol > self.image.quadConfig.jumpCols then
+        currentCol = 0
+    end
     self.image:update(currentCol, row)
 end
 
-function Player:animate(dt)
-    local currentCol = self.image.currentCol + dt*self.image.animVel
+function Player:animateAttack(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel/default.dtAttack*1.3
+    row = 4*self.image.height
+    self.image:update(currentCol, row)
+end
+
+function Player:animateWalk(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel*1.5
     row = self.image.height
-    if currentCol > self.image.quadConfig.moveCols then
+    if currentCol > self.image.quadConfig.walkCols then
+        currentCol = 0
+    end
+
+    self.image:update(currentCol, row)
+end
+
+function Player:animateSlide(dt)
+    local currentCol = self.image.currentCol + dt*self.image.animVel
+    row = 3*self.image.height
+    if currentCol > self.image.quadConfig.slideCols then
         currentCol = 0
     end
 
@@ -204,7 +230,7 @@ end
 
 function Player:calculatePosition(dt)
     self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
-    self.vel.y = self.vel.y + self.acel.y * dt
+    self.vel.y = ( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y)
     self.vel.y = self.vel.y < 1000 and self.vel.y or 1000
     self.position.y = self.position.y + self.vel.y * dt
     self.position.x = self.position.x + self.vel.x * dt
@@ -224,7 +250,7 @@ end
 function Player:moveLeft(dt)
     self.acel.x = -default.velHoriz
     if self.direction == 1 then
-        self.position.x = self.position.x + self.hitbox.width*1.25
+        self.position.x = self.position.x + self.hitbox.width*3
     end
     if self:isFalling() and self.jumpRepeat then
         self.acel.x = self.acel.x*2
@@ -234,15 +260,15 @@ end
 function Player:moveRight(dt)
     self.acel.x = default.velHoriz
     if self.direction == -1 then
-        self.position.x = self.position.x - self.hitbox.width*1.25
+        self.position.x = self.position.x - self.hitbox.width*3
     end
     if self:isFalling() and self.jumpRepeat then
         self.acel.x = self.acel.x*2
     end
 end
 
-function Player:isPunching()
-    return self.dtPunch > 0 and self.hitRepeat
+function Player:isAttacking()
+    return self.dtAttack > 0 and self.hitRepeat
 end
 
 function Player:isOnFloor()
@@ -254,7 +280,6 @@ function Player:isFalling()
 end
 
 function Player:setOnFloor()
-    self.dtJump = default.dtJump
     self.state = 'onFloor'
 end
 
@@ -282,10 +307,6 @@ function Player:setSlidingRight()
     self.state = 'slidingRight'
 end
 
-function Player:setInvencibleDt(cacetinho)
-    if cacetinho then
-        self.dtInvencible = default.dtInvencibleCacetinho
-    else
-        self.dtInvencible = default.dtInvencible
-    end
+function Player:setInvencibleDt()
+    self.dtInvencible = default.dtInvencible
 end

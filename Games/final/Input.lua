@@ -7,13 +7,13 @@ function Input:initialize(buttons)
         self.btUp = buttons.up or 'up'
         self.btDown = buttons.down or 'down'
         self.btJump = buttons.jump or 'space'
-        self.btPunch = buttons.punch or 'p'
+        self.btAttack = buttons.attack or 'p'
     else
         self.btLeft = 'left'
         self.btRight = 'right'
         self.btUp = 'up'
         self.btDown = 'down'
         self.btJump = 'space'
-        self.btPunch = 'p'
+        self.btAttack = 'p'
     end
 end
