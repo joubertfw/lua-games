@@ -73,12 +73,11 @@ function Game:initialize()
     -- Reading map files
     -- map = jsonToMap('assets/maps/winter2.json')
     map = require('assets/maps/Map1')
-    tiles = renderMap(map)
+
+    tiles, back = renderMap(map)
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
-    -- co = coroutine.create(function ()
-    --     tiles = renderMap(map)
-    --     tilemap = TileMap(tiles, 'assets/maps/tilemap.png')
-    --   end)
+    backTilemap = TileMap(back, 'assets/maps/Tileset.png')
+
     initState()
 
     camera = Camera(player.position.x, player.position.y)
@@ -100,7 +99,6 @@ function Game:update(dt)
         elseif menu:getState() == 0 then
             --begin game
             
-            -- coroutine.resume(co)
             state = 'ingame'
             --menuTrack:stop()
             --ingameTrack:play()
@@ -191,6 +189,7 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
+        backTilemap:draw()
         tilemap:draw()
         for i, item in pairs(items) do
             item:draw()
@@ -251,14 +250,19 @@ end
 
 function renderMap(map)
     local tiles = {}
+    local backtiles = {}
     for i,layer in pairs(map.layers) do
         for j, number in pairs(layer.data) do
             if number ~= 0 then
-                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
+                if i == 3 then
+                    table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
+                else
+                    table.insert(backtiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
+                end
             end
         end
     end
-    return tiles
+    return tiles, backtiles
 end
 
 function closeGame()
