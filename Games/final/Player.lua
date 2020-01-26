@@ -237,7 +237,7 @@ function Player:calculatePosition(dt)
 end
 
 function Player:moveUp(dt)
-    self.acel.y = -default.velYOnJump
+    self.acel.y = default.velYOnJump
     -- self:setFalling()
     -- self.position.y = self.position.y + self.vel.y*dt
 end

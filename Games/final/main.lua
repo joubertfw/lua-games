@@ -13,6 +13,7 @@ function love.load ()
     require('Enemie')
     require('Skeleton')
     require('NPC')
+    require('TileMap')
     require('Tile')
     require('Item')
 

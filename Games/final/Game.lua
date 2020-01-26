@@ -5,7 +5,7 @@ function initState()
     menu:reset()
     
     --Player creation
-    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*0.7}}
+    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*3}}
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
     spawnPlayer(player, 1)
 
@@ -17,7 +17,7 @@ function initState()
     for i, spawn in pairs(skeletonSpawns) do
         table.insert(skeletons, spawnSkeleton(spawn))
     end
-    
+
     --[[
     npcs = {}
     npcSpawns = {
@@ -42,7 +42,7 @@ function Game:initialize()
     love.window.setTitle('Rest Home Fight')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
     camera = Camera()
-    camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
+    -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
     camera:setFollowStyle('PLATFORMER')
 
@@ -75,9 +75,14 @@ function Game:initialize()
     )
 
     -- Reading map files
-    map = jsonToMap('assets/maps/winter2.json')
-    tiles = renderMap(map,'assets/maps/platformPack_tilesheet.png')
-
+    -- map = jsonToMap('assets/maps/winter2.json')
+    map = require('assets/maps/Map1')
+    tiles = renderMap(map)
+    tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
+    -- co = coroutine.create(function ()
+    --     tiles = renderMap(map)
+    --     tilemap = TileMap(tiles, 'assets/maps/tilemap.png')
+    --   end)
     initState()
 
     fps = 0
@@ -85,7 +90,6 @@ end
 
 function Game:update(dt)
     fps = 1/dt
-
     if state == 'menu' then
         menu:update(dt)
         --menuTrack:play()
@@ -94,6 +98,8 @@ function Game:update(dt)
             closeGame()
         elseif menu:getState() == 0 then
             --begin game
+            
+            -- coroutine.resume(co)
             state = 'ingame'
             --menuTrack:stop()
             --ingameTrack:play()
@@ -157,7 +163,7 @@ function Game:update(dt)
                 break
             end
         end
-        if util:isOutOfScreen(player.hitbox, 'down', 1000) then
+        if util:isOutOfScreen(player.hitbox, 'down', 1000000) then
             loseLife()
             spawnPlayer(player, 1)
         end
@@ -184,10 +190,7 @@ function Game:draw()
         menu:draw()
     elseif state == 'ingame' then
         camera:attach()
-
-        for i, tile in pairs(tiles) do
-            tile:draw()
-        end
+        tilemap:draw()
         for i, item in pairs(items) do
             item:draw()
         end
@@ -245,22 +248,12 @@ function spawnSkeleton(spawn)
     return Skeleton(spawn.x, spawn.y, spawn.direction, 'assets/image/enemies/skeleton/skeleton.png', spawn.range, spawn.stop)
 end
 
-function getTile(number, tilewidth, tileheight)
-    return {quadWidth = tilewidth, quadHeight = tileheight, animVel = 1, cols = 14, rows = 7, idleCols = 0, moveCols = 0, currentCol =(number-1)%14, row = math.floor((number-1)/13)*64}
-end
-
-function jsonToMap(file)
-    local lines = love.filesystem.read(file)
-
-    return json.decode(lines);
-end
-
-function renderMap(map, tilemap)
+function renderMap(map)
     local tiles = {}
     for i,layer in pairs(map.layers) do
         for j, number in pairs(layer.data) do
             if number ~= 0 then
-                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)))
+                table.insert(tiles, Tile(((j-1) % layer.width)*map.tilewidth, math.floor((j-1)/layer.width)*map.tileheight, number))-- , i == 1, tilemap, getTile(number, map.tilewidth, map.tileheight)
             end
         end
     end
