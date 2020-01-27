@@ -62,17 +62,20 @@ function Player:update(dt)
         end
         if not love.keyboard.isDown(self.input.btJump) then
             self.jumpRepeat = false
-        else
-            if not self.jumpRepeat then
-                self.acel.y = default.acelYOnJump
-                self.vel.y = default.velYOnJump
-                self.jumpRepeat = true
-            end
+        elseif not self.jumpRepeat then
+            self.acel.y = default.acelYOnJump
+            self.vel.y = default.velYOnJump
+            self.jumpRepeat = true
         end
-    elseif self:isSlidingLeft() then
+    elseif self:isSliding() then
         self.vel.x = 0
-    elseif self:isSlidingRight() then
-        self.vel.x = 0
+        if not love.keyboard.isDown(self.input.btJump) then
+            self.jumpRepeat = false
+        elseif not self.jumpRepeat then
+            self.acel.y = default.acelYOnJump
+            self.vel.y = default.velYOnJump
+            self.jumpRepeat = true
+        end
     end
 
     -- After attributes-manipulation update
@@ -230,10 +233,11 @@ end
 
 function Player:calculatePosition(dt)
     self.vel.x = math.floor((self.vel.x * 0.95) + self.acel.x * dt)
+    
     self.vel.y = math.floor(( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y))
     self.vel.y = math.floor(self.vel.y < 1000 and self.vel.y or 1000)
     self.position.y = math.floor(self.position.y + self.vel.y * dt)
-    self.position.x = math.floor(self.position.x + self.vel.x * dt)
+    self.position.x = math.floor(self.position.x + self.direction*self.vel.x * dt)
 end
 
 function Player:moveUp(dt)
@@ -248,7 +252,7 @@ function Player:moveDown(dt)
 end
 
 function Player:moveLeft(dt)
-    self.acel.x = -default.velHoriz
+    self.acel.x = default.velHoriz
     if self.direction == 1 then
         self.position.x = self.position.x + self.hitbox.width*3
     end

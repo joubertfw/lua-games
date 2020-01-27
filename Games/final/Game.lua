@@ -128,14 +128,14 @@ function Game:update(dt)
         end
         player:setFalling()
        for i, tile in pairs(tiles) do
-           if tile:checkObjOnLeftSide(player.hitbox, nil, 32) and player.direction == 1 then
+           if tile:checkObjOnLeftSide(player.hitbox, nil, 32) then
                player.vel.x = 0
                --this prevents player from getting into the wall
                player.position.x = player.position.x - 0.15
                if not player:isOnFloor() then
                    player:setSlidingRight()
                end
-           elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) and player.direction == -1 then
+           elseif tile:checkObjOnRightSide(player.hitbox, nil, 32) then
                player.vel.x = 0
                --this prevents player from getting into the wall
                player.position.x = player.position.x + 0.15
@@ -202,8 +202,8 @@ function Game:draw()
     -- love.graphics.print("isHitted: " .. (skeletons[1].isHitted and 'true' or 'false'), 50, base + 50)
     -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
     -- love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
-    -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
-    -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
+    love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
+    love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
     --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
     --love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
     --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
@@ -261,7 +261,7 @@ function loadMap(number)
     map = require('assets/maps/Map'..number)
     tiles, backtiles = renderMap(map)
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
-    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
+    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png', 'backTiles')
 end
 
 function closeGame()
