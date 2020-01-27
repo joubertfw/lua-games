@@ -20,6 +20,17 @@ function love.load ()
     game = Game()
 end
 
+function love.conf(t)
+	t.console = true
+end
+
+function love.keypressed(key, u)
+    --Debug
+    if key == "rctrl" then --set to whatever key you want to use
+       debug.debug()
+    end
+ end
+
 function love.update(dt)
     game:update(dt)
 end
