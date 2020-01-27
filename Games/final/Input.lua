@@ -8,6 +8,7 @@ function Input:initialize(buttons)
         self.btDown = buttons.down or 'down'
         self.btJump = buttons.jump or 'space'
         self.btAttack = buttons.attack or 'p'
+        self.btInteract = buttons.interact or 'e'
     else
         self.btLeft = 'left'
         self.btRight = 'right'
@@ -15,5 +16,6 @@ function Input:initialize(buttons)
         self.btDown = 'down'
         self.btJump = 'space'
         self.btAttack = 'p'
+        self.btInteract = 'e'
     end
 end

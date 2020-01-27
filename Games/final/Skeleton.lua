@@ -55,7 +55,7 @@ function Skeleton:update(dt)
             self:animateIdle(dt)
         elseif self.dtWalking > 0 then
             if self.dtWalking == self.defaultDtWalking then
-                --this means it has been reset and must rotate    
+                --this means it has been reset and must rotate
                 self:rotate()
             end
             --walking

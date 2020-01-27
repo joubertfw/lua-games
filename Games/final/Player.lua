@@ -270,6 +270,10 @@ function Player:moveRight(dt)
     end
 end
 
+function Player:interacted()
+    return love.keyboard.isDown(self.input.btInteract)
+end
+
 function Player:isAttacking()
     return self.dtAttack > 0 and self.hitRepeat
 end

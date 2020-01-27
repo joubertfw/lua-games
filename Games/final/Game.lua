@@ -15,15 +15,13 @@ function initLevel1()
         table.insert(skeletons, spawnSkeleton(spawn))
     end
 
-    --[[
     npcs = {}
     npcSpawns = {
-        {x = screenDimensions.x*0.55, y = screenDimensions.y*0.78, type = 'archer', range = 3, stop = 1, config = {}}
+        {x = screenDimensions.x*0.5, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
     }
     for i, spawn in pairs(npcSpawns) do
-        table.insert(npcs, spawnNPC(spawn))
+        table.insert(npcs, spawnArcher(spawn))
     end
-    ]]
 
     --Items creation
     items = {
@@ -109,7 +107,17 @@ function Game:update(dt)
                 end
             end
         end
-        
+        for i, npc in pairs(npcs) do
+            npc:update(dt)
+            -- check if player is near the npc and if is interacting
+            if npc.hitbox:checkCollision(player.hitbox) and player:interacted() then
+                npc.isTalking = true
+            end
+            if npc.isTalking and 
+                util:distanceBetween(player.hitbox.x, player.hitbox.y, npc.hitbox.x, npc.hitbox.y) > 200 then
+                npc.isTalking = false
+            end
+        end
         for i, enemie in pairs(skeletons) do
             enemie:update(dt)
             if enemie:isAlreadyDead() then
@@ -184,6 +192,9 @@ function Game:draw()
         for i, enemie in pairs(skeletons) do
             enemie:draw()
         end
+        for i, npc in pairs(npcs) do
+            npc:draw()
+        end
         player:draw()
         camera:detach()
         for i = 0, player.lifes - 1 do
@@ -231,8 +242,8 @@ function spawnPlayer(player, i)
     player.vel.x = 0
 end
 
-function spawnNPC(spawn)
-    return NPC(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/'..spawn.type..'.png', spawn.config)
+function spawnArcher(spawn)
+    return NPC(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/'..spawn.type..'.png')
 end
 
 function spawnSkeleton(spawn)

@@ -3,7 +3,8 @@ local binser = require "lib.binser"
 local TSerial = require "lib.TSerial"
 
 function Util:initialize()
-
+    self.font = love.graphics.newFont('assets/fonts/vcr.ttf', 30)
+    self.smallerFont = love.graphics.newFont('assets/fonts/vcr.ttf', 25)
 end
 
 function Util:areVerticallyAligned(obj1, obj2)
@@ -12,6 +13,12 @@ end
 
 function Util:areHorizontallyAligned(obj1, obj2)
     return obj1.x < obj2.x + obj2.width and obj1.x + self.width > obj2.x
+end
+
+function Util:distanceBetween(x1, y1, x2, y2)
+    local dx = x1-x2
+    local dy = y1-y2
+    return math.sqrt((dx * dx + dy * dy))
 end
 
 
