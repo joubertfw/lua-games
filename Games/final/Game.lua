@@ -1,9 +1,6 @@
 Game = class('Game')
 
-function initState()
-    state = 'menu'
-    menu:reset()
-    
+function initLevel1()
     --Player creation
     spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*3.5}}
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
@@ -31,7 +28,6 @@ function initState()
     --Items creation
     items = {
         Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*1.9, screenDimensions.y*0.4, 'assets/image/misc/cacetinho.png'),
         Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
     }
 end
@@ -69,14 +65,9 @@ function Game:initialize()
         'assets/image/menu/selectionBox.png',
         0, 0
     )
-
-    -- Reading map files
-    -- map = jsonToMap('assets/maps/winter2.json')
-    map = require('assets/maps/Map1')
-    tiles, backtiles = renderMap(map)
-    tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
-    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
-    initState()
+    resetMenu()
+    loadMap(1)
+    initLevel1()
     camera = Camera(player.position.x, player.position.y)
     -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
@@ -166,14 +157,14 @@ function Game:update(dt)
     elseif state == 'gameWon' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
-            state = 'menu'
-            initState()
+            resetMenu()
+            initLevel1()
         end
     elseif state == 'gameOver' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
-            state = 'menu'
-            initState()
+            resetMenu()
+            initLevel1()
         end
     end
 end
@@ -228,6 +219,11 @@ function loseLife()
     end
 end
 
+function resetMenu()
+    state = 'menu'
+    menu:reset()
+end
+
 function spawnPlayer(player, i)
     player.position.x = spawnArea[i].x
     player.position.y = spawnArea[i].y
@@ -257,6 +253,15 @@ function renderMap(map)
         end
     end
     return tiles, backtiles
+end
+
+function loadMap(number)
+    -- Reading map files
+    -- map = jsonToMap('assets/maps/winter2.json')
+    map = require('assets/maps/Map'..number)
+    tiles, backtiles = renderMap(map)
+    tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
+    backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png')
 end
 
 function closeGame()
