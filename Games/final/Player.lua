@@ -232,12 +232,11 @@ function Player:animateSlide(dt)
 end
 
 function Player:calculatePosition(dt)
-    self.vel.x = math.floor((self.vel.x * 0.95) + self.acel.x * dt)
-    
-    self.vel.y = math.floor(( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y))
-    self.vel.y = math.floor(self.vel.y < 1000 and self.vel.y or 1000)
-    self.position.y = math.floor(self.position.y + self.vel.y * dt)
-    self.position.x = math.floor(self.position.x + self.direction*self.vel.x * dt)
+    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
+    self.vel.y = ( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y)
+    self.vel.y = self.vel.y < 1000 and self.vel.y or 1000
+    self.position.y = self.position.y + self.vel.y * dt
+    self.position.x = self.position.x + self.direction*self.vel.x * dt
 end
 
 function Player:moveUp(dt)
