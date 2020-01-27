@@ -243,7 +243,7 @@ function spawnPlayer(player, i)
 end
 
 function spawnArcher(spawn)
-    return NPC(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/'..spawn.type..'.png')
+    return Archer(spawn.x, spawn.y, spawn.direction, 'assets/image/npcs/'..spawn.type..'.png')
 end
 
 function spawnSkeleton(spawn)
