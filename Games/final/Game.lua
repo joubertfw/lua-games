@@ -1,33 +1,44 @@
 Game = class('Game')
 
-function initLevel1()
-    --Player creation
-    spawnArea = {{x = screenDimensions.x/9, y = screenDimensions.y*3.5}}
+function initLevel(level)
+    -- Just set the spawns for each level
+    if level == 1 then
+        --Player creation
+        playerSpawns = {{x = screenDimensions.x/9, y = screenDimensions.y*3.5}}
+
+        --Enemies creation
+        skeletonSpawns = {
+            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
+        }
+
+        npcSpawns = {
+            {x = screenDimensions.x*0.5, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
+        }
+
+        --Items creation
+        items = {
+            Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
+            Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
+        }
+    elseif level == 2 then
+
+    elseif level == 3 then
+
+    end
+    
+    -- Spawning
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
     spawnPlayer(player, 1)
 
-    --Enemies creation
     skeletons = {}
-    skeletonSpawns = {
-        {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
-    }
     for i, spawn in pairs(skeletonSpawns) do
         table.insert(skeletons, spawnSkeleton(spawn))
     end
 
     npcs = {}
-    npcSpawns = {
-        {x = screenDimensions.x*0.5, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
-    }
     for i, spawn in pairs(npcSpawns) do
         table.insert(npcs, spawnArcher(spawn))
     end
-
-    --Items creation
-    items = {
-        Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
-        Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
-    }
 end
 
 function Game:initialize()
@@ -65,7 +76,7 @@ function Game:initialize()
     )
     resetMenu()
     loadMap(1)
-    initLevel1()
+    initLevel(1)
     camera = Camera(player.position.x, player.position.y)
     -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
@@ -166,13 +177,13 @@ function Game:update(dt)
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             resetMenu()
-            initLevel1()
+            initLevel(1)
         end
     elseif state == 'gameOver' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             resetMenu()
-            initLevel1()
+            initLevel(1)
         end
     end
 end
@@ -236,8 +247,8 @@ function resetMenu()
 end
 
 function spawnPlayer(player, i)
-    player.position.x = spawnArea[i].x
-    player.position.y = spawnArea[i].y
+    player.position.x = playerSpawns[i].x
+    player.position.y = playerSpawns[i].y
     player.vel.y = 0
     player.vel.x = 0
 end
