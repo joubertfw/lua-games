@@ -27,12 +27,22 @@ function Tile:checkObjBelow(obj, innerRange, deadzone)
     innerRange = innerRange and innerRange or 0
     deadzone = deadzone and deadzone or 0
     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
-    return x2 + deadzone < x1 + w1 and
-        x2 + w2 - deadzone> x1 and
-        y2 > y1 and
-        y2 > y1 + h1 + innerRange and
-        y2 < y1 + h1
+    return x1 + deadzone < x2 + w2 and 
+        x1 + w1 - deadzone > x2 and
+        y2 <= (y1 + h1) + innerRange and
+        y2 > (y1 + h1) - innerRange
 end
+
+-- function Tile:checkObjBelow(obj, innerRange, deadzone)
+--     innerRange = innerRange and innerRange or 0
+--     deadzone = deadzone and deadzone or 0
+--     local x1, y1, w1, h1, x2, y2, w2, h2 = self.x, self.y, self.width, self.height, obj.x, obj.y, obj.width, obj.height
+--     return x2 + deadzone < x1 + w1 and
+--         x2 + w2 - deadzone> x1 and
+--         y2 > y1 and
+--         y2 > y1 + h1 + innerRange and
+--         y2 < y1 + h1
+-- end
 
 function Tile:checkObjOnLeftSide(obj, innerRange, deadzone)
     innerRange = innerRange and innerRange or 10

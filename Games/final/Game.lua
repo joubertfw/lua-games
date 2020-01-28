@@ -8,7 +8,10 @@ function initLevel(level)
 
         --Enemies creation
         skeletonSpawns = {
-            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
+            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
+            {x = screenDimensions.x*1.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
+            {x = screenDimensions.x*2.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
+            {x = screenDimensions.x*3.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
         }
 
         npcSpawns = {
@@ -17,10 +20,20 @@ function initLevel(level)
 
         --Items creation
         items = {
-            Item(screenDimensions.x, screenDimensions.y*0.95, 'assets/image/misc/cacetinho.png'),
-            Item(screenDimensions.x*3.2, screenDimensions.y*0.6, 'assets/image/misc/bomba.png', true)
+            Item(screenDimensions.x*1.2, screenDimensions.y*2.9, 'assets/image/misc/cacetinho.png'),            
         }
+		
     elseif level == 2 then
+        playerSpawns = {{x = screenDimensions.x + 50, y = screenDimensions.y*3.5}}
+        npcSpawns = {}
+        items = {
+            Item(screenDimensions.x*3.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png'),
+            -- Item(screenDimensions.x*3.2, screenDimensions.y*0.7, 'assets/image/misc/bomba.png', true)
+        }
+
+        skeletonSpawns = {
+            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
+        }
 
     elseif level == 3 then
 
@@ -74,9 +87,10 @@ function Game:initialize()
         'assets/image/menu/selectionBox.png',
         0, 0
     )
+    nivel = 1
     resetMenu()
-    loadMap(1)
-    initLevel(1)
+    loadMap(nivel)
+    initLevel(nivel)
     camera = Camera(player.position.x, player.position.y)
     -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
@@ -111,10 +125,9 @@ function Game:update(dt)
                 if item.isBomba then
                     state = 'gameWon'
                 else
-                    table.remove(items, i)
-                    player.isCacetinhoPowered = true
-                    player.isInvencible = true
-                    player:setInvencibleDt(true)
+                    nivel = nivel + 1                    
+                    loadMap(nivel)
+                    initLevel(nivel)
                 end
             end
         end
@@ -147,21 +160,28 @@ function Game:update(dt)
         end
         player:setFalling()
        for i, tile in pairs(tiles) do
+            if tile:checkObjBelow(player.hitbox, 10, 20) then
+                player.vel.y = 0                
+                --this prevents player from getting into the wall
+                player.position.y = player.position.y + 0.2
+            end
            if tile:checkObjOnLeftSide(player.hitbox, 32) then
                player.vel.x = 0
                --this prevents player from getting into the wall
-               player.position.x = player.position.x - 0.2
-               if not player:isOnFloor() then
+               player.position.x = player.position.x - 0.125
+               if not player:isOnFloor() and love.keyboard.isDown(player.input.btRight) then
                    player:setSlidingRight()
                end
-           elseif tile:checkObjOnRightSide(player.hitbox, 32) then
+            end
+           if tile:checkObjOnRightSide(player.hitbox, 32) then
                player.vel.x = 0
                --this prevents player from getting into the wall
-               player.position.x = player.position.x + 0.15
-               if not player:isOnFloor() then
+               player.position.x = player.position.x + 0.125
+               if not player:isOnFloor() and love.keyboard.isDown(player.input.btLeft) then
                    player:setSlidingLeft()
                end
-           elseif tile:checkObjOnTop(player.hitbox, 10, 10) then
+           end
+           if tile:checkObjOnTop(player.hitbox, 10, 10) then
                --this keeps the player always on same level when on floor
                player.position.y = tile.y - player.hitbox.height*1.3
                player:setOnFloor()
@@ -284,6 +304,10 @@ function loadMap(number)
     tiles, backtiles = renderMap(map)
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
     backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png', 'backTiles')
+end
+
+function advanceMap()
+
 end
 
 function closeGame()
