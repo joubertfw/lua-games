@@ -62,7 +62,7 @@ function Archer:draw()
         love.graphics.print('totalmente derrotadas...', posX + 5, posY + 55)
         love.graphics.print('Rápido! Recupere o cetro', posX + 5, posY + 80)
         love.graphics.print('do rei para que possamos', posX + 5, posY + 105)
-        love.graphics.print('batermos em retirada', posX + 5, posY + 130)
+        love.graphics.print('bater em retirada', posX + 5, posY + 130)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.setFont(util.font)
     end

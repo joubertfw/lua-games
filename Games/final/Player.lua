@@ -16,7 +16,7 @@ local default = {
     velHoriz = 1200,
     velVert = 1200,
     acelYOnJump = -1200,
-    velYOnJump = -800,
+    velYOnJump = -1400,
     acelYOnFall = 2000,
     dtAttack = 0.5,
     dtInvencible = 1.5,
@@ -76,6 +76,14 @@ function Player:update(dt)
             self.vel.y = default.velYOnJump
             self.jumpRepeat = true
         end
+    elseif not self:isOnFloor() and self.jumpRepeat == false then
+        if not love.keyboard.isDown(self.input.btJump) then
+            self.jumpRepeat = false
+        elseif not self.jumpRepeat then
+            self.acel.y = default.acelYOnJump
+            self.vel.y = default.velYOnJump
+            self.jumpRepeat = true
+        end
     end
 
     -- After attributes-manipulation update
@@ -96,7 +104,7 @@ function Player:update(dt)
 
     if self:isSliding() then
         self:animateSlide(dt)
-    elseif self.jumpRepeat then
+    elseif not self:isOnFloor() then
         self:animateJump(dt)
     end
 
@@ -125,18 +133,6 @@ function Player:draw()
     else
         self.image:draw(self.position.x, self.position.y, self.direction)
     end
-
-    -- love.graphics.points( self.hitbox.x, self.hitbox.y )
-    -- love.graphics.print( "y", self.hitbox.x, self.hitbox.y )
-
-    -- love.graphics.points(self.hitbox.x , self.hitbox.y + self.hitbox.height)
-    -- love.graphics.print( "y+h", self.hitbox.x + self.hitbox.width, self.hitbox.y + self.hitbox.height )
-    -- love.graphics.points( self.hurtbox.x, self.hurtbox.y )
-    -- love.graphics.print( "y", self.hurtbox.x, self.hurtbox.y )
-
-    -- love.graphics.points(self.hurtbox.x , self.hurtbox.y + self.hurtbox.height)
-    -- love.graphics.print( "y+h", self.hurtbox.x + self.hurtbox.width, self.hurtbox.y + self.hurtbox.height )
-
 end
 
 function Player:listenInput(dt)
@@ -170,7 +166,7 @@ function Player:listenInput(dt)
     end
 
     --Attack verification
-    if love.keyboard.isDown(self.input.btAttack) and not self.hitRepeat then
+    if love.keyboard.isDown(self.input.btAttack) and not self.hitRepeat and self:isOnFloor() then
         self.image.currentCol = 0
         self.dtAttack = default.dtAttack
         self.hitRepeat = true
@@ -179,6 +175,7 @@ function Player:listenInput(dt)
     if self.dtAttack > 0 then
         self:animateAttack(dt)
         self.dtAttack = self.dtAttack - dt
+        self.acel.x = 0
     elseif love.keyboard.isDown(self.input.btAttack) then
         self.hitRepeat = true
     else

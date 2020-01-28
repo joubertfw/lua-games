@@ -168,7 +168,7 @@ function Game:update(dt)
                break
            end
        end
-        if util:isOutOfScreen(player.hitbox, 'down', 1000000) then
+        if util:isOutOfScreen(player.hitbox, 'down', 10000) then
             loseLife()
             spawnPlayer(player, 1)
         end
