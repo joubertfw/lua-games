@@ -4,14 +4,14 @@ function initLevel(level)
     -- Just set the spawns for each level
     if level == 1 then
         --Player creation
-        playerSpawns = {{x = screenDimensions.x/9, y = screenDimensions.y*3.5}}
+        playerSpawns = {{x = 6 * 64, y = (map.height - 6) * 64}}
 
         --Enemies creation
         skeletonSpawns = {
-            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
-            {x = screenDimensions.x*1.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
-            {x = screenDimensions.x*2.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1},
-            {x = screenDimensions.x*3.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
+            {x = screenDimensions.x*0.66, y = (map.height - 8) * 64, range = 3, stop = 1, direction = 1},
+            {x = screenDimensions.x*1.66, y = (map.height - 13) * 64, range = 2, stop = 1, direction = 1},
+            {x = 31 * 64, y = 29 * 64, range = 4, stop = 1, direction = 1},
+            {x = screenDimensions.x*2.66, y = (map.height - 7) * 64, range = 1, stop = 1, direction = 1}
         }
 
         npcSpawns = {
@@ -20,28 +20,46 @@ function initLevel(level)
 
         --Items creation
         items = {
-            Item(screenDimensions.x*1.2, screenDimensions.y*2.9, 'assets/image/misc/cacetinho.png'),            
+            Item((map.width - 6) * 64, (map.height - 60) * 64, 'assets/image/misc/cacetinho.png'),
         }
 		
     elseif level == 2 then
-        playerSpawns = {{x = screenDimensions.x + 50, y = screenDimensions.y*3.5}}
+        playerSpawns = {{x = 4 * 64, y = (map.height - 6) * 64}}
         npcSpawns = {}
         items = {
-            Item(screenDimensions.x*3.2, screenDimensions.y*0.9, 'assets/image/misc/cacetinho.png'),
+            Item((map.width - 3) * 64, (map.height - 96) * 64, 'assets/image/misc/cacetinho.png'),
             -- Item(screenDimensions.x*3.2, screenDimensions.y*0.7, 'assets/image/misc/bomba.png', true)
         }
 
         skeletonSpawns = {
-            {x = screenDimensions.x*0.66, y = screenDimensions.y*3.38, range = 3, stop = 1, direction = 1}
+            {x = (map.width - 8) * 64, y = (map.height - 69) * 64, range = 1, stop = 1, direction = 1},
+            {x = (map.width - 21) * 64, y = (map.height - 26) * 64, range = 1, stop = 1, direction = 1}
         }
 
     elseif level == 3 then
+        skeletonSpawns = {
+            {x = 19 * 64, y = 40 * 64, range = 3, stop = 4, direction = 1},
+            {x = 29 * 64, y = 38 * 64, range = 1, stop = 2, direction = 1},
+            {x = 36 * 64, y = 23 * 64, range = 2, stop = 1, direction = 1},
+            {x = 20 * 64, y = 20 * 64, range = 3, stop = 3, direction = 1},
+            {x = 65 * 64, y = 45 * 64, range = 4, stop = 5, direction = 1},
+            {x = 53 * 64, y = 34 * 64, range = 1, stop = 6, direction = 1}
+        }
 
+        playerSpawns = {{x = 3 * 64, y = 42 * 64}}
+        npcSpawns = {}
+
+        items = {
+            Item((map.width - 4) * 64, (map.height - 4) * 64, 'assets/image/misc/bomba.png', true)
+        }
     end
     
-    -- Spawning
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
     spawnPlayer(player, 1)
+    
+    camera = Camera(player.position.x, player.position.y)
+    --camera:setBounds(0, 0, map.width * 64, map.height * 64)
+    -- Spawning
 
     skeletons = {}
     for i, spawn in pairs(skeletonSpawns) do
@@ -61,6 +79,7 @@ function Game:initialize()
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
 
     util = Util()
+    mapsName = {"Entrada Macabra", "Escadaria Quebrada", "Sala de prisao"}
 
     --Imgs
     backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
@@ -88,10 +107,12 @@ function Game:initialize()
         0, 0
     )
     nivel = 1
+    scoreTotal = 0
+    dtNivelNome = 0
     resetMenu()
     loadMap(nivel)
     initLevel(nivel)
-    camera = Camera(player.position.x, player.position.y)
+    
     -- camera:setBounds(0, 0, 6400, 1276) --cada tile tem 64x64
     camera:setFollowLerp(0.1)
     camera:setFollowStyle('PLATFORMER')
@@ -100,6 +121,10 @@ function Game:initialize()
 end
 
 function Game:update(dt)
+    if state == 'ingame' then
+        scoreTotal = scoreTotal + dt
+        dtNivelNome = dtNivelNome + dt
+    end
     fps = 1/dt
     if state == 'menu' then
         menu:update(dt)
@@ -128,6 +153,7 @@ function Game:update(dt)
                     nivel = nivel + 1                    
                     loadMap(nivel)
                     initLevel(nivel)
+                    dtNivelNome = 0
                 end
             end
         end
@@ -188,7 +214,7 @@ function Game:update(dt)
                break
            end
        end
-        if util:isOutOfScreen(player.hitbox, 'down', 10000) then
+        if util:isOutOfScreen(player.hitbox, 'down', map.height* 64) then
             loseLife()
             spawnPlayer(player, 1)
         end
@@ -208,7 +234,7 @@ function Game:update(dt)
     end
 end
 
-function Game:draw()
+function Game:draw(dt)
     love.graphics.draw(backgroundImg, 0, 0)
     
     if state == 'menu' then
@@ -234,10 +260,16 @@ function Game:draw()
         camera:draw()
     elseif state == 'gameWon' then
         love.graphics.draw(gameWonImg, 0, 0)
+        love.graphics.print("Seu tempo: " .. string.format("%.2f", scoreTotal), (screenDimensions.x/2) -100 , 400)
     elseif state == 'gameOver' then
         love.graphics.draw(gameOverImg, 0, 0)
+        love.graphics.print("Seu tempo: " .. string.format("%.2f", scoreTotal), (screenDimensions.x/2) -100 , 400)
     end
 
+    if dtNivelNome < 3 and state == 'ingame' then
+        love.graphics.print( mapsName[nivel], (screenDimensions.x/2) -100, 400)
+    end
+    
     -- DEBUG
     local base = 450
     -- love.graphics.print("isAttacking: " .. (player:isAttacking() and 'true' or 'false'), 50, base)
