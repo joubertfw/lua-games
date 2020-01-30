@@ -24,7 +24,7 @@ function initLevel(level)
         }
 		
     elseif level == 2 then
-        playerSpawns = {{x = 4 * 64, y = (map.height - 6) * 64}}
+        playerSpawns = {{x = 4 * 64, y = 93 * 64}}
         npcSpawns = {}
         items = {
             Item((map.width - 3) * 64, (map.height - 96) * 64, 'assets/image/misc/cacetinho.png'),
@@ -46,7 +46,7 @@ function initLevel(level)
             {x = 53 * 64, y = 34 * 64, range = 1, stop = 6, direction = 1}
         }
 
-        playerSpawns = {{x = 3 * 64, y = 42 * 64}}
+        playerSpawns = {{x = 3 * 64, y = 36 * 64}}
         npcSpawns = {}
 
         items = {
@@ -58,7 +58,7 @@ function initLevel(level)
     spawnPlayer(player, 1)
     
     camera = Camera(player.position.x, player.position.y)
-    --camera:setBounds(0, 0, map.width * 64, map.height * 64)
+    camera:setBounds(0, 0, map.width * 64, map.height * 64)
     -- Spawning
 
     skeletons = {}

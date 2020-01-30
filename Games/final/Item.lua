@@ -14,7 +14,7 @@ end
 
 function Item:draw()
     love.graphics.draw(self.image, self.x, self.y, 0, self.size, self.size)
-    love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
+    -- love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
 end
 
 function Item:checkCollision(other)
