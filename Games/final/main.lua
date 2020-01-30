@@ -1,8 +1,6 @@
 function love.load ()
     class = require('lib.middleclass')
     Camera = require 'lib.Camera'
-    json = require("Json")
-
     require('Game')
     require('CollisionBox')
     require('Util')
@@ -16,7 +14,7 @@ function love.load ()
     require('TileMap')
     require('Tile')
     require('Item')
-
+    push = require('Push')
     game = Game()
 end
 

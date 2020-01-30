@@ -55,10 +55,10 @@ function initLevel(level)
     end
     
     player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
-    spawnPlayer(player, 1)
+    spawnPlayer(player, 1)    
     
-    camera = Camera(player.position.x, player.position.y)
-    camera:setBounds(0, 0, map.width * 64, map.height * 64)
+    camera = Camera(player.position.x, player.position.y, screenDimensions.x, screenDimensions.y)
+    camera:setBounds(0, 0, map.width * 64,  map.height * 64)
     -- Spawning
 
     skeletons = {}
@@ -77,7 +77,8 @@ function Game:initialize()
     love.window.setMode(1920, 1080, {fullscreen = false})
     love.window.setTitle('Game Jam Final')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
-
+    windowWidth, windowHeight = love.window.getDesktopDimensions()
+    push:setupScreen(screenDimensions.x , screenDimensions.y, windowWidth, windowHeight, { fullscreen = true})
     util = Util()
     mapsName = {"Entrada Macabra", "Escadaria Quebrada", "Sala de prisao"}
 
@@ -235,6 +236,7 @@ function Game:update(dt)
 end
 
 function Game:draw(dt)
+    push:start()
     love.graphics.draw(backgroundImg, 0, 0)
     
     if state == 'menu' then
@@ -279,11 +281,13 @@ function Game:draw(dt)
     -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
     -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
     --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
-    --love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
+    -- love.graphics.print("height:  " .. windowHeight, 50, 300)
+    -- love.graphics.print("dim:    " .. screenDimensions.y, 50, 350)
     --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
     -- love.graphics.print("dtPunch:" .. player.dtPunch, 50, base + 400)
     -- love.graphics.print("currentCol:" .. player.image.currentCol, 50, base + 500)
 
+    push:finish()
 end
 
 function loseLife()
