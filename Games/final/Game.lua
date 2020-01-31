@@ -8,14 +8,14 @@ function initLevel(level)
 
         --Enemies creation
         skeletonSpawns = {
-            {x = screenDimensions.x*0.66, y = (map.height - 8) * 64, range = 3, stop = 1, direction = 1},
-            {x = screenDimensions.x*1.66, y = (map.height - 13) * 64, range = 2, stop = 1, direction = 1},
+            {x = 21 * 64, y = (map.height - 8) * 64, range = 3, stop = 1, direction = 1},
+            {x = 48 * 64, y = (map.height - 13) * 64, range = 2, stop = 1, direction = 1},
             {x = 31 * 64, y = 29 * 64, range = 4, stop = 1, direction = 1},
-            {x = screenDimensions.x*2.66, y = (map.height - 7) * 64, range = 1, stop = 1, direction = 1}
+            {x = 70 * 64, y = (map.height - 7) * 64, range = 1, stop = 1, direction = 1}
         }
 
         npcSpawns = {
-            {x = screenDimensions.x*0.5, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
+            {x = 16 * 64, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
         }
 
         --Items creation
@@ -28,7 +28,6 @@ function initLevel(level)
         npcSpawns = {}
         items = {
             Item((map.width - 3) * 64, (map.height - 96) * 64, 'assets/image/misc/cacetinho.png'),
-            -- Item(screenDimensions.x*3.2, screenDimensions.y*0.7, 'assets/image/misc/bomba.png', true)
         }
 
         skeletonSpawns = {
@@ -151,7 +150,7 @@ function Game:update(dt)
                 if item.isBomba then
                     state = 'gameWon'
                 else
-                    nivel = nivel + 1                    
+                    nivel = nivel + 1
                     loadMap(nivel)
                     initLevel(nivel)
                     dtNivelNome = 0
@@ -224,13 +223,13 @@ function Game:update(dt)
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             resetMenu()
-            initLevel(1)
+            nivel = 1
         end
     elseif state == 'gameOver' then
         --ingameTrack:stop()
         if love.keyboard.isDown('return') then
             resetMenu()
-            initLevel(1)
+            nivel = 1
         end
     end
 end
@@ -342,9 +341,6 @@ function loadMap(number)
     backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png', 'backTiles')
 end
 
-function advanceMap()
-
-end
 
 function closeGame()
     love.event.quit()
