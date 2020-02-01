@@ -13,7 +13,7 @@ local default = {
     attackCols = 7,
     deathCols = 7,
     rows = 6,
-    velHoriz = 1200,
+    velHoriz = 3000,
     velVert = 1200,
     acelYOnJump = -1200,
     velYOnJump = -1200,
@@ -28,7 +28,8 @@ function Player:initialize(x, y, imgPath, buttons)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
-    self.state = 'falling'
+    self.stateGround = 'falling'
+    self.stateSides = 'none'
     self.direction = 1
     self.jumpRepeat = false
 
@@ -50,7 +51,6 @@ function Player:initialize(x, y, imgPath, buttons)
 end
 
 function Player:update(dt)
-
     self.acel.y = default.acelYOnFall
     self:listenInput(dt)
 
@@ -68,7 +68,7 @@ function Player:update(dt)
             self.jumpRepeat = true
         end
     elseif self:isSliding() then
-        self.vel.x = 0
+        -- self.vel.x = 0
         if not love.keyboard.isDown(self.input.btJump) then
             self.jumpRepeat = false
         elseif not self.jumpRepeat then
@@ -229,11 +229,13 @@ function Player:animateSlide(dt)
 end
 
 function Player:calculatePosition(dt)
-    self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
+    self.vel.x = (self.vel.x * 0.90 ) + self.acel.x * dt* self.direction
     self.vel.y = ( self.acel.y * dt) + (self:isSliding() and self.vel.y  * default.atritoSlide or self.vel.y)
     self.vel.y = self.vel.y < 1000 and self.vel.y or 1000
     self.position.y = self.position.y + self.vel.y * dt
-    self.position.x = self.position.x + self.direction*self.vel.x * dt
+    if not self:isColliding() then
+        self.position.x = self.position.x + self.vel.x * dt
+    end
 end
 
 function Player:moveUp(dt)
@@ -253,7 +255,7 @@ function Player:moveLeft(dt)
         self.position.x = self.position.x + self.hitbox.width*3
     end
     if self:isFalling() and self.jumpRepeat then
-        self.acel.x = self.acel.x*2
+        self.acel.x = self.acel.x*1.3
     end
 end
 
@@ -263,7 +265,7 @@ function Player:moveRight(dt)
         self.position.x = self.position.x - self.hitbox.width*3
     end
     if self:isFalling() and self.jumpRepeat then
-        self.acel.x = self.acel.x*2
+        self.acel.x = self.acel.x*1.3
     end
 end
 
@@ -276,39 +278,47 @@ function Player:isAttacking()
 end
 
 function Player:isOnFloor()
-    return self.state == 'onFloor'
+    return self.stateGround == 'onFloor'
 end
 
 function Player:isFalling()
-    return self.state == 'falling'
+    return self.stateGround == 'falling'
 end
 
 function Player:setOnFloor()
-    self.state = 'onFloor'
+    self.stateGround = 'onFloor'
 end
 
 function Player:setFalling()
-    self.state = 'falling'
+    self.stateGround = 'falling'
+end
+
+function Player:isColliding()
+    return self.stateSides == 'colisionLeft' or self.stateSides == 'colisionRight'
 end
 
 function Player:isSliding()
-    return self.state == 'slidingLeft' or self.state == 'slidingRight'
+    return not self:isOnFloor() and (self.stateSides == 'colisionLeft' or self.stateSides == 'colisionRight')
 end
 
-function Player:isSlidingLeft()
-    return self.state == 'slidingLeft'
+function Player:colisionLeft()
+    return self.stateSides == 'colisionLeft'
 end
 
-function Player:isSlidingRight()
-    return self.state == 'slidingRight'
+function Player:colisionRight()
+    return self.stateSides == 'colisionRight'
 end
 
-function Player:setSlidingLeft()
-    self.state = 'slidingLeft'
+function Player:setColisionLeft()
+    self.stateSides = 'colisionLeft'
 end
 
-function Player:setSlidingRight()
-    self.state = 'slidingRight'
+function Player:setColisionRight()
+    self.stateSides = 'colisionRight'
+end
+
+function Player:setNoColision()
+    self.stateSides = 'none'
 end
 
 function Player:setInvencibleDt()

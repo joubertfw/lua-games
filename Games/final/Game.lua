@@ -1,5 +1,11 @@
 Game = class('Game')
 
+lastbutton = "none"
+ 
+function love.gamepadpressed(joystick, button)
+    lastbutton = button
+end
+
 function initLevel(level)
     -- Just set the spawns for each level
     if level == 1 then
@@ -185,35 +191,35 @@ function Game:update(dt)
             end
         end
         player:setFalling()
+        player:setNoColision()
        for i, tile in pairs(tiles) do
             if tile:checkObjBelow(player.hitbox, 10, 20) then
                 player.vel.y = 0                
                 --this prevents player from getting into the wall
-                player.position.y = player.position.y + 0.2
+                -- player.position.y = player.position.y + 0.2
+                --player.acel.y = 0
             end
-           if tile:checkObjOnLeftSide(player.hitbox, 32) then
+            if tile:checkObjOnTop(player.hitbox, 10, 10) then
+                --this keeps the player always on same level when on floor
+                player.position.y = tile.y - player.hitbox.height*1.3
+                player:setOnFloor()
+                -- break
+            end
+            if tile:checkObjOnLeftSide(player.hitbox, 32) then
                player.vel.x = 0
                --this prevents player from getting into the wall
-               player.position.x = player.position.x - 0.125
+               -- player.position.x = player.position.x - 0.125
                if not player:isOnFloor() and love.keyboard.isDown(player.input.btRight) then
-                   player:setSlidingRight()
+                   player:setColisionRight()
                end
             end
-           if tile:checkObjOnRightSide(player.hitbox, 32) then
+            if tile:checkObjOnRightSide(player.hitbox, 32) then
                player.vel.x = 0
-               --this prevents player from getting into the wall
-               player.position.x = player.position.x + 0.125
                if not player:isOnFloor() and love.keyboard.isDown(player.input.btLeft) then
-                   player:setSlidingLeft()
+                   player:setColisionLeft()
                end
-           end
-           if tile:checkObjOnTop(player.hitbox, 10, 10) then
-               --this keeps the player always on same level when on floor
-               player.position.y = tile.y - player.hitbox.height*1.3
-               player:setOnFloor()
-               break
-           end
-       end
+            end
+        end
         if util:isOutOfScreen(player.hitbox, 'down', map.height* 64) then
             loseLife()
             spawnPlayer(player, 1)
@@ -273,13 +279,16 @@ function Game:draw(dt)
     
     -- DEBUG
     local base = 450
+       love.graphics.print("Last gamepad button pressed: ".. lastbutton, 600, 50)
     -- love.graphics.print("isAttacking: " .. (player:isAttacking() and 'true' or 'false'), 50, base)
     -- love.graphics.print("isHitted: " .. (skeletons[1].isHitted and 'true' or 'false'), 50, base + 50)
     -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
-    -- love.graphics.print("dtPunch: " .. (player.dtPunch ), 50, base + 180)
-    -- love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
-    -- love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
-    --love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
+    love.graphics.print("state: " .. (player.stateSides ), 50, base + 300)
+    love.graphics.print("state: " .. (player.stateGround ), 50, base + 350)
+    love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
+    love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
+    love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
+    love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
     -- love.graphics.print("height:  " .. windowHeight, 50, 300)
     -- love.graphics.print("dim:    " .. screenDimensions.y, 50, 350)
     --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)

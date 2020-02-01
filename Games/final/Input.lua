@@ -9,6 +9,15 @@ function Input:initialize(buttons)
         self.btJump = buttons.jump or 'space'
         self.btAttack = buttons.attack or 'p'
         self.btInteract = buttons.interact or 'e'
+
+        self.btJoyLeft = buttons.joyLeft or 'dpleft'
+        self.btJoyRight = buttons.joyRight or 'dpright'
+        self.btJoyUp = buttons.joyUp or 'dpup'
+        self.btJoyDown = buttons.joyDown or 'dpdown'
+        self.btJoyJump = buttons.JoJump or 'a'
+        self.btJoyAttack = buttons.JoyAttack or 'x'
+        self.btJoyInteract = buttons.JoyInteract or 'y'
+
     else
         self.btLeft = 'left'
         self.btRight = 'right'
@@ -17,5 +26,13 @@ function Input:initialize(buttons)
         self.btJump = 'space'
         self.btAttack = 'p'
         self.btInteract = 'e'
+
+        self.btJoyLeft = 'dpleft'
+        self.btJoyRight = 'dpright'
+        self.btJoyUp = 'dpup'
+        self.btJoyDown = 'dpdown'
+        self.btJoyJump = 'a'
+        self.btJoyAttack = 'x'
+        self.btJoyInteract = 'y'
     end
 end
