@@ -14,9 +14,9 @@ function Input:initialize(buttons)
         self.btJoyRight = buttons.joyRight or 'dpright'
         self.btJoyUp = buttons.joyUp or 'dpup'
         self.btJoyDown = buttons.joyDown or 'dpdown'
-        self.btJoyJump = buttons.JoJump or 'a'
-        self.btJoyAttack = buttons.JoyAttack or 'x'
-        self.btJoyInteract = buttons.JoyInteract or 'y'
+        self.btJoyJump = buttons.joyJump or 'a'
+        self.btJoyAttack = buttons.joyAttack or 'x'
+        self.btJoyInteract = buttons.joyInteract or 'y'
 
     else
         self.btLeft = 'left'

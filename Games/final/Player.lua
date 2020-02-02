@@ -32,6 +32,7 @@ function Player:initialize(x, y, imgPath, buttons)
     self.stateSides = 'none'
     self.direction = 1
     self.jumpRepeat = false
+    self.joystick = love.joystick.getJoysticks()[1]
 
     -- Input
     self.input = Input(buttons)
@@ -60,30 +61,35 @@ function Player:update(dt)
             self.acel.y = 0
             self.vel.y = 0
         end
-        if not love.keyboard.isDown(self.input.btJump) then
-            self.jumpRepeat = false
-        elseif not self.jumpRepeat then
-            self.acel.y = default.acelYOnJump
-            self.vel.y = default.velYOnJump
-            self.jumpRepeat = true
-        end
+        self:resetJump()
+        self:jumpCheck()
+        -- if not love.keyboard.isDown(self.input.btJump) then
+        --     self.jumpRepeat = false
+        -- elseif not self.jumpRepeat then
+        --     self.acel.y = default.acelYOnJump
+        --     self.vel.y = default.velYOnJump
+        --     self.jumpRepeat = true
+        -- end
     elseif self:isSliding() then
         -- self.vel.x = 0
-        if not love.keyboard.isDown(self.input.btJump) then
-            self.jumpRepeat = false
-        elseif not self.jumpRepeat then
-            self.acel.y = default.acelYOnJump
-            self.vel.y = default.velYOnJump
-            self.jumpRepeat = true
-        end
+        self:resetJump()
+        -- if not love.keyboard.isDown(self.input.btJump) then
+        --     self.jumpRepeat = false
+        -- elseif not self.jumpRepeat then
+        --     self.acel.y = default.acelYOnJump
+        --     self.vel.y = default.velYOnJump
+        --     self.jumpRepeat = true
+        -- end
     elseif not self:isOnFloor() and self.jumpRepeat == false then
-        if not love.keyboard.isDown(self.input.btJump) then
-            self.jumpRepeat = false
-        elseif not self.jumpRepeat then
-            self.acel.y = default.acelYOnJump
-            self.vel.y = default.velYOnJump
-            self.jumpRepeat = true
-        end
+        self:resetJump()
+        self:jumpCheck()
+        -- if not love.keyboard.isDown(self.input.btJump) then
+        --     self.jumpRepeat = false
+        -- elseif not self.jumpRepeat then
+        --     self.acel.y = default.acelYOnJump
+        --     self.vel.y = default.velYOnJump
+        --     self.jumpRepeat = true
+        -- end
     end
 
     -- After attributes-manipulation update
@@ -94,12 +100,11 @@ function Player:update(dt)
     self.hurtbox:update(self.position.x + 110*self.direction, self.position.y + self.image.height/3, self.direction*self.image.width/3, self.image.height/2)
     
     --Idle animation
-    if not love.keyboard.isDown(self.input.btLeft)
-        and not love.keyboard.isDown(self.input.btRight) then
-            if self:isOnFloor() and not self:isAttacking() then
-                self:animateIdle(dt)
-            end
-            self.acel.x = 0
+    if not player:isMovingLeft() and not player:isMovingRight() then
+        if self:isOnFloor() and not self:isAttacking() then
+            self:animateIdle(dt)
+        end
+        self.acel.x = 0
     end
 
     if self:isSliding() then
@@ -136,14 +141,14 @@ function Player:draw()
 end
 
 function Player:listenInput(dt)
-    if love.keyboard.isDown(self.input.btLeft) and not love.keyboard.isDown(self.input.btRight) then
+    if self:isMovingLeft() and not self:isMovingRight() then
         self:moveLeft(dt)
         if not self:isAttacking() and not self:isFalling() then
             self:animateWalk(dt)
         end
         self.direction = -1
     end
-    if love.keyboard.isDown(self.input.btRight) and not love.keyboard.isDown(self.input.btLeft) then
+    if self:isMovingRight() and not self:isMovingLeft() then
         self:moveRight(dt)
         if not self:isAttacking() and not self:isFalling() then
             self:animateWalk(dt)
@@ -166,7 +171,7 @@ function Player:listenInput(dt)
     end
 
     --Attack verification
-    if love.keyboard.isDown(self.input.btAttack) and not self.hitRepeat and self:isOnFloor() then
+    if self:isAttackBt() and not self.hitRepeat and self:isOnFloor() then
         self.image.currentCol = 0
         self.dtAttack = default.dtAttack
         self.hitRepeat = true
@@ -176,7 +181,7 @@ function Player:listenInput(dt)
         self:animateAttack(dt)
         self.dtAttack = self.dtAttack - dt
         self.acel.x = 0
-    elseif love.keyboard.isDown(self.input.btAttack) then
+    elseif self:isAttackBt() then
         self.hitRepeat = true
     else
         self.hitRepeat = false
@@ -270,7 +275,7 @@ function Player:moveRight(dt)
 end
 
 function Player:interacted()
-    return love.keyboard.isDown(self.input.btInteract)
+    return player:isInteracting()
 end
 
 function Player:isAttacking()
@@ -323,4 +328,53 @@ end
 
 function Player:setInvencibleDt()
     self.dtInvencible = default.dtInvencible
+end
+
+function Player:resetJump()
+    if not self:isJumping() then
+        self.jumpRepeat = false
+    end
+end
+
+function Player:jumpCheck()
+    if not self.jumpRepeat and self:isJumping() then
+        self.acel.y = default.acelYOnJump
+        self.vel.y = default.velYOnJump
+        self.jumpRepeat = true
+    end
+end
+
+function Player:isMovingLeft()
+    if self.joystick then
+        return love.keyboard.isDown(self.input.btLeft) or self.joystick:isGamepadDown(self.input.btJoyLeft)
+    end
+    return love.keyboard.isDown(self.input.btLeft)
+end
+
+function Player:isMovingRight()
+    if self.joystick then
+        return love.keyboard.isDown(self.input.btRight) or self.joystick:isGamepadDown(self.input.btJoyRight)
+    end
+    return love.keyboard.isDown(self.input.btRight)
+end
+
+function Player:isAttackBt()
+    if self.joystick then
+        return love.keyboard.isDown(self.input.btAttack) or self.joystick:isGamepadDown(self.input.btJoyAttack)
+    end
+    return love.keyboard.isDown(self.input.btAttack)
+end
+
+function Player:isJumping()
+    if self.joystick then
+        return love.keyboard.isDown(self.input.btJump) or self.joystick:isGamepadDown(self.input.btJoyJump)
+    end
+    return love.keyboard.isDown(self.input.btJump)
+end
+
+function Player:isInteracting()
+    if self.joystick then
+        return love.keyboard.isDown(self.input.btInteract) or self.joystick:isGamepadDown(self.input.btJoyInteract)
+    end
+    return love.keyboard.isDown(self.input.btInteract)
 end

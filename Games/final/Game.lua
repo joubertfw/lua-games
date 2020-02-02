@@ -209,13 +209,13 @@ function Game:update(dt)
                player.vel.x = 0
                --this prevents player from getting into the wall
                -- player.position.x = player.position.x - 0.125
-               if not player:isOnFloor() and love.keyboard.isDown(player.input.btRight) then
+               if not player:isOnFloor() and player:isMovingRight() then
                    player:setColisionRight()
                end
             end
             if tile:checkObjOnRightSide(player.hitbox, 32) then
                player.vel.x = 0
-               if not player:isOnFloor() and love.keyboard.isDown(player.input.btLeft) then
+               if not player:isOnFloor() and player:isMovingLeft() then
                    player:setColisionLeft()
                end
             end
