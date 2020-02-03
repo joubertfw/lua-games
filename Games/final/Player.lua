@@ -4,7 +4,9 @@ Player = class('Player')
 --When overritten, all instances are affected
 local default = {
     quadWidth = 200,
-    quadHeight = 148,
+    quadHeight = 145,
+    width = 70,
+    height = 125,
     animVel = 5,
     idleCols = 4,
     walkCols = 6,
@@ -28,6 +30,7 @@ function Player:initialize(x, y, imgPath, buttons)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
+    self.width, self.height = default.width, default.height
     self.stateGround = 'falling'
     self.stateSides = 'none'
     self.direction = 1
@@ -96,8 +99,9 @@ function Player:update(dt)
     self:calculatePosition(dt)
     
     -- Collision boxes updates
-    self.hitbox:update(self.position.x + 70*self.direction, self.position.y + self.image.height/4.5, self.direction*self.image.width/3, self.image.height*0.75)
-    self.hurtbox:update(self.position.x + 110*self.direction, self.position.y + self.image.height/3, self.direction*self.image.width/3, self.image.height/2)
+    -- Change to fixed box size
+    self.hitbox:update(self.position.x - (self.width/2), self.position.y - (self.height/2), self.width, self.height)
+    self.hurtbox:update(self.position.x , self.position.y - (self.height/4), (self.direction * self.height), self.width)
     
     --Idle animation
     if not player:isMovingLeft() and not player:isMovingRight() then
@@ -256,9 +260,9 @@ end
 
 function Player:moveLeft(dt)
     self.acel.x = default.velHoriz
-    if self.direction == 1 then
-        self.position.x = self.position.x + self.hitbox.width*3
-    end
+    -- if self.direction == 1 then
+    --     self.position.x = self.position.x + self.hitbox.width*3
+    -- end
     if self:isFalling() and self.jumpRepeat then
         self.acel.x = self.acel.x*1.3
     end
@@ -266,9 +270,9 @@ end
 
 function Player:moveRight(dt)
     self.acel.x = default.velHoriz
-    if self.direction == -1 then
-        self.position.x = self.position.x - self.hitbox.width*3
-    end
+    -- if self.direction == -1 then
+    --     self.position.x = self.position.x - self.hitbox.width*3
+    -- end
     if self:isFalling() and self.jumpRepeat then
         self.acel.x = self.acel.x*1.3
     end

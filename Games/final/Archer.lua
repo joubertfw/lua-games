@@ -5,6 +5,8 @@ Archer = class('Archer')
 local default = {
     quadWidth = 300,
     quadHeight = 195,
+    width = 80,
+    height = 195,
     idleCols = 2,
     walkCols = 12,
     jumpCols = 6,
@@ -25,6 +27,7 @@ function Archer:initialize(x, y, direction, imgPath)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
+    self.width, self.height = default.width, default.height
     self.state = 'idle'
     self.direction = direction
 
@@ -32,7 +35,7 @@ function Archer:initialize(x, y, direction, imgPath)
     self.image = Image(imgPath, default)
     
     -- Attack and damage
-    self.hitbox = CollisionBox(self.position.x, self.position.y, self.image.width*self.direction, self.image.height)
+    self.hitbox = CollisionBox(0,0,0,0)
     self.dtDieAnimation = -default.dtDieAnimation/2
 
     self.isTalking = false
@@ -44,7 +47,7 @@ function Archer:update(dt)
     -- After attributes-manipulation update
     self:calculatePosition(dt)
 
-    self.hitbox:update(self.position.x + 90*self.direction, self.position.y + self.image.height/7, self.direction*self.image.width*0.2, self.image.height*0.85)
+    self.hitbox:update(self.position.x - (self.width/2), self.position.y - (self.height/2), self.width, self.height)
 end
 
 function Archer:draw()
@@ -111,7 +114,6 @@ end
 
 function Archer:rotate()
     self.direction = -self.direction
-    self.position.x = self.position.x - self.direction*self.image.width
 end
 
 function Archer:isWalking()

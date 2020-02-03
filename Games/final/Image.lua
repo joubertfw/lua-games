@@ -25,7 +25,7 @@ end
 
 function Image:draw(x, row, direction)
     if self.quadConfig then
-        love.graphics.draw(self.drawable, self.quad, x, row, 0, direction, 1)
+        love.graphics.draw(self.drawable, self.quad, x, row, 0, direction, 1, self.width/2, self.height/2)
     else
         love.graphics.draw(self.drawable, x, row, 0, direction, 1)
     end

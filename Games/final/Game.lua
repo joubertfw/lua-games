@@ -8,29 +8,30 @@ end
 
 function initLevel(level)
     -- Just set the spawns for each level
+    playerSpawn = {}
+    camera:setBounds(0, 0, map.width * 64,  map.height * 64)
     if level == 1 then
         --Player creation
-        playerSpawns = {{x = 6 * 64, y = (map.height - 6) * 64}}
+        playerSpawn = {x = 6 * 64, y = (map.height - 6) * 64}
 
         --Enemies creation
         skeletonSpawns = {
-            {x = 21 * 64, y = (map.height - 8) * 64, range = 3, stop = 1, direction = 1},
-            {x = 48 * 64, y = (map.height - 13) * 64, range = 2, stop = 1, direction = 1},
-            {x = 31 * 64, y = 29 * 64, range = 4, stop = 1, direction = 1},
-            {x = 70 * 64, y = (map.height - 7) * 64, range = 1, stop = 1, direction = 1}
+            {x = 21 * 64, y = (map.height - 6) * 64, range = 3, stop = 1, direction = 1},
+            {x = 48 * 64, y = (map.height - 11) * 64, range = 2, stop = 1, direction = 1},
+            {x = 31 * 64, y = 31 * 64, range = 4, stop = 1, direction = 1},
+            {x = 70 * 64, y = (map.height - 5) * 64, range = 1, stop = 1, direction = 1}
         }
 
         npcSpawns = {
-            {x = 16 * 64, y = screenDimensions.y*3.61, direction = -1, type = 'archer'}
+            {x = 16 * 64, y = (map.height - 2) * 64, direction = -1, type = 'archer'}
         }
 
         --Items creation
         items = {
             Item((map.width - 6) * 64, (map.height - 60) * 64, 'assets/image/misc/cacetinho.png'),
-        }
-		
+        }		
     elseif level == 2 then
-        playerSpawns = {{x = 4 * 64, y = 93 * 64}}
+        playerSpawn = {x = 2 * 64, y = 94 * 64}
         npcSpawns = {}
         items = {
             Item((map.width - 3) * 64, (map.height - 96) * 64, 'assets/image/misc/cacetinho.png'),
@@ -40,31 +41,25 @@ function initLevel(level)
             {x = (map.width - 8) * 64, y = (map.height - 69) * 64, range = 1, stop = 1, direction = 1},
             {x = (map.width - 21) * 64, y = (map.height - 26) * 64, range = 1, stop = 1, direction = 1}
         }
-
     elseif level == 3 then
         skeletonSpawns = {
-            {x = 19 * 64, y = 40 * 64, range = 3, stop = 4, direction = 1},
-            {x = 29 * 64, y = 38 * 64, range = 1, stop = 2, direction = 1},
-            {x = 36 * 64, y = 23 * 64, range = 2, stop = 1, direction = 1},
-            {x = 20 * 64, y = 20 * 64, range = 3, stop = 3, direction = 1},
-            {x = 65 * 64, y = 45 * 64, range = 4, stop = 5, direction = 1},
-            {x = 53 * 64, y = 34 * 64, range = 1, stop = 6, direction = 1}
+            {x = 17 * 64, y = 40 * 64, range = 3, stop = 4, direction = 1},
+            {x = 27 * 64, y = 38 * 64, range = 1, stop = 2, direction = 1},
+            {x = 34 * 64, y = 23 * 64, range = 2, stop = 1, direction = 1},
+            {x = 18 * 64, y = 20 * 64, range = 3, stop = 3, direction = 1},
+            {x = 63 * 64, y = 45 * 64, range = 4, stop = 5, direction = 1},
+            {x = 51 * 64, y = 34 * 64, range = 1, stop = 6, direction = 1}
         }
 
-        playerSpawns = {{x = 3 * 64, y = 36 * 64}}
+        playerSpawn = {x = 1 * 64, y = 36 * 64}
         npcSpawns = {}
 
         items = {
             Item((map.width - 4) * 64, (map.height - 4) * 64, 'assets/image/misc/bomba.png', true)
         }
     end
-    
-    player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
-    spawnPlayer(player, 1)    
-    
-    camera = Camera(player.position.x, player.position.y, screenDimensions.x, screenDimensions.y)
-    camera:setBounds(0, 0, map.width * 64,  map.height * 64)
     -- Spawning
+    spawnPlayer(player, level)
 
     skeletons = {}
     for i, spawn in pairs(skeletonSpawns) do
@@ -79,6 +74,7 @@ end
 
 function Game:initialize()
     -- Window configuration
+    playerSpawn = {x = 1 * 64, y = 36 * 64}
     love.window.setMode(1920, 1080, {fullscreen = false})
     love.window.setTitle('Game Jam Final')
     screenDimensions = {x = love.graphics.getWidth(), y = love.graphics.getHeight()}
@@ -86,7 +82,8 @@ function Game:initialize()
     push:setupScreen(screenDimensions.x , screenDimensions.y, windowWidth, windowHeight, { fullscreen = true})
     util = Util()
     mapsName = {"Entrada Macabra", "Escadaria Quebrada", "Sala de prisao"}
-
+    player = Player(0, 0, 'assets/image/player/adventurer.png', {left = 'a', right = 'd', up = 'w', down = 's'})
+    camera = Camera(player.position.x, player.position.y, screenDimensions.x, screenDimensions.y)
     --Imgs
     backgroundImg = love.graphics.newImage("assets/image/scenario/sky.png")
     gameWonImg = love.graphics.newImage('assets/image/game_won.png')
@@ -194,14 +191,14 @@ function Game:update(dt)
         player:setNoColision()
        for i, tile in pairs(tiles) do
             if tile:checkObjBelow(player.hitbox, 10, 20) then
-                player.vel.y = 0                
+                player.vel.y = 0
                 --this prevents player from getting into the wall
                 -- player.position.y = player.position.y + 0.2
                 --player.acel.y = 0
             end
             if tile:checkObjOnTop(player.hitbox, 10, 10) then
                 --this keeps the player always on same level when on floor
-                player.position.y = tile.y - player.hitbox.height*1.3
+                player.position.y = tile.y - (player.hitbox.height/2)
                 player:setOnFloor()
                 -- break
             end
@@ -278,17 +275,22 @@ function Game:draw(dt)
     end
     
     -- DEBUG
-    local base = 450
-       love.graphics.print("Last gamepad button pressed: ".. lastbutton, 600, 50)
+    local base = 200
+    --    love.graphics.print("Last gamepad button pressed: ".. lastbutton, 600, 50)
+    love.graphics.print("pos.x:" .. player.position.x, 50, base + 50)
+    love.graphics.print("spawn x:" .. playerSpawn.x, 50, base + 100)
+    
+    love.graphics.print("pos.y:" .. player.position.y, 50, base + 150)
+    love.graphics.print("spawn y:" .. playerSpawn.y, 50, base + 200)
+    love.graphics.print("nivel: " .. nivel, 50, base + 300)
+    love.graphics.print("state: " .. state, 50, base + 350)
+    
+    -- love.graphics.print("state: " .. (player.stateSides ), 50, base + 300)
+    -- love.graphics.print("state: " .. (player.stateGround ), 50, base + 350)
+
     -- love.graphics.print("isAttacking: " .. (player:isAttacking() and 'true' or 'false'), 50, base)
     -- love.graphics.print("isHitted: " .. (skeletons[1].isHitted and 'true' or 'false'), 50, base + 50)
     -- love.graphics.print("hitRepeat: " .. (player.hitRepeat and 'true' or 'false'), 50, base + 100)
-    love.graphics.print("state: " .. (player.stateSides ), 50, base + 300)
-    love.graphics.print("state: " .. (player.stateGround ), 50, base + 350)
-    love.graphics.print("acel.x:" .. player.acel.x, 50, base + 50)
-    love.graphics.print("vel.x:" .. player.vel.x, 50, base + 100)
-    love.graphics.print("acel.y:" .. player.acel.y, 50, base + 200)
-    love.graphics.print("vel.y:" .. player.vel.y, 50, base + 250)
     -- love.graphics.print("height:  " .. windowHeight, 50, 300)
     -- love.graphics.print("dim:    " .. screenDimensions.y, 50, 350)
     --love.graphics.print("jumpRepeat:" .. (player.jumpRepeat  and 'true' or 'false'), 50, base + 300)
@@ -311,8 +313,8 @@ function resetMenu()
 end
 
 function spawnPlayer(player, i)
-    player.position.x = playerSpawns[i].x
-    player.position.y = playerSpawns[i].y
+    player.position.x = playerSpawn.x
+    player.position.y = playerSpawn.y
     player.vel.y = 0
     player.vel.x = 0
 end
@@ -349,7 +351,6 @@ function loadMap(number)
     tilemap = TileMap(tiles, 'assets/maps/Tileset.png')
     backTilemap = TileMap(backtiles, 'assets/maps/Tileset.png', 'backTiles')
 end
-
 
 function closeGame()
     love.event.quit()

@@ -21,13 +21,16 @@ function CollisionBox:update(x, y, width, height)
 end
 
 function CollisionBox:draw()
-    -- if self:isHitBox() then
-    --     love.graphics.setColor(1, 0, 0)
-    -- else
-    --     love.graphics.setColor(1, 1, 1)
-    -- end
-    -- love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
-    -- love.graphics.setColor(1, 1, 1, 1)
+    if self:isHitBox() then
+        love.graphics.setColor(1, 0, 0)
+    else
+        love.graphics.setColor(1, 1, 1)
+    end
+    love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
+    love.graphics.setPointSize( 5)
+    love.graphics.points(self.x, self.y)
+    love.graphics.points(self.x + self.width, self.y + self.height)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function CollisionBox:checkCollision(other)

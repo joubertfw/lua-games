@@ -4,7 +4,9 @@ Skeleton = class('Skeleton')
 --When overritten, all instances are affected
 local default = {
     quadWidth = 256,
-    quadHeight = 192,
+    quadHeight = 126,
+    width = 64,
+    height = 128,
     animVel = 3,
     idleCols = 4,
     walkCols = 6,
@@ -23,6 +25,7 @@ function Skeleton:initialize(x, y, direction, imgPath, dtWalking, idleTime)
     self.position = {x = x, y = y}
     self.vel = {x = 0, y = 0}
     self.acel = {x = 0, y = 0}
+    self.width, self.height = default.width, default.height
     self.state = 'walking'
     self.direction = -direction
     self.defaultDtWalking = dtWalking
@@ -71,12 +74,12 @@ function Skeleton:update(dt)
     -- After attributes-manipulation update
     self:calculatePosition(dt)
 
-    self.hitbox:update(self.position.x + 65*self.direction, self.position.y + self.image.height/2.6, self.direction*self.image.width/6, self.image.height*0.6)
+    self.hitbox:update(self.position.x - (self.width/2), self.position.y - (self.height/2), self.width, self.height)
 end
 
 function Skeleton:draw()
     self.hitbox:draw()
-    self.image:draw(self.position.x, self.position.y, self.direction)
+    self.image:draw(self.position.x + ((self.width/2)*self.direction), self.position.y, self.direction)
 end
 
 function Skeleton:wasHitted(hurtBox)
@@ -98,8 +101,8 @@ function Skeleton:isAlreadyDead()
 end
 
 function Skeleton:calculatePosition(dt)
-    self.vel.y = (self.vel.y * 0.95) + self.acel.y * dt
-    self.position.y = self.position.y + self.vel.y * dt
+    -- self.vel.y = (self.vel.y * 0.95) + self.acel.y * dt
+    -- self.position.y = self.position.y + self.vel.y * dt
     self.vel.x = (self.vel.x * 0.95) + self.acel.x * dt
     self.position.x = self.position.x + self.vel.x * dt
 end
@@ -145,7 +148,6 @@ end
 
 function Skeleton:rotate()
     self.direction = -self.direction
-    self.position.x = self.position.x - self.direction*self.image.width/1.5
 end
 
 function Skeleton:isWalking()
